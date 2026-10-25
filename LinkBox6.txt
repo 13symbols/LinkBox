@@ -1,0 +1,1749 @@
+```html
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#ECEAE4" id="meta-theme-color">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="application-name" content="LinkBox">
+    <title>LinkBox // Smart Link Organizer</title>
+    <link rel="manifest" id="pwa-manifest">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* 1. СВЕТЛАЯ ТЕМА ПО УМОЛЧАНИЮ */
+        :root {
+            --bg-body: #ECEAE4;
+            --text-main: #141413;
+            --text-muted: #6E6B64;
+            --bg-surface: #F6F4EE;
+            --bg-header: rgba(236, 234, 228, 0.94);
+            --border-main: #D6D3C9;
+            --bg-input: #E2E0D8;
+            --bg-card: #FAF9F5;
+            --icon-stroke: #141413;
+        }
+
+        /* 2. ТЁМНАЯ ТЕМА: Мягкий сланец («золотая середина») */
+        body[data-theme="dim"] {
+            --bg-body: #2C2C28;
+            --text-main: #F5F2EB;
+            --text-muted: #B0ACA2;
+            --bg-surface: #363631;
+            --bg-header: rgba(44, 44, 40, 0.94);
+            --border-main: #484842;
+            --bg-input: #242420;
+            --bg-card: #383833;
+            --icon-stroke: #F5F2EB;
+        }
+
+        /* 3. ЧЁРНАЯ ТЕМА (AMOLED) */
+        body[data-theme="oled"] {
+            --bg-body: #0A0A09;
+            --text-main: #F2EFE9;
+            --text-muted: #827F78;
+            --bg-surface: #141412;
+            --bg-header: rgba(10, 10, 9, 0.95);
+            --border-main: #242420;
+            --bg-input: #1C1C19;
+            --bg-card: #141412;
+            --icon-stroke: #F2EFE9;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            user-select: none;
+            transition: background-color 0.2s ease, color 0.2s ease;
+            padding-bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px));
+            overscroll-behavior-y: none;
+        }
+        /* Жёсткая блокировка скролла фона при открытой шторке */
+        body.sheet-locked {
+            overflow: hidden !important;
+            touch-action: none;
+        }
+
+        .font-mono-code { font-family: 'JetBrains Mono', monospace; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .theme-surface { background-color: var(--bg-surface); border-color: var(--border-main); }
+        .theme-header { background-color: var(--bg-header); border-color: var(--border-main); }
+        .theme-input { background-color: var(--bg-input); color: var(--text-main); }
+        .theme-card { background-color: var(--bg-card); border-color: var(--border-main); }
+        .theme-muted { color: var(--text-muted); }
+
+        /* Строгие минималистичные иконки одной линией */
+        .mono-icon {
+            stroke: var(--icon-stroke);
+            fill: none;
+            stroke-width: 1.75;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .key-press { transition: transform 0.12s ease, opacity 0.12s ease; }
+        .key-press:active { transform: scale(0.97); }
+
+        /* Плавные шторки снизу со стягиванием пальцем */
+        .sheet-backdrop {
+            transition: opacity 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+            opacity: 0;
+            overscroll-behavior: contain;
+        }
+        .sheet-panel {
+            transform: translateY(100%);
+            transition: transform 0.34s cubic-bezier(0.16, 1, 0.3, 1);
+            overscroll-behavior: contain;
+        }
+        .sheet-backdrop.open { opacity: 1; }
+        .sheet-backdrop.open .sheet-panel { transform: translateY(0); }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <!-- ШАПКА: Нажатие на логотип и название сбрасывает все фильтры и возвращает ко ВСЕМ ссылкам -->
+    <header class="sticky top-0 z-40 theme-header backdrop-blur-md border-b px-4 py-3">
+        <div class="max-w-4xl mx-auto flex items-center justify-between gap-3">
+            
+            <!-- Левый блок: Кнопка Домой (Логотип + Название + Количество ссылок) -->
+            <div onclick="resetToAllLinks()" title="Показати всі посилання" class="key-press flex items-center gap-3 min-w-0 cursor-pointer">
+                <div class="w-10 h-10 rounded-lg bg-[#141413] flex items-center justify-center shrink-0 p-1.5">
+                    <svg viewBox="0 0 100 100" class="w-full h-full">
+                        <circle cx="50" cy="50" r="37" fill="none" stroke="#D96B27" stroke-width="11"/>
+                        <path d="M 16 64 Q 24 77 38 82" fill="none" stroke="#F6F4EE" stroke-width="11"/>
+                        <path d="M 84 36 Q 76 23 62 18" fill="none" stroke="#F6F4EE" stroke-width="11"/>
+                        <circle cx="50" cy="50" r="30.5" fill="none" stroke="#141413" stroke-width="3.5"/>
+                        <circle cx="50" cy="50" r="23" fill="none" stroke="#F6F4EE" stroke-width="11"/>
+                        <path d="M 29 40 A 23 23 0 0 0 45 72" fill="none" stroke="#D96B27" stroke-width="11" stroke-linecap="round"/>
+                        <path d="M 71 60 A 23 23 0 0 0 55 28" fill="none" stroke="#D96B27" stroke-width="11" stroke-linecap="round"/>
+                        <circle cx="50" cy="50" r="16.5" fill="#141413"/>
+                    </svg>
+                </div>
+                <div class="flex items-center gap-2 min-w-0">
+                    <h1 class="text-lg sm:text-xl font-black tracking-tight uppercase truncate">LinkBox</h1>
+                    <span id="total-count-pill" class="text-xs font-mono-code font-bold px-2 py-0.5 rounded-md bg-[#D96B27] text-white shrink-0">
+                        6
+                    </span>
+                    <span id="active-filter-pill" class="hidden text-[11px] font-mono-code font-bold px-2 py-0.5 rounded-md theme-input truncate max-w-[130px] sm:max-w-[200px]"></span>
+                </div>
+            </div>
+
+            <!-- Правый блок: Кнопка массового выбора + Кнопка Меню -->
+            <div class="flex items-center gap-2 shrink-0">
+                <button onclick="toggleSelectMode()" id="select-mode-btn" title="Масовий вибір та видалення" class="key-press w-10 h-10 rounded-lg theme-input flex items-center justify-center transition">
+                    <svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24">
+                        <polyline points="9 11 12 14 22 4"/>
+                        <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+                    </svg>
+                </button>
+                <button onclick="openMenuSheet()" class="key-press h-10 px-4 rounded-lg theme-input flex items-center gap-2 font-bold text-sm hover:opacity-90 transition">
+                    <svg class="w-5 h-5 mono-icon" viewBox="0 0 24 24">
+                        <line x1="3" y1="7" x2="21" y2="7"/>
+                        <line x1="3" y1="12" x2="21" y2="12"/>
+                        <line x1="3" y1="17" x2="15" y2="17"/>
+                    </svg>
+                    <span id="btn-menu-label">Меню</span>
+                </button>
+            </div>
+
+        </div>
+    </header>
+
+    <!-- ГЛАВНЫЙ КОНТЕЙНЕР -->
+    <main class="max-w-4xl mx-auto px-4 py-4 space-y-4">
+
+        <!-- Строка ввода ссылок: поле и кнопка ИИ -->
+        <div class="flex items-stretch gap-2">
+            <input id="url-input" type="text" onkeydown="if(event.key==='Enter') addLinkByAI()" placeholder="Посилання або список посилань для ІІ..." class="flex-1 theme-card border rounded-lg px-4 py-3 text-base outline-none font-medium focus:border-[#D96B27] transition">
+            <button onclick="addLinkByAI()" class="key-press bg-[#D96B27] hover:bg-[#c55d1d] text-white font-black text-sm px-5 rounded-lg flex items-center justify-center gap-2 shrink-0">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 3v18M3 12h18M5.6 5.6l12.8 12.8M18.4 5.6L5.6 18.4"/>
+                </svg>
+                <span>ІІ</span>
+            </button>
+        </div>
+
+        <!-- Панель массового выбора и удаления (появляется только в режиме выбора) -->
+        <div id="bulk-action-bar" class="hidden theme-card border border-[#D96B27] rounded-xl p-3 items-center justify-between gap-2">
+            <div class="flex items-center gap-2">
+                <button onclick="selectAllVisible()" class="key-press px-3 py-1.5 rounded-lg theme-input text-xs font-bold" id="btn-select-all">
+                    Вибрати всі
+                </button>
+                <span id="selected-count-label" class="text-xs font-mono-code font-bold theme-muted">0 вибрано</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <button onclick="deleteSelectedItems()" class="key-press px-3.5 py-1.5 rounded-lg bg-rose-500 text-white text-xs font-extrabold" id="btn-delete-selected">
+                    Видалити вибрані
+                </button>
+                <button onclick="toggleSelectMode()" class="key-press px-3 py-1.5 rounded-lg theme-input text-xs font-bold" id="btn-cancel-select">
+                    Скасувати
+                </button>
+            </div>
+        </div>
+
+        <!-- Карточки -->
+        <div id="cards-container">
+            <!-- Заполняется через JS -->
+        </div>
+
+    </main>
+
+    <!-- ШТОРКА «МЕНЮ» -->
+    <div id="menu-sheet-modal" onclick="if(event.target===this) closeMenuSheet()" class="sheet-backdrop fixed inset-0 bg-black/60 z-50 hidden items-end justify-center p-0 sm:p-4">
+        <div id="menu-sheet-panel" class="sheet-panel theme-surface w-full max-w-md rounded-t-2xl sm:rounded-xl p-5 border-t sm:border space-y-5 max-h-[88vh] overflow-y-auto">
+            
+            <!-- Полосочка для стягивания вниз -->
+            <div id="menu-drag-handle" class="w-12 h-2 bg-stone-400/50 rounded-full mx-auto -mt-1 cursor-grab active:cursor-grabbing touch-none"></div>
+            
+            <!-- Шапка Меню -->
+            <div class="flex items-center justify-between">
+                <span class="font-black text-base uppercase tracking-tight" id="menu-title-label">Меню</span>
+                <button onclick="closeMenuSheet()" class="key-press w-9 h-9 rounded-lg theme-input flex items-center justify-center">
+                    <svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24">
+                        <path d="M18 6L6 18M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- СТРОКА 1: Поиск + Кнопка Рандомайзера -->
+            <div class="flex items-stretch gap-2">
+                <div class="flex-1 flex items-center theme-input rounded-lg px-3.5 py-2.5">
+                    <svg class="w-4 h-4 mono-icon mr-2.5 shrink-0 opacity-70" viewBox="0 0 24 24">
+                        <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/>
+                    </svg>
+                    <input id="search-input" oninput="renderApp()" type="text" placeholder="Пошук..." class="w-full bg-transparent text-sm sm:text-base outline-none font-medium">
+                </div>
+                <button onclick="openRandomLink()" title="Випадкове посилання" class="key-press px-4 rounded-lg theme-input flex items-center justify-center gap-2 font-bold text-xs hover:opacity-80 shrink-0">
+                    <svg class="w-5 h-5 mono-icon" viewBox="0 0 24 24">
+                        <polyline points="16 3 21 3 21 8"/>
+                        <line x1="4" y1="20" x2="21" y2="3"/>
+                        <polyline points="21 16 21 21 16 21"/>
+                        <line x1="15" y1="15" x2="21" y2="21"/>
+                        <line x1="4" y1="4" x2="9" y2="9"/>
+                    </svg>
+                    <span id="btn-random-label">Рандом</span>
+                </button>
+            </div>
+
+            <!-- СТРОКА 2: Раскладка и Тема -->
+            <div class="grid grid-cols-12 gap-2">
+                <!-- Переключатель вида (7 колонок) -->
+                <div class="col-span-7 grid grid-cols-3 gap-1 p-1 rounded-lg theme-input">
+                    <button onclick="setLayoutMode('small')" id="layout-small-btn" title="Малі картки" class="key-press py-2 rounded-md flex items-center justify-center gap-1.5 text-xs font-bold transition">
+                        <svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+                    </button>
+                    <button onclick="setLayoutMode('large')" id="layout-large-btn" title="Великі картки" class="key-press py-2 rounded-md flex items-center justify-center gap-1.5 text-xs font-bold transition">
+                        <svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="6"/><rect x="3" y="14" width="18" height="6"/></svg>
+                    </button>
+                    <button onclick="setLayoutMode('list')" id="layout-list-btn" title="Список" class="key-press py-2 rounded-md flex items-center justify-center gap-1.5 text-xs font-bold transition">
+                        <svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+                    </button>
+                </div>
+
+                <!-- Переключатель тем (5 колонок) -->
+                <div class="col-span-5 grid grid-cols-3 gap-1 p-1 rounded-lg theme-input">
+                    <button onclick="setThemeMode('light')" id="theme-light-btn" title="Світла тема" class="key-press py-2 rounded-md flex items-center justify-center transition">
+                        <svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="4"/>
+                            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+                        </svg>
+                    </button>
+                    <button onclick="setThemeMode('dim')" id="theme-dim-btn" title="Темна тема" class="key-press py-2 rounded-md flex items-center justify-center transition">
+                        <svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                        </svg>
+                    </button>
+                    <button onclick="setThemeMode('device')" id="theme-device-btn" title="AMOLED" class="key-press py-2 rounded-md flex items-center justify-center transition">
+                        <svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="8"/>
+                            <path d="M12 4a8 8 0 0 0 0 16Z" fill="currentColor" stroke="none"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- СТРОКА 3: ПАПКИ / КАТЕГОРИИ -->
+            <div class="space-y-2">
+                <div class="flex items-center justify-between">
+                    <span class="text-[11px] font-mono-code font-bold uppercase theme-muted" id="lbl-folders-section">Категорії</span>
+                </div>
+                <div id="folders-grid" class="grid grid-cols-2 gap-1.5 max-h-56 overflow-y-auto overscroll-contain pr-0.5">
+                    <!-- Заполняется через JS -->
+                </div>
+            </div>
+
+            <!-- СТРОКА 4: ИИ-Импорт, Экспорт, Кнопка # (между Експорт и UA) и язык -->
+            <div class="flex items-center gap-2 pt-3 border-t border-black/10">
+                <input id="ai-import-file" type="file" accept=".html,.htm,.txt,.json,.csv" class="hidden" onchange="handleAIFileImport(event)">
+                <button onclick="triggerAIFileImport()" class="key-press flex-1 py-2.5 px-3 rounded-lg bg-[#D96B27] text-white text-xs font-black flex items-center justify-center gap-1.5">
+                    <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="17 8 12 3 7 8"/>
+                        <line x1="12" y1="3" x2="12" y2="15"/>
+                    </svg>
+                    <span id="btn-import-ai" class="truncate">Імпорт ІІ</span>
+                </button>
+                <button onclick="exportBrowserBookmarks()" class="key-press flex-1 py-2.5 px-3 rounded-lg theme-input text-xs font-bold flex items-center justify-center gap-1.5">
+                    <svg class="w-4 h-4 mono-icon shrink-0" viewBox="0 0 24 24">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="7 10 12 15 17 10"/>
+                        <line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                    <span id="btn-export-html" class="truncate">Експорт</span>
+                </button>
+                <!-- Аккуратная кнопка # между Експорт и UA -->
+                <button onclick="openTagsSheetFromMenu()" title="Усі хештеги #" class="key-press px-3.5 py-2.5 rounded-lg theme-input text-xs font-mono-code font-black flex items-center justify-center hover:text-[#D96B27] transition">
+                    #
+                </button>
+                <button onclick="toggleLang()" id="lang-btn" class="key-press px-3.5 py-2.5 rounded-lg theme-input text-xs font-mono-code font-bold">
+                    UA
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ШТОРКА «#ХЕШТЕГИ» -->
+    <div id="tags-sheet-modal" onclick="if(event.target===this) closeTagsSheet()" class="sheet-backdrop fixed inset-0 bg-black/60 z-50 hidden items-end justify-center p-0 sm:p-4">
+        <div id="tags-sheet-panel" class="sheet-panel theme-surface w-full max-w-md rounded-t-2xl sm:rounded-xl p-5 border-t sm:border space-y-4 max-h-[85vh] overflow-y-auto">
+            
+            <div id="tags-drag-handle" class="w-12 h-2 bg-stone-400/50 rounded-full mx-auto -mt-1 cursor-grab active:cursor-grabbing touch-none"></div>
+            
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <span class="w-7 h-7 rounded-lg bg-[#D96B27] text-white font-mono-code font-black text-sm flex items-center justify-center">#</span>
+                    <span class="font-black text-base uppercase tracking-tight" id="tags-sheet-title">Хештеги</span>
+                </div>
+                <button onclick="closeTagsSheet()" class="key-press w-9 h-9 rounded-lg theme-input flex items-center justify-center">
+                    <svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24">
+                        <path d="M18 6L6 18M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+
+            <div id="tags-cloud-container" class="flex flex-wrap gap-2 max-h-80 overflow-y-auto overscroll-contain py-1">
+                <!-- Заполняется через JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ШТОРКА РЕДАКТИРОВАНИЯ КАРТОЧКИ -->
+    <div id="edit-sheet-modal" onclick="if(event.target===this) closeEditSheet()" class="sheet-backdrop fixed inset-0 bg-black/60 z-50 hidden items-end justify-center p-0 sm:p-4">
+        <div id="edit-sheet-panel" class="sheet-panel theme-surface w-full max-w-md rounded-t-2xl sm:rounded-xl p-5 border-t sm:border space-y-4 max-h-[90vh] overflow-y-auto">
+            
+            <div id="edit-drag-handle" class="w-12 h-2 bg-stone-400/50 rounded-full mx-auto -mt-1 cursor-grab active:cursor-grabbing touch-none"></div>
+            
+            <div class="flex items-center justify-between gap-2">
+                <div class="flex items-center gap-2.5 min-w-0">
+                    <span id="sheet-favicon" class="w-9 h-9 rounded-lg flex items-center justify-center text-white shrink-0"></span>
+                    <div class="min-w-0">
+                        <h3 id="sheet-domain" class="text-sm font-mono-code font-bold truncate">domain.com</h3>
+                        <span id="sheet-date" class="text-xs font-mono-code theme-muted">24/10/26</span>
+                    </div>
+                </div>
+                <button onclick="closeEditSheet()" class="key-press w-9 h-9 rounded-lg theme-input flex items-center justify-center shrink-0">
+                    <svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24">
+                        <path d="M18 6L6 18M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Крупная кнопка Открыть в браузере -->
+            <div class="flex items-stretch gap-2">
+                <button id="sheet-open-btn" onclick="openSheetUrl()" class="key-press flex-1 py-3.5 px-4 rounded-lg bg-[#D96B27] text-white font-black text-sm sm:text-base flex items-center justify-center gap-2 transition">
+                    <span id="btn-open">Відкрити в браузері</span>
+                    <span id="sheet-open-icon" class="w-4 h-4 flex items-center justify-center"></span>
+                </button>
+                <button onclick="copySheetUrl()" title="Копіювати посилання" class="key-press w-12 rounded-lg theme-input flex items-center justify-center shrink-0">
+                    <svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24">
+                        <rect x="9" y="9" width="13" height="13" rx="1"/>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Переключатель блокировки прямого перехода для конкретной ссылки -->
+            <button type="button" onclick="toggleSheetItemLock()" id="sheet-lock-toggle" class="key-press w-full py-2.5 px-3.5 rounded-lg theme-input flex items-center justify-between text-xs font-bold transition">
+                <div class="flex items-center gap-2.5">
+                    <span id="sheet-lock-icon" class="w-4 h-4 flex items-center justify-center"></span>
+                    <span id="lbl-lock-link">Блокувати прямий перехід</span>
+                </div>
+                <span id="sheet-lock-state" class="font-mono-code text-[11px] px-2 py-0.5 rounded">OFF</span>
+            </button>
+
+            <div class="space-y-3">
+                <div>
+                    <label class="text-[11px] font-mono-code font-bold uppercase theme-muted">URL</label>
+                    <input id="sheet-url" type="url" class="w-full mt-1 theme-input rounded-lg px-3.5 py-2.5 text-sm font-mono-code outline-none">
+                </div>
+
+                <div>
+                    <label class="text-[11px] font-mono-code font-bold uppercase theme-muted" id="lbl-card-title">Назва</label>
+                    <input id="sheet-title" type="text" class="w-full mt-1 theme-input rounded-lg px-3.5 py-2.5 text-sm sm:text-base font-bold outline-none">
+                </div>
+
+                <div>
+                    <div class="flex items-center justify-between">
+                        <label class="text-[11px] font-mono-code font-bold uppercase theme-muted" id="lbl-note">Нотатка</label>
+                        <button onclick="regenerateAINote()" class="text-[11px] font-mono-code font-bold text-[#D96B27] hover:underline" id="btn-regen">Переписати ІІ</button>
+                    </div>
+                    <textarea id="sheet-note" rows="3" class="w-full mt-1 theme-input rounded-lg px-3.5 py-2.5 text-sm sm:text-base outline-none resize-none"></textarea>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2.5">
+                    <div>
+                        <label class="text-[11px] font-mono-code font-bold uppercase theme-muted" id="lbl-folder">Папка</label>
+                        <input id="sheet-cat" type="text" class="w-full mt-1 theme-input rounded-lg px-3.5 py-2.5 text-sm font-bold outline-none">
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-mono-code font-bold uppercase theme-muted" id="lbl-tags">#Теги</label>
+                        <input id="sheet-tags" type="text" class="w-full mt-1 theme-input rounded-lg px-3.5 py-2.5 text-sm font-mono-code outline-none">
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between pt-2">
+                <button onclick="deleteCurrentItem()" class="key-press px-4 py-2.5 rounded-lg bg-rose-500/15 text-rose-500 text-xs font-extrabold" id="btn-delete">Видалити</button>
+                <button onclick="saveSheet()" class="key-press px-6 py-2.5 rounded-lg bg-[#141413] text-white text-xs sm:text-sm font-extrabold" id="btn-save">Зберегти</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Тост уведомлений -->
+    <div id="action-toast" class="fixed bottom-4 inset-x-4 max-w-sm mx-auto bg-[#141413] text-[#F6F4EE] px-4 py-3 rounded-lg shadow-xl hidden items-center justify-between z-50 text-xs font-mono-code">
+        <span id="toast-message">Скопійовано</span>
+        <span class="text-[#D96B27] font-bold ml-3">OK</span>
+    </div>
+
+    <script>
+        let currentLang = 'uk';
+        let highlightedDuplicateId = null;
+        let isSelectMode = false;
+        let selectedIds = new Set();
+        let selectedFolder = 'ALL';
+        let selectedTag = null;
+        let viewMode = 'small';
+        let themeMode = 'light';
+        let editingId = null;
+        let sheetTempLocked = false;
+
+        const DICT = {
+            uk: {
+                menu: 'Меню',
+                random: 'Рандом',
+                foldersSection: 'Категорії',
+                tagsSheetTitle: 'Усі хештеги',
+                urlPlaceholder: 'Посилання або список посилань для ІІ...',
+                allFolders: 'Усі посилання',
+                importAi: 'Імпорт ІІ',
+                exportHtml: 'Експорт',
+                openMain: 'Відкрити',
+                openBrowser: 'Відкрити в браузері',
+                titleLabel: 'Назва',
+                noteLabel: 'Нотатка',
+                regenBtn: 'Переписати ІІ',
+                folderLabel: 'Папка',
+                tagsLabel: '#Теги',
+                deleteBtn: 'Видалити',
+                saveBtn: 'Зберегти',
+                copied: 'Скопійовано: ',
+                exported: 'Експортовано у .HTML',
+                saved: 'Збережено',
+                deleted: 'Видалено',
+                randomOpened: 'Випадкове: ',
+                lockToggleLabel: 'Блокувати прямий перехід',
+                lockedToast: 'Прямий перехід заблоковано (тільки копіювання)',
+                folderLockedToast: 'Папку заблоковано для прямих переходів',
+                folderUnlockedToast: 'Папку розблоковано',
+                allLockedRandom: 'Усі посилання заблоковані для прямого переходу',
+                duplicateFound: 'Дублікат! Вже є в базі: ',
+                aiAddedSingle: 'ІІ розібрав та додав у «{cat}» ✓',
+                aiImportReport: 'ІІ імпорт: +{added} нових (дублікатів: {dups})',
+                selectAll: 'Вибрати всі',
+                selectedCount: 'вибрано',
+                deleteSelected: 'Видалити вибрані',
+                cancelSelect: 'Скасувати',
+                bulkDeleted: 'Видалено карток: ',
+                homeReset: 'Показано всі посилання'
+            },
+            en: {
+                menu: 'Menu',
+                random: 'Random',
+                foldersSection: 'Categories',
+                tagsSheetTitle: 'All Hashtags',
+                urlPlaceholder: 'Link or multiple links for AI...',
+                allFolders: 'All links',
+                importAi: 'AI Import',
+                exportHtml: 'Export',
+                openMain: 'Open',
+                openBrowser: 'Open in browser',
+                titleLabel: 'Title',
+                noteLabel: 'Note',
+                regenBtn: 'Rewrite AI',
+                folderLabel: 'Folder',
+                tagsLabel: '#Tags',
+                deleteBtn: 'Delete',
+                saveBtn: 'Save',
+                copied: 'Copied: ',
+                exported: 'Exported to .HTML',
+                saved: 'Saved',
+                deleted: 'Deleted',
+                randomOpened: 'Random: ',
+                lockToggleLabel: 'Block direct open',
+                lockedToast: 'Direct open is blocked (copy only)',
+                folderLockedToast: 'Folder blocked for direct open',
+                folderUnlockedToast: 'Folder unblocked',
+                allLockedRandom: 'All links are blocked for direct open',
+                duplicateFound: 'Duplicate! Already exists: ',
+                aiAddedSingle: 'AI analyzed & added to "{cat}" ✓',
+                aiImportReport: 'AI Import: +{added} new ({dups} duplicates)',
+                selectAll: 'Select all',
+                selectedCount: 'selected',
+                deleteSelected: 'Delete selected',
+                cancelSelect: 'Cancel',
+                bulkDeleted: 'Deleted items: ',
+                homeReset: 'Showing all links'
+            }
+        };
+
+        function t(key) {
+            return DICT[currentLang][key] || key;
+        }
+
+        const LINE_ICONS = {
+            music: `<svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>`,
+            design: `<svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>`,
+            travel: `<svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20h18L12 4 3 20z"/><path d="M9.5 12L12 15l2.5-3"/></svg>`,
+            code: `<svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>`,
+            shop: `<svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>`,
+            video: `<svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>`,
+            news: `<svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8"/><path d="M15 18h-5"/><path d="M10 6h8v4h-8V6Z"/></svg>`,
+            book: `<svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>`,
+            social: `<svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>`,
+            finance: `<svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>`,
+            globe: `<svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>`,
+            lock: `<svg viewBox="0 0 24 24" class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>`,
+            unlock: `<svg viewBox="0 0 24 24" class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 7.4-2"/></svg>`,
+            extArrow: `<svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>`
+        };
+
+        let LOCKED_FOLDERS = new Set();
+
+        const DEFAULT_ITEMS = [
+            {
+                id: 1, name: 'Spotify', domain: 'spotify.com', url: 'https://open.spotify.com/playlist/synthwave2026',
+                title: 'Вечірній Синтвейв 2026', cat: 'Музика', date: '24/10/26',
+                color: '#3F6A4E',
+                note: 'Підбірка інструментального синтвейву без вокалу для нічного фокусу.',
+                tags: ['#музика', '#фокус'], svg: LINE_ICONS.music,
+                lockedOverride: null
+            },
+            {
+                id: 2, name: 'Behance', domain: 'behance.net', url: 'https://www.behance.net/gallery/fintech-light-ui',
+                title: 'Фінтех UI — Світлі теми', cat: 'Дизайн', date: '23/10/26',
+                color: '#3D5A78',
+                note: 'Кейс мобільного банкінгу з чистою типографікою та пастельною палітрою.',
+                tags: ['#дизайн', '#ui'], svg: LINE_ICONS.design,
+                lockedOverride: null
+            },
+            {
+                id: 3, name: 'Airbnb', domain: 'airbnb.com', url: 'https://www.airbnb.com/rooms/carpathians-aframe',
+                title: 'Будинок А-фрейм у Карпатах', cat: 'Поїздки', date: '21/10/26',
+                color: '#8F4D53',
+                note: 'Котедж у лісі з панорамними вікнами, чаном на терасі та Starlink.',
+                tags: ['#карпати', '#відпочинок'], svg: LINE_ICONS.travel,
+                lockedOverride: null
+            },
+            {
+                id: 4, name: 'GitHub', domain: 'github.com', url: 'https://github.com/awesome-selfhosted/awesome-selfhosted',
+                title: 'Awesome Self-Hosted 2026', cat: 'Код та ІТ', date: '19/10/26',
+                color: '#43474D',
+                note: 'Каталог open-source рішень для власного домашнього медіасервера.',
+                tags: ['#код', '#сервер'], svg: LINE_ICONS.code,
+                lockedOverride: null
+            },
+            {
+                id: 5, name: 'Rozetka', domain: 'rozetka.com.ua', url: 'https://rozetka.com.ua/ecoflow-river-2/p364589/',
+                title: 'Зарядна станція EcoFlow River', cat: 'Покупки', date: '16/10/26',
+                color: '#556B42',
+                note: 'Станція з LiFePO4 акумулятором та зарядкою за 60 хвилин для роутера.',
+                tags: ['#техніка', '#дім'], svg: LINE_ICONS.shop,
+                lockedOverride: null
+            },
+            {
+                id: 6, name: 'Netflix', domain: 'netflix.com', url: 'https://www.netflix.com/title/81024821',
+                title: 'Проблема трьох тіл', cat: 'Кіно та Серіали', date: '14/10/26',
+                color: '#7D3F3B',
+                note: 'Науково-фантастична екранізація про контакт із позаземною цивілізацією.',
+                tags: ['#кіно', '#scifi'], svg: LINE_ICONS.video,
+                lockedOverride: null
+            }
+        ];
+
+        let ITEMS = structuredClone(DEFAULT_ITEMS);
+        const STORAGE_KEY = 'linkbox_hyperos_v2';
+
+        // Жёсткая очистка URL от запятых, точек, скобок и мусора на конце (исправление бага ",,")
+        function cleanRawUrl(raw) {
+            let u = (raw || '').trim();
+            // Срезаем любые запятые, точки, кавычки, скобки и точки с запятой с концов ссылки
+            u = u.replace(/^[,\s"'<>()[\]{};:]+|[,\s"'<>()[\]{}.;:]+$/g, '');
+            if (!u) return '';
+            if (!/^https?:\/\//i.test(u)) u = 'https://' + u;
+            return u;
+        }
+
+        function saveStateToStorage() {
+            try {
+                const payload = {
+                    items: ITEMS,
+                    lockedFolders: Array.from(LOCKED_FOLDERS),
+                    themeMode,
+                    viewMode,
+                    currentLang
+                };
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+            } catch (e) {}
+        }
+
+        function loadStateFromStorage() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY) || localStorage.getItem('linkbox_hyperos_v1');
+                if (!raw) return false;
+                const parsed = JSON.parse(raw);
+                if (Array.isArray(parsed.items)) {
+                    // Заодно лечим старые ссылки с запятыми на конце, если они были сохранены
+                    ITEMS = parsed.items.map(it => ({
+                        ...it,
+                        url: cleanRawUrl(it.url)
+                    }));
+                }
+                if (Array.isArray(parsed.lockedFolders)) LOCKED_FOLDERS = new Set(parsed.lockedFolders);
+                if (parsed.themeMode) themeMode = parsed.themeMode;
+                if (parsed.viewMode) viewMode = parsed.viewMode;
+                if (parsed.currentLang) currentLang = parsed.currentLang;
+                return true;
+            } catch (e) {
+                return false;
+            }
+        }
+
+        // Блокировка и разблокировка фонового скролла страницы при открытых шторках
+        function lockBodyScroll() {
+            document.body.classList.add('sheet-locked');
+        }
+
+        function unlockBodyScrollIfNoneOpen() {
+            const menuOpen = document.getElementById('menu-sheet-modal').classList.contains('open');
+            const editOpen = document.getElementById('edit-sheet-modal').classList.contains('open');
+            const tagsOpen = document.getElementById('tags-sheet-modal').classList.contains('open');
+            if (!menuOpen && !editOpen && !tagsOpen) {
+                document.body.classList.remove('sheet-locked');
+            }
+        }
+
+        // Сброс всех фильтров по нажатию на логотип/название LinkBox в шапке
+        function resetToAllLinks() {
+            const hadFilter = selectedFolder !== 'ALL' || selectedTag !== null || (document.getElementById('search-input')?.value || '') !== '';
+            selectedFolder = 'ALL';
+            selectedTag = null;
+            const searchEl = document.getElementById('search-input');
+            if (searchEl) searchEl.value = '';
+            if (isSelectMode) {
+                isSelectMode = false;
+                selectedIds.clear();
+                updateBulkBarUI();
+            }
+            renderApp();
+            if (hadFilter) showToast(t('homeReset'));
+        }
+
+        // Режим массового выбора и удаления карточек
+        function toggleSelectMode() {
+            isSelectMode = !isSelectMode;
+            selectedIds.clear();
+            updateBulkBarUI();
+            renderApp();
+        }
+
+        function updateBulkBarUI() {
+            const bar = document.getElementById('bulk-action-bar');
+            const btn = document.getElementById('select-mode-btn');
+            const countLbl = document.getElementById('selected-count-label');
+            if (isSelectMode) {
+                bar.classList.remove('hidden');
+                bar.classList.add('flex');
+                btn.className = 'key-press w-10 h-10 rounded-lg bg-[#D96B27] text-white flex items-center justify-center transition';
+                countLbl.textContent = `${selectedIds.size} ${t('selectedCount')}`;
+            } else {
+                bar.classList.add('hidden');
+                bar.classList.remove('flex');
+                btn.className = 'key-press w-10 h-10 rounded-lg theme-input flex items-center justify-center transition';
+            }
+        }
+
+        function toggleCardSelect(id, e) {
+            if (e) e.stopPropagation();
+            if (selectedIds.has(id)) selectedIds.delete(id);
+            else selectedIds.add(id);
+            updateBulkBarUI();
+            renderApp();
+        }
+
+        function getFilteredItems() {
+            const q = (document.getElementById('search-input')?.value || '').trim().toLowerCase();
+            let filtered = selectedFolder === 'ALL' ? ITEMS : ITEMS.filter(i => i.cat === selectedFolder);
+            if (selectedTag) {
+                filtered = filtered.filter(i => Array.isArray(i.tags) && i.tags.some(tg => tg.toLowerCase() === selectedTag.toLowerCase()));
+            }
+            if (q) {
+                filtered = filtered.filter(i =>
+                    [i.name, i.domain, i.title, i.cat, i.note, ...(i.tags || [])].join(' ').toLowerCase().includes(q)
+                );
+            }
+            return filtered;
+        }
+
+        function selectAllVisible() {
+            const visible = getFilteredItems();
+            const allSelected = visible.length > 0 && visible.every(i => selectedIds.has(i.id));
+            if (allSelected) {
+                visible.forEach(i => selectedIds.delete(i.id));
+            } else {
+                visible.forEach(i => selectedIds.add(i.id));
+            }
+            updateBulkBarUI();
+            renderApp();
+        }
+
+        function deleteSelectedItems() {
+            if (selectedIds.size === 0) return;
+            const removedCount = selectedIds.size;
+            ITEMS = ITEMS.filter(i => !selectedIds.has(i.id));
+            selectedIds.clear();
+            isSelectMode = false;
+            updateBulkBarUI();
+            saveStateToStorage();
+            renderApp();
+            showToast(t('bulkDeleted') + removedCount);
+        }
+
+        function isItemLocked(item) {
+            if (typeof item.lockedOverride === 'boolean') {
+                return item.lockedOverride;
+            }
+            return LOCKED_FOLDERS.has(item.cat);
+        }
+
+        function toggleFolderLock(cat, e) {
+            if (e) e.stopPropagation();
+            if (LOCKED_FOLDERS.has(cat)) {
+                LOCKED_FOLDERS.delete(cat);
+                showToast(`${cat}: ${t('folderUnlockedToast')}`);
+            } else {
+                LOCKED_FOLDERS.add(cat);
+                showToast(`${cat}: ${t('folderLockedToast')}`);
+            }
+            saveStateToStorage();
+            renderFoldersInMenu();
+            renderApp();
+        }
+
+        function setLayoutMode(mode) {
+            viewMode = mode;
+            ['small', 'large', 'list'].forEach(m => {
+                const btn = document.getElementById(`layout-${m}-btn`);
+                if (btn) {
+                    btn.style.backgroundColor = (m === mode) ? 'var(--bg-card)' : 'transparent';
+                    btn.style.boxShadow = (m === mode) ? '0 1px 2px rgba(0,0,0,0.12)' : 'none';
+                }
+            });
+            saveStateToStorage();
+            renderApp();
+        }
+
+        function openRandomLink() {
+            const unlockedItems = ITEMS.filter(item => !isItemLocked(item));
+            if (!unlockedItems.length) {
+                showToast(t('allLockedRandom'));
+                return;
+            }
+            const rand = unlockedItems[Math.floor(Math.random() * unlockedItems.length)];
+            closeMenuSheet();
+            showToast(t('randomOpened') + rand.name);
+            window.open(rand.url, '_blank', 'noopener,noreferrer');
+        }
+
+        function toggleLang() {
+            currentLang = currentLang === 'uk' ? 'en' : 'uk';
+            document.getElementById('lang-btn').textContent = currentLang === 'uk' ? 'UA' : 'EN';
+            saveStateToStorage();
+            updateStaticTexts();
+            renderApp();
+            renderFoldersInMenu();
+        }
+
+        function updateStaticTexts() {
+            document.getElementById('btn-menu-label').textContent = t('menu');
+            document.getElementById('menu-title-label').textContent = t('menu');
+            document.getElementById('btn-random-label').textContent = t('random');
+            document.getElementById('lbl-folders-section').textContent = t('foldersSection');
+            document.getElementById('tags-sheet-title').textContent = t('tagsSheetTitle');
+            document.getElementById('url-input').placeholder = t('urlPlaceholder');
+            document.getElementById('btn-import-ai').textContent = t('importAi');
+            document.getElementById('btn-export-html').textContent = t('exportHtml');
+            document.getElementById('btn-open').textContent = t('openBrowser');
+            document.getElementById('lbl-lock-link').textContent = t('lockToggleLabel');
+            document.getElementById('lbl-card-title').textContent = t('titleLabel');
+            document.getElementById('lbl-note').textContent = t('noteLabel');
+            document.getElementById('btn-regen').textContent = t('regenBtn');
+            document.getElementById('lbl-folder').textContent = t('folderLabel');
+            document.getElementById('lbl-tags').textContent = t('tagsLabel');
+            document.getElementById('btn-delete').textContent = t('deleteBtn');
+            document.getElementById('btn-save').textContent = t('saveBtn');
+            document.getElementById('btn-select-all').textContent = t('selectAll');
+            document.getElementById('btn-delete-selected').textContent = t('deleteSelected');
+            document.getElementById('btn-cancel-select').textContent = t('cancelSelect');
+        }
+
+        function setThemeMode(mode) {
+            themeMode = mode;
+            const body = document.body;
+            const metaTheme = document.getElementById('meta-theme-color');
+            if (mode === 'light') {
+                body.removeAttribute('data-theme');
+                if (metaTheme) metaTheme.setAttribute('content', '#ECEAE4');
+            } else if (mode === 'dim') {
+                body.setAttribute('data-theme', 'dim');
+                if (metaTheme) metaTheme.setAttribute('content', '#2C2C28');
+            } else if (mode === 'device') {
+                body.setAttribute('data-theme', 'oled');
+                if (metaTheme) metaTheme.setAttribute('content', '#0A0A09');
+            }
+
+            ['light', 'dim', 'device'].forEach(m => {
+                const btn = document.getElementById(`theme-${m}-btn`);
+                if (btn) {
+                    btn.style.backgroundColor = (m === mode) ? 'var(--bg-card)' : 'transparent';
+                    btn.style.boxShadow = (m === mode) ? '0 1px 2px rgba(0,0,0,0.12)' : 'none';
+                }
+            });
+            saveStateToStorage();
+            renderApp();
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('action-toast');
+            document.getElementById('toast-message').textContent = msg;
+            toast.classList.remove('hidden');
+            toast.classList.add('flex');
+            setTimeout(() => { toast.classList.add('hidden'); toast.classList.remove('flex'); }, 2200);
+        }
+
+        function openMenuSheet() {
+            lockBodyScroll();
+            const modal = document.getElementById('menu-sheet-modal');
+            const panel = document.getElementById('menu-sheet-panel');
+            panel.style.transform = '';
+            modal.classList.remove('hidden');
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('open'), 10);
+            renderFoldersInMenu();
+        }
+
+        function closeMenuSheet() {
+            const modal = document.getElementById('menu-sheet-modal');
+            const panel = document.getElementById('menu-sheet-panel');
+            modal.classList.remove('open');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.style.display = 'none';
+                panel.style.transform = '';
+                unlockBodyScrollIfNoneOpen();
+            }, 340);
+        }
+
+        // Открытие шторки #Хештегов из кнопки # внизу Меню
+        function openTagsSheetFromMenu() {
+            const menuModal = document.getElementById('menu-sheet-modal');
+            menuModal.classList.remove('open');
+            setTimeout(() => {
+                menuModal.classList.add('hidden');
+                menuModal.style.display = 'none';
+                openTagsSheet();
+            }, 220);
+        }
+
+        function openTagsSheet() {
+            lockBodyScroll();
+            renderTagsCloud();
+            const modal = document.getElementById('tags-sheet-modal');
+            const panel = document.getElementById('tags-sheet-panel');
+            panel.style.transform = '';
+            modal.classList.remove('hidden');
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('open'), 10);
+        }
+
+        function closeTagsSheet() {
+            const modal = document.getElementById('tags-sheet-modal');
+            const panel = document.getElementById('tags-sheet-panel');
+            modal.classList.remove('open');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.style.display = 'none';
+                panel.style.transform = '';
+                unlockBodyScrollIfNoneOpen();
+            }, 340);
+        }
+
+        function renderTagsCloud() {
+            const tagCounts = new Map();
+            ITEMS.forEach(item => {
+                (item.tags || []).forEach(rawTag => {
+                    const clean = rawTag.trim();
+                    if (!clean) return;
+                    const key = clean.toLowerCase();
+                    const prev = tagCounts.get(key) || { label: clean, count: 0 };
+                    prev.count += 1;
+                    tagCounts.set(key, prev);
+                });
+            });
+
+            const container = document.getElementById('tags-cloud-container');
+            const sorted = Array.from(tagCounts.values()).sort((a, b) => b.count - a.count);
+
+            let html = `
+                <button onclick="selectTagAndClose(null)" class="key-press px-3.5 py-2 rounded-lg text-xs font-mono-code font-bold flex items-center gap-2 transition ${
+                    selectedTag === null ? 'bg-[#D96B27] text-white' : 'theme-input'
+                }">
+                    <span>${t('allFolders')}</span>
+                    <span class="opacity-75">${ITEMS.length}</span>
+                </button>
+            `;
+
+            html += sorted.map(tObj => {
+                const isAct = selectedTag && selectedTag.toLowerCase() === tObj.label.toLowerCase();
+                return `
+                    <button onclick="selectTagAndClose('${tObj.label.replace(/'/g, "\\'")}')" class="key-press px-3.5 py-2 rounded-lg text-xs font-mono-code font-bold flex items-center gap-1.5 transition ${
+                        isAct ? 'bg-[#D96B27] text-white' : 'theme-input'
+                    }">
+                        <span>${tObj.label}</span>
+                        <span class="text-[10px] opacity-70 px-1.5 py-0.2 rounded bg-black/10">${tObj.count}</span>
+                    </button>
+                `;
+            }).join('');
+
+            container.innerHTML = html;
+        }
+
+        function selectTagAndClose(tag) {
+            selectedTag = tag;
+            if (tag) selectedFolder = 'ALL';
+            renderApp();
+            closeTagsSheet();
+        }
+
+        function renderFoldersInMenu() {
+            const cats = [];
+            ITEMS.forEach(item => {
+                if (!cats.find(c => c.cat === item.cat)) {
+                    cats.push({ cat: item.cat, color: item.color, count: ITEMS.filter(x => x.cat === item.cat).length });
+                }
+            });
+
+            const grid = document.getElementById('folders-grid');
+            const isAll = selectedFolder === 'ALL' && !selectedTag;
+
+            let html = `
+                <button onclick="selectFolderAndClose('ALL')" class="col-span-2 key-press rounded-lg px-3.5 py-2.5 flex items-center justify-between transition ${
+                    isAll ? 'bg-[#D96B27] text-white' : 'theme-input'
+                }">
+                    <span class="text-xs sm:text-sm font-bold">${t('allFolders')}</span>
+                    <span class="text-xs font-mono-code font-bold opacity-80">${ITEMS.length}</span>
+                </button>
+            `;
+
+            html += cats.map(c => {
+                const active = selectedFolder === c.cat;
+                const folderLocked = LOCKED_FOLDERS.has(c.cat);
+                const safeCat = c.cat.replace(/'/g, "\\'");
+                return `
+                    <div class="rounded-lg flex items-stretch overflow-hidden ${active ? 'text-white' : 'theme-input'}"
+                        style="${active ? `background:${c.color};` : ''}">
+                        <button onclick="selectFolderAndClose('${safeCat}')" class="key-press flex-1 px-3 py-2.5 text-left flex items-center justify-between min-w-0">
+                            <div class="flex items-center gap-2 min-w-0">
+                                <span class="w-2 h-2 rounded-full shrink-0" style="background:${active ? '#fff' : c.color}"></span>
+                                <span class="text-xs sm:text-sm font-bold truncate">${c.cat}</span>
+                            </div>
+                            <span class="text-xs font-mono-code font-bold opacity-75 ml-1">${c.count}</span>
+                        </button>
+                        <button onclick="toggleFolderLock('${safeCat}', event)" title="Блокувати / розблокувати прямий перехід у папці"
+                            class="key-press px-2.5 border-l flex items-center justify-center transition ${
+                                folderLocked
+                                    ? (active ? 'bg-black/25 text-white' : 'bg-[#D96B27]/15 text-[#D96B27]')
+                                    : 'opacity-45 hover:opacity-100'
+                            }" style="border-color: var(--border-main)">
+                            ${folderLocked ? LINE_ICONS.lock : LINE_ICONS.unlock}
+                        </button>
+                    </div>
+                `;
+            }).join('');
+            grid.innerHTML = html;
+        }
+
+        function selectFolderAndClose(cat) {
+            selectedFolder = cat;
+            selectedTag = null;
+            renderApp();
+            closeMenuSheet();
+        }
+
+        function copyItemUrl(url, e) {
+            if (e) e.stopPropagation();
+            const clean = cleanRawUrl(url);
+            const temp = document.createElement('textarea');
+            temp.value = clean;
+            document.body.appendChild(temp);
+            temp.select();
+            document.execCommand('copy');
+            document.body.removeChild(temp);
+            showToast(t('copied') + clean);
+        }
+
+        function openItemById(id, e) {
+            if (e) e.stopPropagation();
+            const item = ITEMS.find(x => x.id === id);
+            if (!item) return;
+            if (isItemLocked(item)) {
+                showToast(t('lockedToast'));
+                return;
+            }
+            window.open(cleanRawUrl(item.url), '_blank', 'noopener,noreferrer');
+        }
+
+        function copySheetUrl() {
+            const val = cleanRawUrl(document.getElementById('sheet-url').value);
+            if (!val) return;
+            copyItemUrl(val);
+        }
+
+        function openSheetUrl() {
+            if (sheetTempLocked) {
+                showToast(t('lockedToast'));
+                return;
+            }
+            const val = cleanRawUrl(document.getElementById('sheet-url').value);
+            if (!val) return;
+            window.open(val, '_blank', 'noopener,noreferrer');
+        }
+
+        function exportBrowserBookmarks() {
+            const foldersMap = {};
+            ITEMS.forEach(item => {
+                if (!foldersMap[item.cat]) foldersMap[item.cat] = [];
+                foldersMap[item.cat].push(item);
+            });
+            const nowUnix = Math.floor(Date.now() / 1000);
+            let html = `<!DOCTYPE NETSCAPE-Bookmark-file-1><META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8"><TITLE>LinkBox Bookmarks</TITLE><H1>LinkBox</H1><DL><p>\n`;
+            Object.keys(foldersMap).forEach(cat => {
+                html += `    <DT><H3 ADD_DATE="${nowUnix}">${cat}</H3>\n    <DL><p>\n`;
+                foldersMap[cat].forEach(item => {
+                    html += `        <DT><A HREF="${cleanRawUrl(item.url)}" ADD_DATE="${nowUnix}">${item.name} — ${item.title}</A>\n<DD>${item.note}\n`;
+                });
+                html += `    </DL><p>\n`;
+            });
+            html += `</DL><p>\n`;
+
+            const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `linkbox_bookmarks.html`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast(t('exported'));
+            closeMenuSheet();
+        }
+
+        function renderApp() {
+            document.getElementById('total-count-pill').textContent = `${ITEMS.length}`;
+            const filterPill = document.getElementById('active-filter-pill');
+            if (selectedTag) {
+                filterPill.textContent = `${selectedTag} ✕`;
+                filterPill.classList.remove('hidden');
+            } else if (selectedFolder !== 'ALL') {
+                filterPill.textContent = `${selectedFolder} ✕`;
+                filterPill.classList.remove('hidden');
+            } else {
+                filterPill.classList.add('hidden');
+            }
+
+            const filtered = getFilteredItems();
+            const cardsEl = document.getElementById('cards-container');
+
+            if (filtered.length === 0) {
+                cardsEl.className = '';
+                cardsEl.innerHTML = `<div class="py-12 text-center text-sm theme-muted font-mono-code">Порожньо</div>`;
+                return;
+            }
+
+            // 1. МАЛЫЕ КАРТОЧКИ
+            if (viewMode === 'small') {
+                cardsEl.className = 'grid grid-cols-1 sm:grid-cols-2 gap-3';
+                cardsEl.innerHTML = filtered.map(s => {
+                    const locked = isItemLocked(s);
+                    const isDup = highlightedDuplicateId === s.id;
+                    const isSelected = selectedIds.has(s.id);
+                    const clickAction = isSelectMode ? `toggleCardSelect(${s.id}, event)` : `openEditSheet(${s.id})`;
+                    return `
+                    <div id="card-${s.id}" onclick="${clickAction}" class="rounded-xl p-4 theme-card border flex flex-col justify-between cursor-pointer hover:border-[#D96B27] transition ${isDup || isSelected ? 'ring-2 ring-[#D96B27] border-[#D96B27]' : ''}">
+                        <div>
+                            <div class="flex items-center justify-between gap-2">
+                                <div class="flex items-center gap-2.5 min-w-0">
+                                    ${isSelectMode ? `
+                                        <span class="w-6 h-6 rounded-md border flex items-center justify-center shrink-0 ${isSelected ? 'bg-[#D96B27] border-[#D96B27] text-white' : 'theme-input'}">
+                                            ${isSelected ? '✓' : ''}
+                                        </span>
+                                    ` : ''}
+                                    <span class="w-8 h-8 rounded-lg flex items-center justify-center text-white shrink-0" style="background:${s.color}">
+                                        ${s.svg}
+                                    </span>
+                                    <div class="min-w-0">
+                                        <div class="font-black text-base leading-tight truncate">${s.name}</div>
+                                        <div class="text-xs font-mono-code theme-muted truncate">${s.domain}</div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-1.5 shrink-0">
+                                    ${locked ? `<span class="w-6 h-6 rounded-md theme-input flex items-center justify-center opacity-75" title="Прямий перехід заблоковано">${LINE_ICONS.lock}</span>` : ''}
+                                    <span class="text-[11px] font-bold px-2 py-0.5 rounded-md text-white" style="background:${s.color}">${s.cat}</span>
+                                </div>
+                            </div>
+
+                            <div class="text-sm sm:text-base font-bold mt-3 line-clamp-1">${s.title}</div>
+                            <p class="mt-1.5 text-sm theme-muted leading-snug line-clamp-2">
+                                ${s.note}
+                            </p>
+                        </div>
+
+                        <div class="flex items-stretch gap-2 mt-4">
+                            <button onclick="openItemById(${s.id}, event)" ${locked ? 'disabled' : ''} class="flex-1 py-2.5 px-4 rounded-lg font-black text-sm flex items-center justify-center gap-1.5 transition ${
+                                locked
+                                    ? 'theme-input opacity-45 cursor-not-allowed'
+                                    : 'key-press bg-[#D96B27] hover:bg-[#c55d1d] text-white'
+                            }">
+                                <span>${t('openMain')}</span>
+                                ${locked ? LINE_ICONS.lock : LINE_ICONS.extArrow}
+                            </button>
+                            <button onclick="copyItemUrl('${s.url.replace(/'/g, "\\'")}', event)" title="Копіювати" class="key-press w-11 rounded-lg theme-input flex items-center justify-center shrink-0">
+                                <svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24">
+                                    <rect x="9" y="9" width="13" height="13" rx="1"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                `}).join('');
+            }
+            // 2. БОЛЬШИЕ КАРТОЧКИ
+            else if (viewMode === 'large') {
+                cardsEl.className = 'space-y-3';
+                cardsEl.innerHTML = filtered.map(s => {
+                    const locked = isItemLocked(s);
+                    const isDup = highlightedDuplicateId === s.id;
+                    const isSelected = selectedIds.has(s.id);
+                    const clickAction = isSelectMode ? `toggleCardSelect(${s.id}, event)` : `openEditSheet(${s.id})`;
+                    return `
+                    <div id="card-${s.id}" onclick="${clickAction}" class="rounded-xl theme-card border grid grid-cols-1 md:grid-cols-12 overflow-hidden cursor-pointer hover:border-[#D96B27] transition ${isDup || isSelected ? 'ring-2 ring-[#D96B27] border-[#D96B27]' : ''}">
+                        <div class="md:col-span-5 p-4 flex flex-col justify-between md:border-r border-b md:border-b-0" style="border-color: var(--border-main)">
+                            <div>
+                                <div class="flex items-center justify-between gap-2">
+                                    <div class="flex items-center gap-2.5 min-w-0">
+                                        ${isSelectMode ? `
+                                            <span class="w-6 h-6 rounded-md border flex items-center justify-center shrink-0 ${isSelected ? 'bg-[#D96B27] border-[#D96B27] text-white' : 'theme-input'}">
+                                                ${isSelected ? '✓' : ''}
+                                            </span>
+                                        ` : ''}
+                                        <span class="w-8 h-8 rounded-lg flex items-center justify-center text-white shrink-0" style="background:${s.color}">${s.svg}</span>
+                                        <div class="min-w-0">
+                                            <div class="font-black text-base truncate">${s.name}</div>
+                                            <div class="text-xs font-mono-code theme-muted truncate">${s.domain}</div>
+                                        </div>
+                                    </div>
+                                    <span class="text-xs font-mono-code theme-muted">${s.date}</span>
+                                </div>
+                                <div class="mt-3 text-base font-bold">${s.title}</div>
+                            </div>
+
+                            <div class="flex items-stretch gap-2 mt-4">
+                                <button onclick="openItemById(${s.id}, event)" ${locked ? 'disabled' : ''} class="flex-1 py-2.5 px-4 rounded-lg font-black text-sm flex items-center justify-center gap-1.5 transition ${
+                                    locked
+                                        ? 'theme-input opacity-45 cursor-not-allowed'
+                                        : 'key-press bg-[#D96B27] hover:bg-[#c55d1d] text-white'
+                                }">
+                                    <span>${t('openMain')}</span>
+                                    ${locked ? LINE_ICONS.lock : LINE_ICONS.extArrow}
+                                </button>
+                                <button onclick="copyItemUrl('${s.url.replace(/'/g, "\\'")}', event)" class="key-press w-11 rounded-lg theme-input flex items-center justify-center shrink-0">
+                                    <svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="1"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="md:col-span-7 p-4 flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-1.5">
+                                        ${locked ? `<span class="w-6 h-6 rounded-md theme-input flex items-center justify-center opacity-75">${LINE_ICONS.lock}</span>` : ''}
+                                        <span class="text-xs font-bold px-2 py-0.5 rounded-md text-white" style="background:${s.color}">${s.cat}</span>
+                                    </div>
+                                    <span class="text-xs font-mono-code theme-muted">${(s.tags || []).join(' ')}</span>
+                                </div>
+                                <p class="text-sm sm:text-base mt-3 leading-relaxed">${s.note}</p>
+                            </div>
+                        </div>
+                    </div>
+                `}).join('');
+            }
+            // 3. СПИСОК
+            else {
+                cardsEl.className = 'space-y-2';
+                cardsEl.innerHTML = filtered.map(s => {
+                    const locked = isItemLocked(s);
+                    const isDup = highlightedDuplicateId === s.id;
+                    const isSelected = selectedIds.has(s.id);
+                    const clickAction = isSelectMode ? `toggleCardSelect(${s.id}, event)` : `openEditSheet(${s.id})`;
+                    return `
+                    <div id="card-${s.id}" onclick="${clickAction}" class="rounded-lg p-3 theme-card border flex items-center justify-between gap-3 cursor-pointer hover:border-[#D96B27] transition ${isDup || isSelected ? 'ring-2 ring-[#D96B27] border-[#D96B27]' : ''}">
+                        <div class="flex items-center gap-3 min-w-0 flex-1">
+                            ${isSelectMode ? `
+                                <span class="w-6 h-6 rounded-md border flex items-center justify-center shrink-0 ${isSelected ? 'bg-[#D96B27] border-[#D96B27] text-white' : 'theme-input'}">
+                                    ${isSelected ? '✓' : ''}
+                                </span>
+                            ` : ''}
+                            <span class="w-8 h-8 rounded-lg flex items-center justify-center text-white shrink-0" style="background:${s.color}">${s.svg}</span>
+                            <div class="min-w-0 flex-1">
+                                <div class="font-bold text-sm sm:text-base truncate">${s.name} — ${s.title}</div>
+                                <div class="text-xs sm:text-sm theme-muted truncate">${s.note}</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-1.5 shrink-0">
+                            <button onclick="openItemById(${s.id}, event)" ${locked ? 'disabled' : ''} class="py-2 px-3.5 rounded-lg font-black text-xs sm:text-sm flex items-center gap-1.5 transition ${
+                                locked
+                                    ? 'theme-input opacity-45 cursor-not-allowed'
+                                    : 'key-press bg-[#D96B27] text-white'
+                            }">
+                                <span>${t('openMain')}</span>
+                                ${locked ? LINE_ICONS.lock : LINE_ICONS.extArrow}
+                            </button>
+                            <button onclick="copyItemUrl('${s.url.replace(/'/g, "\\'")}', event)" title="Копіювати" class="key-press w-9 h-9 rounded-lg theme-input flex items-center justify-center shrink-0">
+                                <svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="1"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                `}).join('');
+            }
+        }
+
+        // Нормализация URL для точного поиска дубликатов (с предварительной очисткой запятых)
+        function normalizeUrlForCheck(rawUrl) {
+            const u = cleanRawUrl(rawUrl);
+            if (!u) return '';
+            try {
+                const parsed = new URL(u);
+                const host = parsed.hostname.replace(/^www\./i, '').toLowerCase();
+                const path = parsed.pathname.replace(/\/+$/, '');
+                return host + path + parsed.search.toLowerCase();
+            } catch (e) {
+                return u.replace(/^https?:\/\//i, '').replace(/^www\./i, '').replace(/\/+$/, '').toLowerCase();
+            }
+        }
+
+        function findDuplicateItem(rawUrl) {
+            const norm = normalizeUrlForCheck(rawUrl);
+            if (!norm) return null;
+            return ITEMS.find(item => normalizeUrlForCheck(item.url) === norm) || null;
+        }
+
+        // Извлечение красивого имени бренда из домена (без поддомена "m." или "ukr.")
+        function extractCleanBrandName(domain) {
+            const parts = domain.split('.').filter(p => !['www', 'm', 'mobile', 'ua', 'com', 'net', 'org', 'gov', 'edu', 'info', 'io', 'co', 'uk', 'ru', 'biz'].includes(p));
+            const root = parts.length > 0 ? parts[parts.length - 1] : domain.split('.')[0];
+            if (!root) return 'Сайт';
+            return root.charAt(0).toUpperCase() + root.slice(1);
+        }
+
+        // Очистка человеческого заголовка (если из браузера пришло нормальное название, оставляем его; если голый URL или мусор — не берём)
+        function sanitizeBookmarkTitle(rawTitle, cleanName) {
+            if (!rawTitle) return '';
+            let tStr = rawTitle.trim();
+            if (/^https?:\/\//i.test(tStr)) return '';
+            // Отсекаем случайные хвосты из запятых
+            tStr = tStr.replace(/[,\s]+$/g, '');
+            if (tStr.length < 2) return '';
+            return tStr;
+        }
+
+        // Умный ИИ-классификатор: раскладывает сайты по 11 осмысленным категориям и пишет живую контекстную заметку
+        function buildSmartAIItem(rawUrl, customTitle = '') {
+            const finalUrl = cleanRawUrl(rawUrl);
+            const domain = finalUrl.replace(/^https?:\/\//i, '').replace(/^www\./i, '').split('/')[0].toLowerCase();
+            const cleanName = extractCleanBrandName(domain);
+            const humanTitle = sanitizeBookmarkTitle(customTitle, cleanName);
+            const combinedSignal = `${finalUrl} ${humanTitle}`.toLowerCase();
+
+            let cat = currentLang === 'uk' ? 'Веб-ресурси' : 'Web Resources';
+            let color = '#4F6352';
+            let svg = LINE_ICONS.globe;
+            let tags = [`#${cleanName.toLowerCase()}`, '#веб'];
+            let defaultCategoryTitle = currentLang === 'uk' ? `${cleanName} — Корисний ресурс` : `${cleanName} — Web Resource`;
+            let note = '';
+
+            // 1. МУЗЫКА И АУДИО
+            if (/spotify|soundcloud|music\.apple|deezer|bandcamp|last\.fm|shazam|mp3|radio|podcast|audio|музик|пісн|альбом|плейлист/.test(combinedSignal)) {
+                cat = currentLang === 'uk' ? 'Музика' : 'Music';
+                color = '#3F6A4E';
+                svg = LINE_ICONS.music;
+                tags = ['#музика', '#аудіо', `#${cleanName.toLowerCase()}`];
+                defaultCategoryTitle = currentLang === 'uk' ? `${cleanName} — Музика та аудіо` : `${cleanName} — Music & Audio`;
+                note = humanTitle
+                    ? `Музична добірка або трек «${humanTitle}» на ${domain} для прослуховування.`
+                    : `Аудіострімінг та музичний каталог на платформі ${cleanName} (${domain}).`;
+            }
+            // 2. КИНО, СЕРИАЛЫ И ВИДЕО
+            else if (/youtube|youtu\.be|netflix|megogo|sweet\.tv|takflix|kinopoisk|imdb|vimeo|twitch|rezka|filmix|uaserial|serial|кіно|серіал|фільм|мульт|movie|cinema|video/.test(combinedSignal)) {
+                cat = currentLang === 'uk' ? 'Кіно та Серіали' : 'Movies & Video';
+                color = '#7D3F3B';
+                svg = LINE_ICONS.video;
+                tags = ['#кіно', '#серіали', `#${cleanName.toLowerCase()}`];
+                defaultCategoryTitle = currentLang === 'uk' ? `${cleanName} — Кіно та відео` : `${cleanName} — Video & Series`;
+                note = humanTitle
+                    ? `Відео або серіал «${humanTitle}» (${domain}) — збережено у список на перегляд.`
+                    : `Відеоплатформа ${cleanName}: кіно, серіали та ефіри для вечірнього перегляду.`;
+            }
+            // 3. НОВОСТИ, МЕДИА И СТАТЬИ
+            else if (/news|pravda|unian|nv\.ua|tsn|rbc|liga\.net|censor|telegraf|ukranews|24tv|hromadske|babel|forbes|bbc|reuters|bloomberg|korrespondent|zn\.ua|gazeta|obozrevatel|focus\.ua|espreso|новин|статт|медіа|преса/.test(combinedSignal)) {
+                cat = currentLang === 'uk' ? 'Новини та ЗМІ' : 'News & Media';
+                color = '#3B5C6E';
+                svg = LINE_ICONS.news;
+                tags = ['#новини', '#медіа', `#${cleanName.toLowerCase()}`];
+                defaultCategoryTitle = currentLang === 'uk' ? `${cleanName} — Новини та аналітика` : `${cleanName} — News & Media`;
+                note = humanTitle
+                    ? `Публікація ЗМІ на ${cleanName}: «${humanTitle}». Збережено для швидкого ознайомлення.`
+                    : `Інформаційний портал ${cleanName} (${domain}): актуальні новини, репортажі та аналітика.`;
+            }
+            // 4. ПОКУПКИ, МАРКЕТПЛЕЙСЫ И ТЕХНИКА
+            else if (/rozetka|prom\.ua|olx|epicentr|allo|comfy|foxtrot|moyo|citrus|amazon|aliexpress|ebay|makeup|shafa|kasta|zakaz|silpo|atb|shop|store|market|buy|price|nedorogoy|купит|ціна|товар|магазин|знижк/.test(combinedSignal)) {
+                cat = currentLang === 'uk' ? 'Покупки' : 'Shopping';
+                color = '#556B42';
+                svg = LINE_ICONS.shop;
+                tags = ['#покупки', '#каталог', `#${cleanName.toLowerCase()}`];
+                defaultCategoryTitle = currentLang === 'uk' ? `${cleanName} — Товар у каталозі` : `${cleanName} — Store Item`;
+                note = humanTitle
+                    ? `Пропозиція в магазині ${cleanName}: «${humanTitle}». Збережено для порівняння цін та характеристик.`
+                    : `Онлайн-каталог ${cleanName} (${domain}): моніторинг цін, акцій та наявності товарів.`;
+            }
+            // 5. КОД, ПРОГРАММЫ, ИИ И ТЕХНОЛОГИИ
+            else if (/github|gitlab|stackoverflow|habr|dou\.ua|dev\.to|itc\.ua|ain\.ua|gagadget|internetua|volia|kyivstar|vodafone|lifecell|chatgpt|openai|claude|gemini|vercel|docker|linux|android|apk|4pda|xda|soft|app|tehnologii|технолог|програм|код|сервер/.test(combinedSignal)) {
+                cat = currentLang === 'uk' ? 'Код та ІТ' : 'Tech & Code';
+                color = '#43474D';
+                svg = LINE_ICONS.code;
+                tags = ['#технології', '#іт', `#${cleanName.toLowerCase()}`];
+                defaultCategoryTitle = currentLang === 'uk' ? `${cleanName} — ІТ та технології` : `${cleanName} — Tech & Software`;
+                note = humanTitle
+                    ? `Технічний матеріал або сервіс «${humanTitle}» на ${cleanName} (${domain}).`
+                    : `Технологічний ресурс ${cleanName} (${domain}): програми, огляди заліза та цифрові сервіси.`;
+            }
+            // 6. ДИЗАЙН И КРЕАТИВ
+            else if (/figma|behance|dribbble|awwwards|pinterest|framer|unsplash|freepik|canva|adobe|artstation|дизайн|ілюстрац|шрифт/.test(combinedSignal)) {
+                cat = currentLang === 'uk' ? 'Дизайн' : 'Design';
+                color = '#3D5A78';
+                svg = LINE_ICONS.design;
+                tags = ['#дизайн', '#референс', `#${cleanName.toLowerCase()}`];
+                defaultCategoryTitle = currentLang === 'uk' ? `${cleanName} — Візуальний референс` : `${cleanName} — Design Reference`;
+                note = humanTitle
+                    ? `Дизайн-проєкт «${humanTitle}» на ${cleanName}: збережено як візуальний референс.`
+                    : `Колекція інтерфейсів, графіки та дизайн-рішень на платформі ${cleanName}.`;
+            }
+            // 7. КНИГИ, ОБРАЗОВАНИЕ И СПРАВОЧНИКИ
+            else if (/wikipedia|coursera|udemy|prometheus|edera|yakaboo|knigoland|litres|goodreads|duolingo|stud|book|wiki|library|книг|освіт|курс|словник|енциклопед|навчан/.test(combinedSignal)) {
+                cat = currentLang === 'uk' ? 'Книги та Освіта' : 'Books & Edu';
+                color = '#6B5344';
+                svg = LINE_ICONS.book;
+                tags = ['#книги', '#освіта', `#${cleanName.toLowerCase()}`];
+                defaultCategoryTitle = currentLang === 'uk' ? `${cleanName} — Книги та знання` : `${cleanName} — Books & Learning`;
+                note = humanTitle
+                    ? `Навчальний матеріал або книга «${humanTitle}» на ${cleanName} (${domain}).`
+                    : `Освітня база знань та література на ресурсі ${cleanName} (${domain}).`;
+            }
+            // 8. ПОЕЗДКИ, КАРТЫ И ТУРИЗМ
+            else if (/airbnb|booking|skyscanner|tripadvisor|ryanair|uz\.gov|tickets\.ua|infobus|maps\.google|waze|hotel|travel|карпат|подорож|маршрут|квитк|готел/.test(combinedSignal)) {
+                cat = currentLang === 'uk' ? 'Поїздки' : 'Travel';
+                color = '#8F4D53';
+                svg = LINE_ICONS.travel;
+                tags = ['#поїздки', '#маршрут', `#${cleanName.toLowerCase()}`];
+                defaultCategoryTitle = currentLang === 'uk' ? `${cleanName} — Маршрут та бронювання` : `${cleanName} — Travel & Stay`;
+                note = humanTitle
+                    ? `Локація або бронювання «${humanTitle}» на ${cleanName} для планування поїздки.`
+                    : `Сервіс подорожей ${cleanName} (${domain}): маршрути, квитки та варіанти проживання.`;
+            }
+            // 9. ФИНАНСЫ, БАНКИ И БИЗНЕС
+            else if (/privatbank|privat24|monobank|oschadbank|sense|minfin|finance\.ua|kurs\.com|binance|tradingview|diia\.gov|tax\.gov|biz|market|bank|фінанс|банк|бізнес|курс|податк/.test(combinedSignal)) {
+                cat = currentLang === 'uk' ? 'Фінанси та Бізнес' : 'Finance & Biz';
+                color = '#3A6351';
+                svg = LINE_ICONS.finance;
+                tags = ['#фінанси', '#бізнес', `#${cleanName.toLowerCase()}`];
+                defaultCategoryTitle = currentLang === 'uk' ? `${cleanName} — Фінанси та сервіси` : `${cleanName} — Finance & Business`;
+                note = humanTitle
+                    ? `Діловий матеріал або фінансовий сервіс «${humanTitle}» на ${cleanName}.`
+                    : `Фінансово-економічний портал ${cleanName} (${domain}): курси, аналітика ринків та банкінг.`;
+            }
+            // 10. СОЦСЕТИ, ФОРУМЫ И МЕССЕНДЖЕРЫ
+            else if (/t\.me|telegram|instagram|facebook|twitter|x\.com|threads|linkedin|reddit|tiktok|discord|viber|соцмереж|форум|канал/.test(combinedSignal)) {
+                cat = currentLang === 'uk' ? 'Соцмережі' : 'Social';
+                color = '#485675';
+                svg = LINE_ICONS.social;
+                tags = ['#соцмережі', '#спільнота', `#${cleanName.toLowerCase()}`];
+                defaultCategoryTitle = currentLang === 'uk' ? `${cleanName} — Канал / Обговорення` : `${cleanName} — Social Post`;
+                note = humanTitle
+                    ? `Допис або спільнота «${humanTitle}» у мережі ${cleanName}.`
+                    : `Сторінка або авторський канал на платформі ${cleanName} (${domain}).`;
+            }
+            // 11. УНИВЕРСАЛЬНАЯ КАТЕГОРИЯ (если сайт узкоспециализированный)
+            else {
+                note = humanTitle
+                    ? `Збережена сторінка «${humanTitle}» з веб-ресурсу ${cleanName} (${domain}).`
+                    : `Веб-сторінка на домені ${domain} (${cleanName}) для швидкого доступу з колекції.`;
+            }
+
+            const finalTitle = humanTitle || defaultCategoryTitle;
+            const now = new Date();
+            const dateStr = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${String(now.getFullYear()).slice(-2)}`;
+
+            return {
+                id: Date.now() + Math.floor(Math.random() * 100000),
+                name: cleanName,
+                domain,
+                url: finalUrl,
+                title: finalTitle,
+                cat,
+                date: dateStr,
+                color,
+                note,
+                tags,
+                svg,
+                lockedOverride: null
+            };
+        }
+
+        function highlightExistingCard(item) {
+            if (selectedFolder !== 'ALL' && selectedFolder !== item.cat) {
+                selectedFolder = 'ALL';
+            }
+            selectedTag = null;
+            highlightedDuplicateId = item.id;
+            renderApp();
+            setTimeout(() => {
+                const el = document.getElementById(`card-${item.id}`);
+                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 60);
+            setTimeout(() => {
+                highlightedDuplicateId = null;
+                renderApp();
+            }, 2600);
+        }
+
+        // Разбор одной или сразу пачки ссылок через главное поле ИИ
+        function addLinkByAI() {
+            const input = document.getElementById('url-input');
+            const rawText = input.value.trim();
+            if (!rawText) return;
+
+            const urlMatches = rawText.match(/(?:https?:\/\/|www\.)[^\s"'<>]+/gi);
+            const rawCandidates = urlMatches && urlMatches.length > 0 ? urlMatches : [rawText];
+            const candidates = rawCandidates.map(u => cleanRawUrl(u)).filter(Boolean);
+
+            if (candidates.length === 1) {
+                const singleUrl = candidates[0];
+                const existing = findDuplicateItem(singleUrl);
+                if (existing) {
+                    showToast(`${t('duplicateFound')}${existing.name} (${existing.cat})`);
+                    highlightExistingCard(existing);
+                    return;
+                }
+                const newItem = buildSmartAIItem(singleUrl);
+                ITEMS.unshift(newItem);
+                input.value = '';
+                saveStateToStorage();
+                renderApp();
+                showToast(t('aiAddedSingle').replace('{cat}', newItem.cat));
+            } else if (candidates.length > 1) {
+                let added = 0;
+                let dups = 0;
+                candidates.forEach(u => {
+                    if (findDuplicateItem(u)) {
+                        dups++;
+                    } else {
+                        ITEMS.unshift(buildSmartAIItem(u));
+                        added++;
+                    }
+                });
+                input.value = '';
+                saveStateToStorage();
+                renderApp();
+                showToast(t('aiImportReport').replace('{added}', added).replace('{dups}', dups));
+            }
+        }
+
+        // Импорт файла закладок (.HTML / .TXT / .JSON) с автоматическим ИИ-разбором и отсевом дубликатов
+        function triggerAIFileImport() {
+            const fileInput = document.getElementById('ai-import-file');
+            if (fileInput) {
+                fileInput.value = '';
+                fileInput.click();
+            }
+        }
+
+        function handleAIFileImport(event) {
+            const file = event.target.files?.[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const content = String(e.target?.result || '');
+                const extracted = [];
+
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(content, 'text/html');
+                const anchors = doc.querySelectorAll('a[href]');
+
+                if (anchors.length > 0) {
+                    anchors.forEach(a => {
+                        const href = cleanRawUrl(a.getAttribute('href') || '');
+                        if (/^https?:\/\//i.test(href)) {
+                            extracted.push({ url: href, title: (a.textContent || '').trim() });
+                        }
+                    });
+                } else {
+                    const rawUrls = content.match(/https?:\/\/[^\s"'<>]+/gi) || [];
+                    rawUrls.forEach(u => {
+                        const clean = cleanRawUrl(u);
+                        if (clean) extracted.push({ url: clean, title: '' });
+                    });
+                }
+
+                let added = 0;
+                let dups = 0;
+
+                extracted.forEach(entry => {
+                    if (findDuplicateItem(entry.url)) {
+                        dups++;
+                    } else {
+                        ITEMS.unshift(buildSmartAIItem(entry.url, entry.title));
+                        added++;
+                    }
+                });
+
+                closeMenuSheet();
+                saveStateToStorage();
+                renderApp();
+                showToast(t('aiImportReport').replace('{added}', added).replace('{dups}', dups));
+            };
+            reader.readAsText(file);
+        }
+
+        function syncSheetLockUI() {
+            const openBtn = document.getElementById('sheet-open-btn');
+            const openIcon = document.getElementById('sheet-open-icon');
+            const lockIcon = document.getElementById('sheet-lock-icon');
+            const lockState = document.getElementById('sheet-lock-state');
+
+            if (sheetTempLocked) {
+                openBtn.disabled = true;
+                openBtn.className = 'flex-1 py-3.5 px-4 rounded-lg theme-input opacity-45 cursor-not-allowed font-black text-sm sm:text-base flex items-center justify-center gap-2 transition';
+                openIcon.innerHTML = LINE_ICONS.lock;
+                lockIcon.innerHTML = LINE_ICONS.lock;
+                lockState.textContent = 'LOCKED';
+                lockState.className = 'font-mono-code text-[11px] px-2 py-0.5 rounded bg-[#D96B27] text-white font-bold';
+            } else {
+                openBtn.disabled = false;
+                openBtn.className = 'key-press flex-1 py-3.5 px-4 rounded-lg bg-[#D96B27] text-white font-black text-sm sm:text-base flex items-center justify-center gap-2 transition';
+                openIcon.innerHTML = LINE_ICONS.extArrow;
+                lockIcon.innerHTML = LINE_ICONS.unlock;
+                lockState.textContent = 'OFF';
+                lockState.className = 'font-mono-code text-[11px] px-2 py-0.5 rounded bg-black/10';
+            }
+        }
+
+        function toggleSheetItemLock() {
+            sheetTempLocked = !sheetTempLocked;
+            syncSheetLockUI();
+        }
+
+        function openEditSheet(id) {
+            const item = ITEMS.find(x => x.id === id);
+            if (!item) return;
+            lockBodyScroll();
+            editingId = id;
+            sheetTempLocked = isItemLocked(item);
+
+            const fav = document.getElementById('sheet-favicon');
+            fav.style.background = item.color;
+            fav.innerHTML = item.svg;
+
+            document.getElementById('sheet-domain').textContent = item.domain;
+            document.getElementById('sheet-date').textContent = item.date;
+            document.getElementById('sheet-url').value = cleanRawUrl(item.url);
+            document.getElementById('sheet-title').value = item.title;
+            document.getElementById('sheet-note').value = item.note;
+            document.getElementById('sheet-cat').value = item.cat;
+            document.getElementById('sheet-tags').value = (item.tags || []).join(' ');
+
+            syncSheetLockUI();
+
+            const modal = document.getElementById('edit-sheet-modal');
+            const panel = document.getElementById('edit-sheet-panel');
+            panel.style.transform = '';
+            modal.classList.remove('hidden');
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('open'), 10);
+        }
+
+        function closeEditSheet() {
+            const modal = document.getElementById('edit-sheet-modal');
+            const panel = document.getElementById('edit-sheet-panel');
+            modal.classList.remove('open');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.style.display = 'none';
+                panel.style.transform = '';
+                unlockBodyScrollIfNoneOpen();
+            }, 340);
+            editingId = null;
+        }
+
+        function regenerateAINote() {
+            const item = ITEMS.find(x => x.id === editingId);
+            if (!item) return;
+            const currentUrl = cleanRawUrl(document.getElementById('sheet-url').value || item.url);
+            const currentTitle = document.getElementById('sheet-title').value.trim();
+            const smart = buildSmartAIItem(currentUrl, currentTitle);
+            document.getElementById('sheet-note').value = smart.note;
+            document.getElementById('sheet-cat').value = smart.cat;
+            document.getElementById('sheet-tags').value = smart.tags.join(' ');
+        }
+
+        function saveSheet() {
+            const item = ITEMS.find(x => x.id === editingId);
+            if (!item) return;
+            const newUrl = cleanRawUrl(document.getElementById('sheet-url').value);
+            if (newUrl) {
+                item.url = newUrl;
+                item.domain = newUrl.replace(/^https?:\/\//i, '').replace(/^www\./i, '').split('/')[0].toLowerCase();
+            }
+            item.title = document.getElementById('sheet-title').value.trim() || item.title;
+            item.note = document.getElementById('sheet-note').value.trim() || item.note;
+            item.cat = document.getElementById('sheet-cat').value.trim() || item.cat;
+            const rawTags = document.getElementById('sheet-tags').value.trim();
+            if (rawTags) {
+                item.tags = rawTags.split(/\s+/).map(tg => tg.startsWith('#') ? tg : `#${tg}`);
+            }
+
+            item.lockedOverride = sheetTempLocked;
+
+            saveStateToStorage();
+            closeEditSheet();
+            renderApp();
+            showToast(t('saved'));
+        }
+
+        function deleteCurrentItem() {
+            ITEMS = ITEMS.filter(x => x.id !== editingId);
+            saveStateToStorage();
+            closeEditSheet();
+            renderApp();
+            showToast(t('deleted'));
+        }
+
+        function attachSheetDrag(handleId, panelId, closeFn) {
+            const handle = document.getElementById(handleId);
+            const panel = document.getElementById(panelId);
+            let startY = 0, currentY = 0, dragging = false;
+
+            function onStart(e) {
+                dragging = true;
+                startY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
+                panel.style.transition = 'none';
+            }
+            function onMove(e) {
+                if (!dragging) return;
+                currentY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
+                const diff = currentY - startY;
+                if (diff > 0) panel.style.transform = `translateY(${diff}px)`;
+            }
+            function onEnd() {
+                if (!dragging) return;
+                dragging = false;
+                panel.style.transition = 'transform 0.34s cubic-bezier(0.16, 1, 0.3, 1)';
+                if (currentY - startY > 90) closeFn();
+                else panel.style.transform = 'translateY(0)';
+                startY = 0; currentY = 0;
+            }
+
+            handle.addEventListener('mousedown', onStart);
+            window.addEventListener('mousemove', onMove);
+            window.addEventListener('mouseup', onEnd);
+
+            handle.addEventListener('touchstart', onStart, { passive: true });
+            window.addEventListener('touchmove', onMove, { passive: true });
+            window.addEventListener('touchend', onEnd);
+        }
+
+        function setupPWA() {
+            const svgIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="#141413"/><circle cx="50" cy="50" r="37" fill="none" stroke="#D96B27" stroke-width="11"/><path d="M 16 64 Q 24 77 38 82" fill="none" stroke="#F6F4EE" stroke-width="11"/><path d="M 84 36 Q 76 23 62 18" fill="none" stroke="#F6F4EE" stroke-width="11"/><circle cx="50" cy="50" r="30.5" fill="none" stroke="#141413" stroke-width="3.5"/><circle cx="50" cy="50" r="23" fill="none" stroke="#F6F4EE" stroke-width="11"/><path d="M 29 40 A 23 23 0 0 0 45 72" fill="none" stroke="#D96B27" stroke-width="11" stroke-linecap="round"/><path d="M 71 60 A 23 23 0 0 0 55 28" fill="none" stroke="#D96B27" stroke-width="11" stroke-linecap="round"/><circle cx="50" cy="50" r="16.5" fill="#141413"/></svg>`;
+            const iconUrl = 'data:image/svg+xml;utf8,' + encodeURIComponent(svgIcon);
+
+            const manifest = {
+                name: 'LinkBox // Smart Link Organizer',
+                short_name: 'LinkBox',
+                description: 'Розумний ІІ-органайзер посилань та нотаток',
+                start_url: window.location.href,
+                display: 'standalone',
+                orientation: 'portrait',
+                background_color: '#ECEAE4',
+                theme_color: '#ECEAE4',
+                icons: [
+                    { src: iconUrl, sizes: '192x192', type: 'image/svg+xml', purpose: 'any maskable' },
+                    { src: iconUrl, sizes: '512x512', type: 'image/svg+xml', purpose: 'any maskable' }
+                ]
+            };
+
+            const manifestBlob = new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' });
+            const manifestEl = document.getElementById('pwa-manifest');
+            if (manifestEl) {
+                manifestEl.setAttribute('href', URL.createObjectURL(manifestBlob));
+            }
+        }
+
+        window.onload = () => {
+            setupPWA();
+            const hadSaved = loadStateFromStorage();
+            document.getElementById('lang-btn').textContent = currentLang === 'uk' ? 'UA' : 'EN';
+            updateStaticTexts();
+            setThemeMode(themeMode || 'light');
+            const initialMode = hadSaved ? viewMode : (window.innerWidth >= 1024 ? 'large' : 'small');
+            setLayoutMode(initialMode);
+            attachSheetDrag('menu-drag-handle', 'menu-sheet-panel', closeMenuSheet);
+            attachSheetDrag('tags-drag-handle', 'tags-sheet-panel', closeTagsSheet);
+            attachSheetDrag('edit-drag-handle', 'edit-sheet-panel', closeEditSheet);
+        };
+    </script>
+</body>
+</html>
+```
