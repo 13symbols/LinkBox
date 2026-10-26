@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="uk">
 <head>
@@ -160,14 +159,17 @@
     <!-- ГЛАВНЫЙ КОНТЕЙНЕР -->
     <main class="max-w-4xl mx-auto px-4 py-4 space-y-4">
 
-        <!-- Строка ввода ссылок: поле и кнопка ИИ -->
+        <!-- Строка ввода ссылок: поле и интуитивная кнопка Додати (с плюсом и AI-искрой) -->
         <div class="flex items-stretch gap-2">
-            <input id="url-input" type="text" onkeydown="if(event.key==='Enter') addLinkByAI()" placeholder="Посилання або список посилань для ІІ..." class="flex-1 theme-card border rounded-lg px-4 py-3 text-base outline-none font-medium focus:border-[#D96B27] transition">
-            <button onclick="addLinkByAI()" class="key-press bg-[#D96B27] hover:bg-[#c55d1d] text-white font-black text-sm px-5 rounded-lg flex items-center justify-center gap-2 shrink-0">
-                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 3v18M3 12h18M5.6 5.6l12.8 12.8M18.4 5.6L5.6 18.4"/>
+            <input id="url-input" type="text" onkeydown="if(event.key==='Enter') addLinkByAI()" placeholder="Вставте посилання або список посилань..." class="flex-1 theme-card border rounded-lg px-4 py-3 text-base outline-none font-medium focus:border-[#D96B27] transition">
+            <button onclick="addLinkByAI()" title="Розумне додавання посилання" class="key-press bg-[#D96B27] hover:bg-[#c55d1d] text-white font-black text-sm px-4 sm:px-5 rounded-lg flex items-center justify-center gap-2 shrink-0 shadow-xs">
+                <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none">
+                    <!-- Чёткий жирный плюс (добавление) -->
+                    <path d="M11 5v14M4 12h14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+                    <!-- Аккуратная искра ИИ в правом верхнем углу -->
+                    <path d="M19 2.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8.8-2.2z" fill="currentColor"/>
                 </svg>
-                <span>ІІ</span>
+                <span id="btn-add-label">Додати</span>
             </button>
         </div>
 
@@ -280,7 +282,7 @@
                 </div>
             </div>
 
-            <!-- СТРОКА 4: ИИ-Импорт, Экспорт, Кнопка # (между Експорт и UA) и язык -->
+            <!-- СТРОКА 4: ИИ-Импорт, Экспорт, Кнопка # (между Експорт и UA), язык и фирменная иконка Автора/Справки -->
             <div class="flex items-center gap-2 pt-3 border-t border-black/10">
                 <input id="ai-import-file" type="file" accept=".html,.htm,.txt,.json,.csv" class="hidden" onchange="handleAIFileImport(event)">
                 <button onclick="triggerAIFileImport()" class="key-press flex-1 py-2.5 px-3 rounded-lg bg-[#D96B27] text-white text-xs font-black flex items-center justify-center gap-1.5">
@@ -300,11 +302,19 @@
                     <span id="btn-export-html" class="truncate">Експорт</span>
                 </button>
                 <!-- Аккуратная кнопка # между Експорт и UA -->
-                <button onclick="openTagsSheetFromMenu()" title="Усі хештеги #" class="key-press px-3.5 py-2.5 rounded-lg theme-input text-xs font-mono-code font-black flex items-center justify-center hover:text-[#D96B27] transition">
+                <button onclick="openTagsSheetFromMenu()" title="Усі хештеги #" class="key-press w-9 h-9 rounded-lg theme-input text-xs font-mono-code font-black flex items-center justify-center hover:text-[#D96B27] transition shrink-0">
                     #
                 </button>
-                <button onclick="toggleLang()" id="lang-btn" class="key-press px-3.5 py-2.5 rounded-lg theme-input text-xs font-mono-code font-bold">
+                <button onclick="toggleLang()" id="lang-btn" class="key-press h-9 px-3 rounded-lg theme-input text-xs font-mono-code font-bold flex items-center justify-center shrink-0">
                     UA
+                </button>
+                <!-- Фирменная векторная иконка «О приложении / Авторские права» за кнопкой UA -->
+                <button onclick="openAboutSheetFromMenu()" title="Про додаток та автора" class="key-press w-9 h-9 rounded-lg theme-input flex items-center justify-center hover:text-[#D96B27] transition shrink-0">
+                    <svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                        <path d="M12 8h.01"/>
+                        <path d="M11 12h1v4h1"/>
+                    </svg>
                 </button>
             </div>
         </div>
@@ -329,6 +339,38 @@
             </div>
 
             <div id="tags-cloud-container" class="flex flex-wrap gap-2 max-h-80 overflow-y-auto overscroll-contain py-1">
+                <!-- Заполняется через JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ШТОРКА «ПРО ДОДАТОК / АВТОРСЬКІ ПРАВА» -->
+    <div id="about-sheet-modal" onclick="if(event.target===this) closeAboutSheet()" class="sheet-backdrop fixed inset-0 bg-black/60 z-50 hidden items-end justify-center p-0 sm:p-4">
+        <div id="about-sheet-panel" class="sheet-panel theme-surface w-full max-w-md rounded-t-2xl sm:rounded-xl p-5 border-t sm:border space-y-4 max-h-[88vh] overflow-y-auto">
+            
+            <!-- Полосочка для стягивания вниз -->
+            <div id="about-drag-handle" class="w-12 h-2 bg-stone-400/50 rounded-full mx-auto -mt-1 cursor-grab active:cursor-grabbing touch-none"></div>
+            
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                    <span class="w-8 h-8 rounded-lg bg-[#D96B27] text-white flex items-center justify-center shrink-0">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                            <path d="M12 8h.01"/>
+                            <path d="M11 12h1v4h1"/>
+                        </svg>
+                    </span>
+                    <span class="font-black text-base uppercase tracking-tight" id="about-sheet-title">Як усе влаштовано</span>
+                </div>
+                <button onclick="closeAboutSheet()" class="key-press w-9 h-9 rounded-lg theme-input flex items-center justify-center">
+                    <svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24">
+                        <path d="M18 6L6 18M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Контент гида и авторский блок (переводится UA / EN) -->
+            <div id="about-sheet-body" class="space-y-3 text-sm leading-relaxed overflow-y-auto overscroll-contain pr-0.5">
                 <!-- Заполняется через JS -->
             </div>
         </div>
@@ -437,10 +479,11 @@
         const DICT = {
             uk: {
                 menu: 'Меню',
+                addBtn: 'Додати',
                 random: 'Рандом',
                 foldersSection: 'Категорії',
                 tagsSheetTitle: 'Усі хештеги',
-                urlPlaceholder: 'Посилання або список посилань для ІІ...',
+                urlPlaceholder: 'Вставте посилання або список посилань...',
                 allFolders: 'Усі посилання',
                 importAi: 'Імпорт ІІ',
                 exportHtml: 'Експорт',
@@ -471,14 +514,16 @@
                 deleteSelected: 'Видалити вибрані',
                 cancelSelect: 'Скасувати',
                 bulkDeleted: 'Видалено карток: ',
-                homeReset: 'Показано всі посилання'
+                homeReset: 'Показано всі посилання',
+                aboutSheetTitle: 'Як усе влаштовано'
             },
             en: {
                 menu: 'Menu',
+                addBtn: 'Add',
                 random: 'Random',
                 foldersSection: 'Categories',
                 tagsSheetTitle: 'All Hashtags',
-                urlPlaceholder: 'Link or multiple links for AI...',
+                urlPlaceholder: 'Paste a link or multiple links...',
                 allFolders: 'All links',
                 importAi: 'AI Import',
                 exportHtml: 'Export',
@@ -509,7 +554,8 @@
                 deleteSelected: 'Delete selected',
                 cancelSelect: 'Cancel',
                 bulkDeleted: 'Deleted items: ',
-                homeReset: 'Showing all links'
+                homeReset: 'Showing all links',
+                aboutSheetTitle: 'How It Works'
             }
         };
 
@@ -590,10 +636,9 @@
         let ITEMS = structuredClone(DEFAULT_ITEMS);
         const STORAGE_KEY = 'linkbox_hyperos_v2';
 
-        // Жёсткая очистка URL от запятых, точек, скобок и мусора на конце (исправление бага ",,")
+        // Жёсткая очистка URL от запятых, точек, скобок и мусора на конце
         function cleanRawUrl(raw) {
             let u = (raw || '').trim();
-            // Срезаем любые запятые, точки, кавычки, скобки и точки с запятой с концов ссылки
             u = u.replace(/^[,\s"'<>()[\]{};:]+|[,\s"'<>()[\]{}.;:]+$/g, '');
             if (!u) return '';
             if (!/^https?:\/\//i.test(u)) u = 'https://' + u;
@@ -619,11 +664,24 @@
                 if (!raw) return false;
                 const parsed = JSON.parse(raw);
                 if (Array.isArray(parsed.items)) {
-                    // Заодно лечим старые ссылки с запятыми на конце, если они были сохранены
-                    ITEMS = parsed.items.map(it => ({
-                        ...it,
-                        url: cleanRawUrl(it.url)
-                    }));
+                    ITEMS = parsed.items.map(it => {
+                        const cleanedUrl = cleanRawUrl(it.url);
+                        const isGenericClone = /Інформаційний портал .* актуальні новини|Проаналізовано ІІ/i.test(it.note || '');
+                        if (isGenericClone) {
+                            const customT = (!it.title || /Новини та аналітика|Корисний ресурс/i.test(it.title)) ? '' : it.title;
+                            const rebuilt = buildSmartAIItem(cleanedUrl, customT);
+                            return {
+                                ...rebuilt,
+                                id: it.id,
+                                date: it.date || rebuilt.date,
+                                lockedOverride: it.lockedOverride ?? null
+                            };
+                        }
+                        return {
+                            ...it,
+                            url: cleanedUrl
+                        };
+                    });
                 }
                 if (Array.isArray(parsed.lockedFolders)) LOCKED_FOLDERS = new Set(parsed.lockedFolders);
                 if (parsed.themeMode) themeMode = parsed.themeMode;
@@ -635,7 +693,22 @@
             }
         }
 
-        // Блокировка и разблокировка фонового скролла страницы при открытых шторках
+        function openExternalUrlInNewTab(rawUrl) {
+            const finalUrl = cleanRawUrl(rawUrl);
+            if (!finalUrl) return;
+
+            const a = document.createElement('a');
+            a.href = finalUrl;
+            a.target = '_blank';
+            a.rel = 'noopener noreferrer external';
+            a.style.display = 'none';
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => {
+                if (a.parentNode) a.parentNode.removeChild(a);
+            }, 150);
+        }
+
         function lockBodyScroll() {
             document.body.classList.add('sheet-locked');
         }
@@ -644,12 +717,12 @@
             const menuOpen = document.getElementById('menu-sheet-modal').classList.contains('open');
             const editOpen = document.getElementById('edit-sheet-modal').classList.contains('open');
             const tagsOpen = document.getElementById('tags-sheet-modal').classList.contains('open');
-            if (!menuOpen && !editOpen && !tagsOpen) {
+            const aboutOpen = document.getElementById('about-sheet-modal').classList.contains('open');
+            if (!menuOpen && !editOpen && !tagsOpen && !aboutOpen) {
                 document.body.classList.remove('sheet-locked');
             }
         }
 
-        // Сброс всех фильтров по нажатию на логотип/название LinkBox в шапке
         function resetToAllLinks() {
             const hadFilter = selectedFolder !== 'ALL' || selectedTag !== null || (document.getElementById('search-input')?.value || '') !== '';
             selectedFolder = 'ALL';
@@ -665,7 +738,6 @@
             if (hadFilter) showToast(t('homeReset'));
         }
 
-        // Режим массового выбора и удаления карточек
         function toggleSelectMode() {
             isSelectMode = !isSelectMode;
             selectedIds.clear();
@@ -778,7 +850,7 @@
             const rand = unlockedItems[Math.floor(Math.random() * unlockedItems.length)];
             closeMenuSheet();
             showToast(t('randomOpened') + rand.name);
-            window.open(rand.url, '_blank', 'noopener,noreferrer');
+            openExternalUrlInNewTab(rand.url);
         }
 
         function toggleLang() {
@@ -788,14 +860,17 @@
             updateStaticTexts();
             renderApp();
             renderFoldersInMenu();
+            renderAboutContent();
         }
 
         function updateStaticTexts() {
             document.getElementById('btn-menu-label').textContent = t('menu');
+            document.getElementById('btn-add-label').textContent = t('addBtn');
             document.getElementById('menu-title-label').textContent = t('menu');
             document.getElementById('btn-random-label').textContent = t('random');
             document.getElementById('lbl-folders-section').textContent = t('foldersSection');
             document.getElementById('tags-sheet-title').textContent = t('tagsSheetTitle');
+            document.getElementById('about-sheet-title').textContent = t('aboutSheetTitle');
             document.getElementById('url-input').placeholder = t('urlPlaceholder');
             document.getElementById('btn-import-ai').textContent = t('importAi');
             document.getElementById('btn-export-html').textContent = t('exportHtml');
@@ -870,7 +945,6 @@
             }, 340);
         }
 
-        // Открытие шторки #Хештегов из кнопки # внизу Меню
         function openTagsSheetFromMenu() {
             const menuModal = document.getElementById('menu-sheet-modal');
             menuModal.classList.remove('open');
@@ -902,6 +976,196 @@
                 panel.style.transform = '';
                 unlockBodyScrollIfNoneOpen();
             }, 340);
+        }
+
+        function openAboutSheetFromMenu() {
+            const menuModal = document.getElementById('menu-sheet-modal');
+            menuModal.classList.remove('open');
+            setTimeout(() => {
+                menuModal.classList.add('hidden');
+                menuModal.style.display = 'none';
+                openAboutSheet();
+            }, 220);
+        }
+
+        function openAboutSheet() {
+            lockBodyScroll();
+            renderAboutContent();
+            const modal = document.getElementById('about-sheet-modal');
+            const panel = document.getElementById('about-sheet-panel');
+            panel.style.transform = '';
+            modal.classList.remove('hidden');
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('open'), 10);
+        }
+
+        function closeAboutSheet() {
+            const modal = document.getElementById('about-sheet-modal');
+            const panel = document.getElementById('about-sheet-panel');
+            modal.classList.remove('open');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.style.display = 'none';
+                panel.style.transform = '';
+                unlockBodyScrollIfNoneOpen();
+            }, 340);
+        }
+
+        function renderAboutContent() {
+            const container = document.getElementById('about-sheet-body');
+            if (!container) return;
+
+            if (currentLang === 'uk') {
+                container.innerHTML = `
+                    <div class="theme-card border rounded-xl p-3.5 space-y-1.5">
+                        <div class="font-extrabold text-sm text-[#D96B27]">Ласкаво просимо до LinkBox!</div>
+                        <p class="text-xs sm:text-sm theme-muted leading-relaxed">
+                            Цей органайзер створено для того, щоб збережені посилання не перетворювалися на забутий цвинтар закладок, а завжди були під рукою у чистому, охайному та зручному вигляді.
+                        </p>
+                    </div>
+
+                    <div class="space-y-2.5 text-xs sm:text-sm">
+                        <div class="theme-card border rounded-xl p-3.5 space-y-1">
+                            <div class="font-bold">1. Головна шапка та швидке повернення</div>
+                            <p class="theme-muted">
+                                Ліворуч угорі розташований логотип <b>LinkBox</b> із лічильником усіх збережених посилань. Натискання на логотип у будь-який момент миттєво скидає вибрану папку, тег чи пошук і повертає до повного списку. Праворуч знаходяться кнопка масового вибору (іконка з галочкою) та кнопка <b>«Меню»</b>.
+                            </p>
+                        </div>
+
+                        <div class="theme-card border rounded-xl p-3.5 space-y-1">
+                            <div class="font-bold">2. Розумний рядок додавання («+ Додати»)</div>
+                            <p class="theme-muted">
+                                У верхнє поле можна вставити як одне посилання, так і цілий список адрес. Після натискання кнопки <b>«Додати»</b> розумний алгоритм автоматично очистить адресу від зайвих ком чи сміття, перевірить базу на дублікати, визначить тему сторінки за заголовком та адресою, підбере відповідну папку, колір, іконку, хештеги та складе змістовну нотатку.
+                            </p>
+                        </div>
+
+                        <div class="theme-card border rounded-xl p-3.5 space-y-1">
+                            <div class="font-bold">3. Режим «Сейф» (Захист від випадкових переходів)</div>
+                            <p class="theme-muted">
+                                Для особистих або делікатних посилань передбачено блокування прямого відкриття. Замок можна увімкнути як для цілої папки у Меню, так і для окремої картки. Коли замок активний, кнопка переходу в браузер стає неактивною — випадково натиснути на неї неможливо, але адресу завжди можна скопіювати кнопкою поруч.
+                            </p>
+                        </div>
+
+                        <div class="theme-card border rounded-xl p-3.5 space-y-1">
+                            <div class="font-bold">4. Картка посилання та її поля</div>
+                            <p class="theme-muted">
+                                Натискання на будь-яку картку відкриває шторку керування, де кожне поле можна налаштувати:
+                            </p>
+                            <ul class="list-disc list-inside space-y-1 theme-muted pt-1">
+                                <li><b>Відкрити в браузері та Копіювати:</b> відкриває сайт у новій вкладці або копіює чистий URL у буфер обміну.</li>
+                                <li><b>Блокувати прямий перехід:</b> індивідуальний тумблер замка (OFF / LOCKED) саме для цієї картки.</li>
+                                <li><b>URL:</b> пряма адреса сторінки, яку завжди можна підправити.</li>
+                                <li><b>Назва:</b> заголовок матеріалу або статті.</li>
+                                <li><b>Нотатка + «Переписати ІІ»:</b> короткий опис суті сторінки. Кнопка «Переписати ІІ» заново аналізує URL і назву та оновлює опис, папку й теги.</li>
+                                <li><b>Папка та #Теги:</b> категорія, в якій живе картка, та список хештегів через пробіл для швидкої фільтрації.</li>
+                            </ul>
+                        </div>
+
+                        <div class="theme-card border rounded-xl p-3.5 space-y-1">
+                            <div class="font-bold">5. Можливості шторки «Меню»</div>
+                            <ul class="list-disc list-inside space-y-1 theme-muted pt-1">
+                                <li><b>Пошук та Рандом:</b> миттєвий пошук за словами, доменом чи тегами, а також кнопка відкриття випадкового незаблокованого посилання.</li>
+                                <li><b>Вигляд та Теми:</b> перемикання розкладки (Малі картки, Великі картки, Список) та трьох тем оформлення (Світла, М'яка темна, Чорна AMOLED).</li>
+                                <li><b>Категорії:</b> список усіх папок із лічильниками та кнопками замків праворуч від кожної папки.</li>
+                                <li><b>Імпорт ІІ та Експорт:</b> завантаження закладок із файлів (.HTML, .TXT, .JSON, .CSV) з автоматичним ІІ-розбором по папках, а також вивантаження всієї бази у стандартний .HTML файл для будь-якого браузера.</li>
+                                <li><b>Кнопка # та Мова (UA/EN):</b> окреме вікно з усіма хештегами та миттєве перемикання мови інтерфейсу.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="theme-card border border-[#D96B27]/40 rounded-xl p-4 text-center space-y-2 mt-3">
+                        <div class="w-9 h-9 rounded-lg bg-[#D96B27]/15 text-[#D96B27] flex items-center justify-center mx-auto">
+                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                                <path d="M9 12l2 2 4-4"/>
+                            </svg>
+                        </div>
+                        <div class="font-black text-sm sm:text-base tracking-tight">Зробив Shans</div>
+                        <div class="flex items-center justify-center gap-2 font-extrabold text-sm">
+                            <span>Слава Україні!</span>
+                            <span class="inline-flex flex-col w-6 h-4 rounded-xs overflow-hidden shadow-2xs shrink-0" title="Україна">
+                                <span class="w-full h-1/2 bg-[#0057B7]"></span>
+                                <span class="w-full h-1/2 bg-[#FFD700]"></span>
+                            </span>
+                        </div>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `
+                    <div class="theme-card border rounded-xl p-3.5 space-y-1.5">
+                        <div class="font-extrabold text-sm text-[#D96B27]">Welcome to LinkBox!</div>
+                        <p class="text-xs sm:text-sm theme-muted leading-relaxed">
+                            This organizer is built so that saved links never turn into a forgotten graveyard of bookmarks, staying clean, structured, and always at hand.
+                        </p>
+                    </div>
+
+                    <div class="space-y-2.5 text-xs sm:text-sm">
+                        <div class="theme-card border rounded-xl p-3.5 space-y-1">
+                            <div class="font-bold">1. Top Header & Instant Reset</div>
+                            <p class="theme-muted">
+                                On the top left is the <b>LinkBox</b> logo with the total link counter. Tapping the logo at any time resets active folder, tag, or search filters and brings back the full list. On the right are the bulk selection button (checkbox icon) and the <b>"Menu"</b> button.
+                            </p>
+                        </div>
+
+                        <div class="theme-card border rounded-xl p-3.5 space-y-1">
+                            <div class="font-bold">2. Smart Input Bar ("+ Add")</div>
+                            <p class="theme-muted">
+                                Paste a single link or a whole list of URLs into the top field. Pressing <b>"Add"</b> automatically strips trailing commas or punctuation, checks for duplicates, detects the topic from the title and URL path, assigns the right folder, color, icon, hashtags, and writes a clear summary note.
+                            </p>
+                        </div>
+
+                        <div class="theme-card border rounded-xl p-3.5 space-y-1">
+                            <div class="font-bold">3. Safe Lock Mode (Accidental Tap Protection)</div>
+                            <p class="theme-muted">
+                                For private or sensitive links, direct opening can be blocked. Locks can be toggled for an entire folder inside the Menu or for an individual card. When locked, the browser open button is disabled to prevent accidental taps, while the copy button next to it remains ready for use.
+                            </p>
+                        </div>
+
+                        <div class="theme-card border rounded-xl p-3.5 space-y-1">
+                            <div class="font-bold">4. Link Card & Its Fields</div>
+                            <p class="theme-muted">
+                                Tapping any card opens the details sheet where every field can be customized:
+                            </p>
+                            <ul class="list-disc list-inside space-y-1 theme-muted pt-1">
+                                <li><b>Open in Browser & Copy:</b> opens the site in a new tab or copies the clean URL to the clipboard.</li>
+                                <li><b>Block Direct Open:</b> individual lock switch (OFF / LOCKED) for this specific card.</li>
+                                <li><b>URL:</b> direct page address that can be edited anytime.</li>
+                                <li><b>Title:</b> the headline of the article or resource.</li>
+                                <li><b>Note + "Rewrite AI":</b> concise summary of the page. "Rewrite AI" re-analyzes the URL and title to refresh the note, folder, and tags.</li>
+                                <li><b>Folder & #Tags:</b> the category where the card lives and space-separated hashtags for quick filtering.</li>
+                            </ul>
+                        </div>
+
+                        <div class="theme-card border rounded-xl p-3.5 space-y-1">
+                            <div class="font-bold">5. Inside the "Menu" Sheet</div>
+                            <ul class="list-disc list-inside space-y-1 theme-muted pt-1">
+                                <li><b>Search & Random:</b> instant search by keywords, domain, or tags, plus a button to open a random unlocked link.</li>
+                                <li><b>Layout & Themes:</b> switch between Small cards, Large cards, or List view, and three color themes (Light, Soft Dim, AMOLED Black).</li>
+                                <li><b>Categories:</b> all folders with item counters and quick lock buttons on the right.</li>
+                                <li><b>AI Import & Export:</b> import bookmark files (.HTML, .TXT, .JSON, .CSV) with automatic AI sorting, or export the entire database to a standard browser .HTML file.</li>
+                                <li><b># Button & Language (UA/EN):</b> dedicated hashtag cloud sheet and instant interface language switch.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="theme-card border border-[#D96B27]/40 rounded-xl p-4 text-center space-y-2 mt-3">
+                        <div class="w-9 h-9 rounded-lg bg-[#D96B27]/15 text-[#D96B27] flex items-center justify-center mx-auto">
+                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                                <path d="M9 12l2 2 4-4"/>
+                            </svg>
+                        </div>
+                        <div class="font-black text-sm sm:text-base tracking-tight">Made by Shans</div>
+                        <div class="flex items-center justify-center gap-2 font-extrabold text-sm">
+                            <span>Glory to Ukraine!</span>
+                            <span class="inline-flex flex-col w-6 h-4 rounded-xs overflow-hidden shadow-2xs shrink-0" title="Ukraine">
+                                <span class="w-full h-1/2 bg-[#0057B7]"></span>
+                                <span class="w-full h-1/2 bg-[#FFD700]"></span>
+                            </span>
+                        </div>
+                    </div>
+                `;
+            }
         }
 
         function renderTagsCloud() {
@@ -1026,7 +1290,7 @@
                 showToast(t('lockedToast'));
                 return;
             }
-            window.open(cleanRawUrl(item.url), '_blank', 'noopener,noreferrer');
+            openExternalUrlInNewTab(item.url);
         }
 
         function copySheetUrl() {
@@ -1042,7 +1306,7 @@
             }
             const val = cleanRawUrl(document.getElementById('sheet-url').value);
             if (!val) return;
-            window.open(val, '_blank', 'noopener,noreferrer');
+            openExternalUrlInNewTab(val);
         }
 
         function exportBrowserBookmarks() {
@@ -1133,24 +1397,25 @@
                             </p>
                         </div>
 
-                        <div class="flex items-stretch gap-2 mt-4">
-                            <button onclick="openItemById(${s.id}, event)" ${locked ? 'disabled' : ''} class="flex-1 py-2.5 px-4 rounded-lg font-black text-sm flex items-center justify-center gap-1.5 transition ${
-                                locked
-                                    ? 'theme-input opacity-45 cursor-not-allowed'
-                                    : 'key-press bg-[#D96B27] hover:bg-[#c55d1d] text-white'
-                            }">
+                        <div class="flex items-stretch gap-2 mt-4 pt-3 border-t" style="border-color: var(--border-main)">
+                            <button onclick="openItemById(${s.id}, event)" ${locked ? 'disabled' : ''}
+                                class="flex-1 py-2.5 px-3 rounded-lg font-extrabold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition ${
+                                    locked ? 'theme-input opacity-45 cursor-not-allowed' : 'key-press bg-[#D96B27] text-white'
+                                }">
                                 <span>${t('openMain')}</span>
                                 ${locked ? LINE_ICONS.lock : LINE_ICONS.extArrow}
                             </button>
-                            <button onclick="copyItemUrl('${s.url.replace(/'/g, "\\'")}', event)" title="Копіювати" class="key-press w-11 rounded-lg theme-input flex items-center justify-center shrink-0">
+                            <button onclick="copyItemUrl('${s.url.replace(/'/g, "\\'")}', event)" title="Копіювати URL" class="key-press w-11 rounded-lg theme-input flex items-center justify-center shrink-0">
                                 <svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24">
-                                    <rect x="9" y="9" width="13" height="13" rx="1"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                                    <rect x="9" y="9" width="13" height="13" rx="1"/>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
                                 </svg>
                             </button>
                         </div>
                     </div>
                 `}).join('');
             }
+
             // 2. БОЛЬШИЕ КАРТОЧКИ
             else if (viewMode === 'large') {
                 cardsEl.className = 'space-y-3';
@@ -1160,57 +1425,54 @@
                     const isSelected = selectedIds.has(s.id);
                     const clickAction = isSelectMode ? `toggleCardSelect(${s.id}, event)` : `openEditSheet(${s.id})`;
                     return `
-                    <div id="card-${s.id}" onclick="${clickAction}" class="rounded-xl theme-card border grid grid-cols-1 md:grid-cols-12 overflow-hidden cursor-pointer hover:border-[#D96B27] transition ${isDup || isSelected ? 'ring-2 ring-[#D96B27] border-[#D96B27]' : ''}">
-                        <div class="md:col-span-5 p-4 flex flex-col justify-between md:border-r border-b md:border-b-0" style="border-color: var(--border-main)">
-                            <div>
-                                <div class="flex items-center justify-between gap-2">
-                                    <div class="flex items-center gap-2.5 min-w-0">
-                                        ${isSelectMode ? `
-                                            <span class="w-6 h-6 rounded-md border flex items-center justify-center shrink-0 ${isSelected ? 'bg-[#D96B27] border-[#D96B27] text-white' : 'theme-input'}">
-                                                ${isSelected ? '✓' : ''}
-                                            </span>
-                                        ` : ''}
-                                        <span class="w-8 h-8 rounded-lg flex items-center justify-center text-white shrink-0" style="background:${s.color}">${s.svg}</span>
-                                        <div class="min-w-0">
-                                            <div class="font-black text-base truncate">${s.name}</div>
-                                            <div class="text-xs font-mono-code theme-muted truncate">${s.domain}</div>
-                                        </div>
+                    <div id="card-${s.id}" onclick="${clickAction}" class="rounded-xl p-4 sm:p-5 theme-card border grid grid-cols-1 md:grid-cols-12 gap-4 items-center cursor-pointer hover:border-[#D96B27] transition ${isDup || isSelected ? 'ring-2 ring-[#D96B27] border-[#D96B27]' : ''}">
+                        <div class="md:col-span-5 flex flex-col justify-between space-y-3">
+                            <div class="flex items-center justify-between gap-2">
+                                <div class="flex items-center gap-2.5 min-w-0">
+                                    ${isSelectMode ? `
+                                        <span class="w-6 h-6 rounded-md border flex items-center justify-center shrink-0 ${isSelected ? 'bg-[#D96B27] border-[#D96B27] text-white' : 'theme-input'}">
+                                            ${isSelected ? '✓' : ''}
+                                        </span>
+                                    ` : ''}
+                                    <span class="w-9 h-9 rounded-lg flex items-center justify-center text-white shrink-0" style="background:${s.color}">
+                                        ${s.svg}
+                                    </span>
+                                    <div class="min-w-0">
+                                        <div class="font-black text-base truncate">${s.name}</div>
+                                        <div class="text-xs font-mono-code theme-muted truncate">${s.domain}</div>
                                     </div>
-                                    <span class="text-xs font-mono-code theme-muted">${s.date}</span>
                                 </div>
-                                <div class="mt-3 text-base font-bold">${s.title}</div>
+                                <span class="text-xs font-bold px-2.5 py-0.5 rounded-md text-white shrink-0" style="background:${s.color}">${s.cat}</span>
                             </div>
 
-                            <div class="flex items-stretch gap-2 mt-4">
-                                <button onclick="openItemById(${s.id}, event)" ${locked ? 'disabled' : ''} class="flex-1 py-2.5 px-4 rounded-lg font-black text-sm flex items-center justify-center gap-1.5 transition ${
-                                    locked
-                                        ? 'theme-input opacity-45 cursor-not-allowed'
-                                        : 'key-press bg-[#D96B27] hover:bg-[#c55d1d] text-white'
-                                }">
+                            <div class="flex items-stretch gap-2">
+                                <button onclick="openItemById(${s.id}, event)" ${locked ? 'disabled' : ''}
+                                    class="flex-1 py-2.5 px-3 rounded-lg font-extrabold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition ${
+                                        locked ? 'theme-input opacity-45 cursor-not-allowed' : 'key-press bg-[#D96B27] text-white'
+                                    }">
                                     <span>${t('openMain')}</span>
                                     ${locked ? LINE_ICONS.lock : LINE_ICONS.extArrow}
                                 </button>
                                 <button onclick="copyItemUrl('${s.url.replace(/'/g, "\\'")}', event)" class="key-press w-11 rounded-lg theme-input flex items-center justify-center shrink-0">
-                                    <svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="1"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                                    <svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24">
+                                        <rect x="9" y="9" width="13" height="13" rx="1"/>
+                                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                                    </svg>
                                 </button>
                             </div>
                         </div>
 
-                        <div class="md:col-span-7 p-4 flex flex-col justify-between">
-                            <div>
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center gap-1.5">
-                                        ${locked ? `<span class="w-6 h-6 rounded-md theme-input flex items-center justify-center opacity-75">${LINE_ICONS.lock}</span>` : ''}
-                                        <span class="text-xs font-bold px-2 py-0.5 rounded-md text-white" style="background:${s.color}">${s.cat}</span>
-                                    </div>
-                                    <span class="text-xs font-mono-code theme-muted">${(s.tags || []).join(' ')}</span>
-                                </div>
-                                <p class="text-sm sm:text-base mt-3 leading-relaxed">${s.note}</p>
+                        <div class="md:col-span-7 md:border-l md:pl-4 space-y-1.5" style="border-color: var(--border-main)">
+                            <div class="text-base font-bold">${s.title}</div>
+                            <p class="text-sm theme-muted leading-relaxed">${s.note}</p>
+                            <div class="flex flex-wrap gap-1.5 pt-1">
+                                ${(s.tags || []).map(tg => `<span class="text-[11px] font-mono-code theme-muted">${tg}</span>`).join('')}
                             </div>
                         </div>
                     </div>
                 `}).join('');
             }
+
             // 3. СПИСОК
             else {
                 cardsEl.className = 'space-y-2';
@@ -1220,30 +1482,36 @@
                     const isSelected = selectedIds.has(s.id);
                     const clickAction = isSelectMode ? `toggleCardSelect(${s.id}, event)` : `openEditSheet(${s.id})`;
                     return `
-                    <div id="card-${s.id}" onclick="${clickAction}" class="rounded-lg p-3 theme-card border flex items-center justify-between gap-3 cursor-pointer hover:border-[#D96B27] transition ${isDup || isSelected ? 'ring-2 ring-[#D96B27] border-[#D96B27]' : ''}">
-                        <div class="flex items-center gap-3 min-w-0 flex-1">
+                    <div id="card-${s.id}" onclick="${clickAction}" class="rounded-xl p-3 theme-card border flex items-center justify-between gap-3 cursor-pointer hover:border-[#D96B27] transition ${isDup || isSelected ? 'ring-2 ring-[#D96B27] border-[#D96B27]' : ''}">
+                        <div class="flex items-center gap-2.5 min-w-0 flex-1">
                             ${isSelectMode ? `
                                 <span class="w-6 h-6 rounded-md border flex items-center justify-center shrink-0 ${isSelected ? 'bg-[#D96B27] border-[#D96B27] text-white' : 'theme-input'}">
                                     ${isSelected ? '✓' : ''}
                                 </span>
                             ` : ''}
-                            <span class="w-8 h-8 rounded-lg flex items-center justify-center text-white shrink-0" style="background:${s.color}">${s.svg}</span>
+                            <span class="w-8 h-8 rounded-lg flex items-center justify-center text-white shrink-0" style="background:${s.color}">
+                                ${s.svg}
+                            </span>
                             <div class="min-w-0 flex-1">
-                                <div class="font-bold text-sm sm:text-base truncate">${s.name} — ${s.title}</div>
-                                <div class="text-xs sm:text-sm theme-muted truncate">${s.note}</div>
+                                <div class="flex items-center gap-2">
+                                    <span class="font-bold text-sm truncate">${s.title}</span>
+                                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded text-white shrink-0" style="background:${s.color}">${s.cat}</span>
+                                </div>
+                                <div class="text-xs theme-muted truncate">${s.note}</div>
                             </div>
                         </div>
                         <div class="flex items-center gap-1.5 shrink-0">
-                            <button onclick="openItemById(${s.id}, event)" ${locked ? 'disabled' : ''} class="py-2 px-3.5 rounded-lg font-black text-xs sm:text-sm flex items-center gap-1.5 transition ${
-                                locked
-                                    ? 'theme-input opacity-45 cursor-not-allowed'
-                                    : 'key-press bg-[#D96B27] text-white'
-                            }">
-                                <span>${t('openMain')}</span>
+                            <button onclick="openItemById(${s.id}, event)" ${locked ? 'disabled' : ''}
+                                class="w-9 h-9 rounded-lg flex items-center justify-center transition ${
+                                    locked ? 'theme-input opacity-45 cursor-not-allowed' : 'key-press bg-[#D96B27] text-white'
+                                }">
                                 ${locked ? LINE_ICONS.lock : LINE_ICONS.extArrow}
                             </button>
-                            <button onclick="copyItemUrl('${s.url.replace(/'/g, "\\'")}', event)" title="Копіювати" class="key-press w-9 h-9 rounded-lg theme-input flex items-center justify-center shrink-0">
-                                <svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="1"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                            <button onclick="copyItemUrl('${s.url.replace(/'/g, "\\'")}', event)" class="key-press w-9 h-9 rounded-lg theme-input flex items-center justify-center">
+                                <svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24">
+                                    <rect x="9" y="9" width="13" height="13" rx="1"/>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                                </svg>
                             </button>
                         </div>
                     </div>
@@ -1251,499 +1519,185 @@
             }
         }
 
-        // Нормализация URL для точного поиска дубликатов (с предварительной очисткой запятых)
-        function normalizeUrlForCheck(rawUrl) {
-            const u = cleanRawUrl(rawUrl);
-            if (!u) return '';
-            try {
-                const parsed = new URL(u);
-                const host = parsed.hostname.replace(/^www\./i, '').toLowerCase();
-                const path = parsed.pathname.replace(/\/+$/, '');
-                return host + path + parsed.search.toLowerCase();
-            } catch (e) {
-                return u.replace(/^https?:\/\//i, '').replace(/^www\./i, '').replace(/\/+$/, '').toLowerCase();
-            }
+        function normalizeUrlForCompare(raw) {
+            return cleanRawUrl(raw).replace(/^https?:\/\//i, '').replace(/^www\./i, '').replace(/\/+$/, '').toLowerCase();
         }
 
         function findDuplicateItem(rawUrl) {
-            const norm = normalizeUrlForCheck(rawUrl);
-            if (!norm) return null;
-            return ITEMS.find(item => normalizeUrlForCheck(item.url) === norm) || null;
+            const target = normalizeUrlForCompare(rawUrl);
+            if (!target) return null;
+            return ITEMS.find(item => normalizeUrlForCompare(item.url) === target) || null;
         }
 
-        // Извлечение красивого имени бренда из домена (без поддомена "m." или "ukr.")
         function extractCleanBrandName(domain) {
             const parts = domain.split('.').filter(p => !['www', 'm', 'mobile', 'ua', 'com', 'net', 'org', 'gov', 'edu', 'info', 'io', 'co', 'uk', 'ru', 'biz'].includes(p));
             const root = parts.length > 0 ? parts[parts.length - 1] : domain.split('.')[0];
             if (!root) return 'Сайт';
-            return root.charAt(0).toUpperCase() + root.slice(1);
+            const mainBrand = root.charAt(0).toUpperCase() + root.slice(1);
+            if (parts.length > 1) {
+                const sub = parts[0].toLowerCase();
+                const subMap = {
+                    techno: 'Techno',
+                    life: 'Life',
+                    sport: 'Sport',
+                    auto: 'Auto',
+                    health: 'Health',
+                    style: 'Style',
+                    travel: 'Travel',
+                    music: 'Music',
+                    books: 'Books'
+                };
+                if (subMap[sub]) return `${mainBrand} ${subMap[sub]}`;
+            }
+            return mainBrand;
         }
 
-        // Очистка человеческого заголовка (если из браузера пришло нормальное название, оставляем его; если голый URL или мусор — не берём)
+        function decodeUrlPathToHumanTopic(urlStr) {
+            try {
+                const u = new URL(cleanRawUrl(urlStr));
+                const segments = u.pathname.split('/').filter(Boolean);
+                if (segments.length === 0) return { topic: '', sectionHint: '' };
+
+                let slug = decodeURIComponent(segments[segments.length - 1]);
+                slug = slug.replace(/\.(html?|php|aspx?|jsp)$/i, '');
+                slug = slug.replace(/(?:^|[-_])\d{4,}(?=$|[-_])/g, '');
+                slug = slug.replace(/^\d+[-_]/, '');
+
+                const sectionRaw = segments.length > 1 ? segments.slice(0, -1).join(' ').toLowerCase() : '';
+
+                const words = slug.split(/[-_]+/).filter(w => w.length > 0 && !/^\d+$/.test(w));
+                if (words.length < 2) return { topic: '', sectionHint: sectionRaw };
+
+                if (/[а-яіїєґ]/i.test(slug)) {
+                    const cleanCyr = words.join(' ');
+                    return {
+                        topic: cleanCyr.charAt(0).toUpperCase() + cleanCyr.slice(1),
+                        sectionHint: sectionRaw
+                    };
+                }
+
+                const SLUG_DICT = {
+                    'luchshih': 'лучших', 'luchshie': 'лучшие', 'samye': 'самые', 'samyh': 'самых',
+                    'nauchno': 'научно', 'fantasticheskih': 'фантастических', 'romanov': 'романов',
+                    'knig': 'книг', 'knigi': 'книги', 'xxi': 'XXI', 'veka': 'века', 'chtivo': 'чтиво',
+                    'voskresnoje': 'воскресное', 'smeshnye': 'смешные', 'zagolovki': 'заголовки',
+                    'ukrainskiy': 'украинский', 'ukrainskie': 'украинские', 'shou': 'шоу', 'biz': 'биз',
+                    'memy': 'мемы', 'pro': 'про', 'literaturu': 'литературу', 'veselye': 'весёлые',
+                    'kanaly': 'каналы', 'telegram': 'Telegram', 'vybor': 'выбор', 'redakcii': 'редакции',
+                    'kakie': 'какие', 'sajty': 'сайты', 'rabotayut': 'работают', 'ukraine': 'Украине',
+                    'ukraina': 'Украина', 'besplatno': 'бесплатно', 'onlajn': 'онлайн', 'smotret': 'смотреть',
+                    'serialy': 'сериалы', 'filmy': 'фильмы', 'kino': 'кино', 'novosti': 'новости',
+                    'tehnologii': 'технологии', 'gadzhety': 'гаджеты', 'smartfony': 'смартфоны',
+                    'obzor': 'обзор', 'reyting': 'рейтинг', 'top': 'ТОП', 'kak': 'как', 'chto': 'что',
+                    'gde': 'где', 'kogda': 'когда', 'pochemu': 'почему', 'sovety': 'советы',
+                    'instrukciya': 'инструкция', 'recepty': 'рецепты', 'igry': 'игры', 'muzyka': 'музыка',
+                    'nauka': 'наука', 'kosmos': 'космос', 'istoriya': 'история', 'ekonomika': 'экономика',
+                    'biznes': 'бизнес', 'kriptovalyuta': 'криптовалюта', 'kurs': 'курс', 'valyut': 'валют',
+                    'nedorogoy': 'недорогой', 'kupit': 'купить', 'cena': 'цена'
+                };
+
+                const isTranslitLike = words.some(w => SLUG_DICT[w.toLowerCase()] || /(shch|zh|kh|ts|ch|sh|yu|ya|iy|yy|oje|aya|yye|ov|ev|ih|yh)$/i.test(w));
+
+                function translitWordToCyr(w) {
+                    const low = w.toLowerCase();
+                    if (SLUG_DICT[low]) return SLUG_DICT[low];
+                    if (['ai', 'ui', 'ux', 'it', 'ios', 'android', 'apk', 'pc', 'tv', 'usb', 'wifi', 'vpn', 'gpt', 'telegram', 'youtube', 'netflix', 'spotify', 'starlink', 'ecoflow'].includes(low)) {
+                        return w.toUpperCase() === w ? w : (w.charAt(0).toUpperCase() + w.slice(1));
+                    }
+                    let s = low
+                        .replace(/shch/g, 'щ')
+                        .replace(/yo/g, 'ё')
+                        .replace(/zh/g, 'ж')
+                        .replace(/kh/g, 'х')
+                        .replace(/ts/g, 'ц')
+                        .replace(/ch/g, 'ч')
+                        .replace(/sh/g, 'ш')
+                        .replace(/yu/g, 'ю')
+                        .replace(/ya/g, 'я')
+                        .replace(/je/g, 'е')
+                        .replace(/iy/g, 'ий')
+                        .replace(/yy/g, 'ый')
+                        .replace(/aya/g, 'ая')
+                        .replace(/oye/g, 'ое');
+                    const map = {
+                        a:'а', b:'б', v:'в', g:'г', d:'д', e:'е', z:'з', i:'и', j:'й', y:'й',
+                        k:'k', l:'л', m:'м', n:'н', o:'о', p:'п', r:'р', s:'с', t:'т', u:'у',
+                        f:'ф', h:'х', c:'ц', w:'в', x:'кс', q:'к'
+                    };
+                    map.k = 'к';
+                    let out = '';
+                    for (const ch of s) out += map[ch] || ch;
+                    return out;
+                }
+
+                const converted = words.slice(0, 11).map(w => isTranslitLike ? translitWordToCyr(w) : w);
+                let phrase = converted.join(' ').trim();
+                if (phrase) {
+                    phrase = phrase.charAt(0).toUpperCase() + phrase.slice(1);
+                }
+                return { topic: phrase, sectionHint: sectionRaw };
+            } catch (e) {
+                return { topic: '', sectionHint: '' };
+            }
+        }
+
         function sanitizeBookmarkTitle(rawTitle, cleanName) {
             if (!rawTitle) return '';
             let tStr = rawTitle.trim();
             if (/^https?:\/\//i.test(tStr)) return '';
-            // Отсекаем случайные хвосты из запятых
             tStr = tStr.replace(/[,\s]+$/g, '');
+            if (/—\s*[a-z0-9_-]+\s+\d{4,}/i.test(tStr)) return '';
             if (tStr.length < 2) return '';
             return tStr;
         }
 
-        // Умный ИИ-классификатор: раскладывает сайты по 11 осмысленным категориям и пишет живую контекстную заметку
         function buildSmartAIItem(rawUrl, customTitle = '') {
             const finalUrl = cleanRawUrl(rawUrl);
             const domain = finalUrl.replace(/^https?:\/\//i, '').replace(/^www\./i, '').split('/')[0].toLowerCase();
             const cleanName = extractCleanBrandName(domain);
-            const humanTitle = sanitizeBookmarkTitle(customTitle, cleanName);
-            const combinedSignal = `${finalUrl} ${humanTitle}`.toLowerCase();
+            const { topic: slugTopic, sectionHint } = decodeUrlPathToHumanTopic(finalUrl);
+            const humanTitle = sanitizeBookmarkTitle(customTitle, cleanName) || slugTopic;
+
+            const pageTopicSignal = `${humanTitle} ${sectionHint} ${finalUrl}`.toLowerCase();
+            const domainOnlySignal = domain.toLowerCase();
 
             let cat = currentLang === 'uk' ? 'Веб-ресурси' : 'Web Resources';
             let color = '#4F6352';
             let svg = LINE_ICONS.globe;
-            let tags = [`#${cleanName.toLowerCase()}`, '#веб'];
-            let defaultCategoryTitle = currentLang === 'uk' ? `${cleanName} — Корисний ресурс` : `${cleanName} — Web Resource`;
+            const baseBrandTag = `#${cleanName.toLowerCase().replace(/\s+/g, '')}`;
+            let tags = [baseBrandTag];
+            let defaultCategoryTitle = currentLang === 'uk' ? `${cleanName} — Матеріал` : `${cleanName} — Article`;
             let note = '';
 
-            // 1. МУЗЫКА И АУДИО
-            if (/spotify|soundcloud|music\.apple|deezer|bandcamp|last\.fm|shazam|mp3|radio|podcast|audio|музик|пісн|альбом|плейлист/.test(combinedSignal)) {
+            // 1. КНИГИ, ЛИТЕРАТУРА, НАУКА И ОБРАЗОВАНИЕ
+            if (/roman|роман|книг|літератур|литератур|фантастик|chtivo|чтиво|science|наук|wikipedia|coursera|udemy|prometheus|yakaboo|goodreads|duolingo|book|wiki|library|освіт|курс|словник|енциклопед|навчан/.test(pageTopicSignal)) {
+                cat = currentLang === 'uk' ? 'Книги та Освіта' : 'Books & Science';
+                color = '#6B5344';
+                svg = LINE_ICONS.book;
+                tags = ['#книги', '#література', '#наука', baseBrandTag];
+                defaultCategoryTitle = currentLang === 'uk' ? `${cleanName} — Книги та наука` : `${cleanName} — Books & Science`;
+                note = humanTitle
+                    ? `Літературна або наукова добірка на ${cleanName}: «${humanTitle}». Збережено у список для читання.`
+                    : `Матеріал про книги, науку та освіту на ресурсі ${cleanName} (${domain}).`;
+            }
+            // 2. МУЗЫКА И АУДИО
+            else if (/spotify|soundcloud|music\.apple|deezer|bandcamp|last\.fm|shazam|mp3|radio|podcast|audio|музик|музык|пісн|альбом|плейлист/.test(pageTopicSignal)) {
                 cat = currentLang === 'uk' ? 'Музика' : 'Music';
                 color = '#3F6A4E';
                 svg = LINE_ICONS.music;
-                tags = ['#музика', '#аудіо', `#${cleanName.toLowerCase()}`];
+                tags = ['#музика', '#аудіо', baseBrandTag];
                 defaultCategoryTitle = currentLang === 'uk' ? `${cleanName} — Музика та аудіо` : `${cleanName} — Music & Audio`;
                 note = humanTitle
-                    ? `Музична добірка або трек «${humanTitle}» на ${domain} для прослуховування.`
+                    ? `Музична добірка або аудіоматеріал «${humanTitle}» на ${cleanName} (${domain}).`
                     : `Аудіострімінг та музичний каталог на платформі ${cleanName} (${domain}).`;
             }
-            // 2. КИНО, СЕРИАЛЫ И ВИДЕО
-            else if (/youtube|youtu\.be|netflix|megogo|sweet\.tv|takflix|kinopoisk|imdb|vimeo|twitch|rezka|filmix|uaserial|serial|кіно|серіал|фільм|мульт|movie|cinema|video/.test(combinedSignal)) {
+            // 3. КИНО, СЕРИАЛЫ И ВИДЕО
+            else if (/youtube|youtu\.be|netflix|megogo|sweet\.tv|takflix|kinopoisk|imdb|vimeo|twitch|rezka|filmix|uaserial|serial|серіал|сериал|кіно|кино|фільм|фильм|мульт|movie|cinema|video/.test(pageTopicSignal)) {
                 cat = currentLang === 'uk' ? 'Кіно та Серіали' : 'Movies & Video';
                 color = '#7D3F3B';
                 svg = LINE_ICONS.video;
-                tags = ['#кіно', '#серіали', `#${cleanName.toLowerCase()}`];
-                defaultCategoryTitle = currentLang === 'uk' ? `${cleanName} — Кіно та відео` : `${cleanName} — Video & Series`;
+                tags = ['#кіно', '#серіали', baseBrandTag];
+                defaultCategoryTitle = currentLang === 'uk' ? `${cleanName} — Кіно та серіали` : `${cleanName} — Video & Series`;
                 note = humanTitle
-                    ? `Відео або серіал «${humanTitle}» (${domain}) — збережено у список на перегляд.`
-                    : `Відеоплатформа ${cleanName}: кіно, серіали та ефіри для вечірнього перегляду.`;
-            }
-            // 3. НОВОСТИ, МЕДИА И СТАТЬИ
-            else if (/news|pravda|unian|nv\.ua|tsn|rbc|liga\.net|censor|telegraf|ukranews|24tv|hromadske|babel|forbes|bbc|reuters|bloomberg|korrespondent|zn\.ua|gazeta|obozrevatel|focus\.ua|espreso|новин|статт|медіа|преса/.test(combinedSignal)) {
-                cat = currentLang === 'uk' ? 'Новини та ЗМІ' : 'News & Media';
-                color = '#3B5C6E';
-                svg = LINE_ICONS.news;
-                tags = ['#новини', '#медіа', `#${cleanName.toLowerCase()}`];
-                defaultCategoryTitle = currentLang === 'uk' ? `${cleanName} — Новини та аналітика` : `${cleanName} — News & Media`;
-                note = humanTitle
-                    ? `Публікація ЗМІ на ${cleanName}: «${humanTitle}». Збережено для швидкого ознайомлення.`
-                    : `Інформаційний портал ${cleanName} (${domain}): актуальні новини, репортажі та аналітика.`;
-            }
-            // 4. ПОКУПКИ, МАРКЕТПЛЕЙСЫ И ТЕХНИКА
-            else if (/rozetka|prom\.ua|olx|epicentr|allo|comfy|foxtrot|moyo|citrus|amazon|aliexpress|ebay|makeup|shafa|kasta|zakaz|silpo|atb|shop|store|market|buy|price|nedorogoy|купит|ціна|товар|магазин|знижк/.test(combinedSignal)) {
-                cat = currentLang === 'uk' ? 'Покупки' : 'Shopping';
-                color = '#556B42';
-                svg = LINE_ICONS.shop;
-                tags = ['#покупки', '#каталог', `#${cleanName.toLowerCase()}`];
-                defaultCategoryTitle = currentLang === 'uk' ? `${cleanName} — Товар у каталозі` : `${cleanName} — Store Item`;
-                note = humanTitle
-                    ? `Пропозиція в магазині ${cleanName}: «${humanTitle}». Збережено для порівняння цін та характеристик.`
-                    : `Онлайн-каталог ${cleanName} (${domain}): моніторинг цін, акцій та наявності товарів.`;
-            }
-            // 5. КОД, ПРОГРАММЫ, ИИ И ТЕХНОЛОГИИ
-            else if (/github|gitlab|stackoverflow|habr|dou\.ua|dev\.to|itc\.ua|ain\.ua|gagadget|internetua|volia|kyivstar|vodafone|lifecell|chatgpt|openai|claude|gemini|vercel|docker|linux|android|apk|4pda|xda|soft|app|tehnologii|технолог|програм|код|сервер/.test(combinedSignal)) {
-                cat = currentLang === 'uk' ? 'Код та ІТ' : 'Tech & Code';
-                color = '#43474D';
-                svg = LINE_ICONS.code;
-                tags = ['#технології', '#іт', `#${cleanName.toLowerCase()}`];
-                defaultCategoryTitle = currentLang === 'uk' ? `${cleanName} — ІТ та технології` : `${cleanName} — Tech & Software`;
-                note = humanTitle
-                    ? `Технічний матеріал або сервіс «${humanTitle}» на ${cleanName} (${domain}).`
-                    : `Технологічний ресурс ${cleanName} (${domain}): програми, огляди заліза та цифрові сервіси.`;
-            }
-            // 6. ДИЗАЙН И КРЕАТИВ
-            else if (/figma|behance|dribbble|awwwards|pinterest|framer|unsplash|freepik|canva|adobe|artstation|дизайн|ілюстрац|шрифт/.test(combinedSignal)) {
-                cat = currentLang === 'uk' ? 'Дизайн' : 'Design';
-                color = '#3D5A78';
-                svg = LINE_ICONS.design;
-                tags = ['#дизайн', '#референс', `#${cleanName.toLowerCase()}`];
-                defaultCategoryTitle = currentLang === 'uk' ? `${cleanName} — Візуальний референс` : `${cleanName} — Design Reference`;
-                note = humanTitle
-                    ? `Дизайн-проєкт «${humanTitle}» на ${cleanName}: збережено як візуальний референс.`
-                    : `Колекція інтерфейсів, графіки та дизайн-рішень на платформі ${cleanName}.`;
-            }
-            // 7. КНИГИ, ОБРАЗОВАНИЕ И СПРАВОЧНИКИ
-            else if (/wikipedia|coursera|udemy|prometheus|edera|yakaboo|knigoland|litres|goodreads|duolingo|stud|book|wiki|library|книг|освіт|курс|словник|енциклопед|навчан/.test(combinedSignal)) {
-                cat = currentLang === 'uk' ? 'Книги та Освіта' : 'Books & Edu';
-                color = '#6B5344';
-                svg = LINE_ICONS.book;
-                tags = ['#книги', '#освіта', `#${cleanName.toLowerCase()}`];
-                defaultCategoryTitle = currentLang === 'uk' ? `${cleanName} — Книги та знання` : `${cleanName} — Books & Learning`;
-                note = humanTitle
-                    ? `Навчальний матеріал або книга «${humanTitle}» на ${cleanName} (${domain}).`
-                    : `Освітня база знань та література на ресурсі ${cleanName} (${domain}).`;
-            }
-            // 8. ПОЕЗДКИ, КАРТЫ И ТУРИЗМ
-            else if (/airbnb|booking|skyscanner|tripadvisor|ryanair|uz\.gov|tickets\.ua|infobus|maps\.google|waze|hotel|travel|карпат|подорож|маршрут|квитк|готел/.test(combinedSignal)) {
-                cat = currentLang === 'uk' ? 'Поїздки' : 'Travel';
-                color = '#8F4D53';
-                svg = LINE_ICONS.travel;
-                tags = ['#поїздки', '#маршрут', `#${cleanName.toLowerCase()}`];
-                defaultCategoryTitle = currentLang === 'uk' ? `${cleanName} — Маршрут та бронювання` : `${cleanName} — Travel & Stay`;
-                note = humanTitle
-                    ? `Локація або бронювання «${humanTitle}» на ${cleanName} для планування поїздки.`
-                    : `Сервіс подорожей ${cleanName} (${domain}): маршрути, квитки та варіанти проживання.`;
-            }
-            // 9. ФИНАНСЫ, БАНКИ И БИЗНЕС
-            else if (/privatbank|privat24|monobank|oschadbank|sense|minfin|finance\.ua|kurs\.com|binance|tradingview|diia\.gov|tax\.gov|biz|market|bank|фінанс|банк|бізнес|курс|податк/.test(combinedSignal)) {
-                cat = currentLang === 'uk' ? 'Фінанси та Бізнес' : 'Finance & Biz';
-                color = '#3A6351';
-                svg = LINE_ICONS.finance;
-                tags = ['#фінанси', '#бізнес', `#${cleanName.toLowerCase()}`];
-                defaultCategoryTitle = currentLang === 'uk' ? `${cleanName} — Фінанси та сервіси` : `${cleanName} — Finance & Business`;
-                note = humanTitle
-                    ? `Діловий матеріал або фінансовий сервіс «${humanTitle}» на ${cleanName}.`
-                    : `Фінансово-економічний портал ${cleanName} (${domain}): курси, аналітика ринків та банкінг.`;
-            }
-            // 10. СОЦСЕТИ, ФОРУМЫ И МЕССЕНДЖЕРЫ
-            else if (/t\.me|telegram|instagram|facebook|twitter|x\.com|threads|linkedin|reddit|tiktok|discord|viber|соцмереж|форум|канал/.test(combinedSignal)) {
-                cat = currentLang === 'uk' ? 'Соцмережі' : 'Social';
-                color = '#485675';
-                svg = LINE_ICONS.social;
-                tags = ['#соцмережі', '#спільнота', `#${cleanName.toLowerCase()}`];
-                defaultCategoryTitle = currentLang === 'uk' ? `${cleanName} — Канал / Обговорення` : `${cleanName} — Social Post`;
-                note = humanTitle
-                    ? `Допис або спільнота «${humanTitle}» у мережі ${cleanName}.`
-                    : `Сторінка або авторський канал на платформі ${cleanName} (${domain}).`;
-            }
-            // 11. УНИВЕРСАЛЬНАЯ КАТЕГОРИЯ (если сайт узкоспециализированный)
-            else {
-                note = humanTitle
-                    ? `Збережена сторінка «${humanTitle}» з веб-ресурсу ${cleanName} (${domain}).`
-                    : `Веб-сторінка на домені ${domain} (${cleanName}) для швидкого доступу з колекції.`;
-            }
-
-            const finalTitle = humanTitle || defaultCategoryTitle;
-            const now = new Date();
-            const dateStr = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${String(now.getFullYear()).slice(-2)}`;
-
-            return {
-                id: Date.now() + Math.floor(Math.random() * 100000),
-                name: cleanName,
-                domain,
-                url: finalUrl,
-                title: finalTitle,
-                cat,
-                date: dateStr,
-                color,
-                note,
-                tags,
-                svg,
-                lockedOverride: null
-            };
-        }
-
-        function highlightExistingCard(item) {
-            if (selectedFolder !== 'ALL' && selectedFolder !== item.cat) {
-                selectedFolder = 'ALL';
-            }
-            selectedTag = null;
-            highlightedDuplicateId = item.id;
-            renderApp();
-            setTimeout(() => {
-                const el = document.getElementById(`card-${item.id}`);
-                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }, 60);
-            setTimeout(() => {
-                highlightedDuplicateId = null;
-                renderApp();
-            }, 2600);
-        }
-
-        // Разбор одной или сразу пачки ссылок через главное поле ИИ
-        function addLinkByAI() {
-            const input = document.getElementById('url-input');
-            const rawText = input.value.trim();
-            if (!rawText) return;
-
-            const urlMatches = rawText.match(/(?:https?:\/\/|www\.)[^\s"'<>]+/gi);
-            const rawCandidates = urlMatches && urlMatches.length > 0 ? urlMatches : [rawText];
-            const candidates = rawCandidates.map(u => cleanRawUrl(u)).filter(Boolean);
-
-            if (candidates.length === 1) {
-                const singleUrl = candidates[0];
-                const existing = findDuplicateItem(singleUrl);
-                if (existing) {
-                    showToast(`${t('duplicateFound')}${existing.name} (${existing.cat})`);
-                    highlightExistingCard(existing);
-                    return;
-                }
-                const newItem = buildSmartAIItem(singleUrl);
-                ITEMS.unshift(newItem);
-                input.value = '';
-                saveStateToStorage();
-                renderApp();
-                showToast(t('aiAddedSingle').replace('{cat}', newItem.cat));
-            } else if (candidates.length > 1) {
-                let added = 0;
-                let dups = 0;
-                candidates.forEach(u => {
-                    if (findDuplicateItem(u)) {
-                        dups++;
-                    } else {
-                        ITEMS.unshift(buildSmartAIItem(u));
-                        added++;
-                    }
-                });
-                input.value = '';
-                saveStateToStorage();
-                renderApp();
-                showToast(t('aiImportReport').replace('{added}', added).replace('{dups}', dups));
-            }
-        }
-
-        // Импорт файла закладок (.HTML / .TXT / .JSON) с автоматическим ИИ-разбором и отсевом дубликатов
-        function triggerAIFileImport() {
-            const fileInput = document.getElementById('ai-import-file');
-            if (fileInput) {
-                fileInput.value = '';
-                fileInput.click();
-            }
-        }
-
-        function handleAIFileImport(event) {
-            const file = event.target.files?.[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const content = String(e.target?.result || '');
-                const extracted = [];
-
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(content, 'text/html');
-                const anchors = doc.querySelectorAll('a[href]');
-
-                if (anchors.length > 0) {
-                    anchors.forEach(a => {
-                        const href = cleanRawUrl(a.getAttribute('href') || '');
-                        if (/^https?:\/\//i.test(href)) {
-                            extracted.push({ url: href, title: (a.textContent || '').trim() });
-                        }
-                    });
-                } else {
-                    const rawUrls = content.match(/https?:\/\/[^\s"'<>]+/gi) || [];
-                    rawUrls.forEach(u => {
-                        const clean = cleanRawUrl(u);
-                        if (clean) extracted.push({ url: clean, title: '' });
-                    });
-                }
-
-                let added = 0;
-                let dups = 0;
-
-                extracted.forEach(entry => {
-                    if (findDuplicateItem(entry.url)) {
-                        dups++;
-                    } else {
-                        ITEMS.unshift(buildSmartAIItem(entry.url, entry.title));
-                        added++;
-                    }
-                });
-
-                closeMenuSheet();
-                saveStateToStorage();
-                renderApp();
-                showToast(t('aiImportReport').replace('{added}', added).replace('{dups}', dups));
-            };
-            reader.readAsText(file);
-        }
-
-        function syncSheetLockUI() {
-            const openBtn = document.getElementById('sheet-open-btn');
-            const openIcon = document.getElementById('sheet-open-icon');
-            const lockIcon = document.getElementById('sheet-lock-icon');
-            const lockState = document.getElementById('sheet-lock-state');
-
-            if (sheetTempLocked) {
-                openBtn.disabled = true;
-                openBtn.className = 'flex-1 py-3.5 px-4 rounded-lg theme-input opacity-45 cursor-not-allowed font-black text-sm sm:text-base flex items-center justify-center gap-2 transition';
-                openIcon.innerHTML = LINE_ICONS.lock;
-                lockIcon.innerHTML = LINE_ICONS.lock;
-                lockState.textContent = 'LOCKED';
-                lockState.className = 'font-mono-code text-[11px] px-2 py-0.5 rounded bg-[#D96B27] text-white font-bold';
-            } else {
-                openBtn.disabled = false;
-                openBtn.className = 'key-press flex-1 py-3.5 px-4 rounded-lg bg-[#D96B27] text-white font-black text-sm sm:text-base flex items-center justify-center gap-2 transition';
-                openIcon.innerHTML = LINE_ICONS.extArrow;
-                lockIcon.innerHTML = LINE_ICONS.unlock;
-                lockState.textContent = 'OFF';
-                lockState.className = 'font-mono-code text-[11px] px-2 py-0.5 rounded bg-black/10';
-            }
-        }
-
-        function toggleSheetItemLock() {
-            sheetTempLocked = !sheetTempLocked;
-            syncSheetLockUI();
-        }
-
-        function openEditSheet(id) {
-            const item = ITEMS.find(x => x.id === id);
-            if (!item) return;
-            lockBodyScroll();
-            editingId = id;
-            sheetTempLocked = isItemLocked(item);
-
-            const fav = document.getElementById('sheet-favicon');
-            fav.style.background = item.color;
-            fav.innerHTML = item.svg;
-
-            document.getElementById('sheet-domain').textContent = item.domain;
-            document.getElementById('sheet-date').textContent = item.date;
-            document.getElementById('sheet-url').value = cleanRawUrl(item.url);
-            document.getElementById('sheet-title').value = item.title;
-            document.getElementById('sheet-note').value = item.note;
-            document.getElementById('sheet-cat').value = item.cat;
-            document.getElementById('sheet-tags').value = (item.tags || []).join(' ');
-
-            syncSheetLockUI();
-
-            const modal = document.getElementById('edit-sheet-modal');
-            const panel = document.getElementById('edit-sheet-panel');
-            panel.style.transform = '';
-            modal.classList.remove('hidden');
-            modal.style.display = 'flex';
-            setTimeout(() => modal.classList.add('open'), 10);
-        }
-
-        function closeEditSheet() {
-            const modal = document.getElementById('edit-sheet-modal');
-            const panel = document.getElementById('edit-sheet-panel');
-            modal.classList.remove('open');
-            setTimeout(() => {
-                modal.classList.add('hidden');
-                modal.style.display = 'none';
-                panel.style.transform = '';
-                unlockBodyScrollIfNoneOpen();
-            }, 340);
-            editingId = null;
-        }
-
-        function regenerateAINote() {
-            const item = ITEMS.find(x => x.id === editingId);
-            if (!item) return;
-            const currentUrl = cleanRawUrl(document.getElementById('sheet-url').value || item.url);
-            const currentTitle = document.getElementById('sheet-title').value.trim();
-            const smart = buildSmartAIItem(currentUrl, currentTitle);
-            document.getElementById('sheet-note').value = smart.note;
-            document.getElementById('sheet-cat').value = smart.cat;
-            document.getElementById('sheet-tags').value = smart.tags.join(' ');
-        }
-
-        function saveSheet() {
-            const item = ITEMS.find(x => x.id === editingId);
-            if (!item) return;
-            const newUrl = cleanRawUrl(document.getElementById('sheet-url').value);
-            if (newUrl) {
-                item.url = newUrl;
-                item.domain = newUrl.replace(/^https?:\/\//i, '').replace(/^www\./i, '').split('/')[0].toLowerCase();
-            }
-            item.title = document.getElementById('sheet-title').value.trim() || item.title;
-            item.note = document.getElementById('sheet-note').value.trim() || item.note;
-            item.cat = document.getElementById('sheet-cat').value.trim() || item.cat;
-            const rawTags = document.getElementById('sheet-tags').value.trim();
-            if (rawTags) {
-                item.tags = rawTags.split(/\s+/).map(tg => tg.startsWith('#') ? tg : `#${tg}`);
-            }
-
-            item.lockedOverride = sheetTempLocked;
-
-            saveStateToStorage();
-            closeEditSheet();
-            renderApp();
-            showToast(t('saved'));
-        }
-
-        function deleteCurrentItem() {
-            ITEMS = ITEMS.filter(x => x.id !== editingId);
-            saveStateToStorage();
-            closeEditSheet();
-            renderApp();
-            showToast(t('deleted'));
-        }
-
-        function attachSheetDrag(handleId, panelId, closeFn) {
-            const handle = document.getElementById(handleId);
-            const panel = document.getElementById(panelId);
-            let startY = 0, currentY = 0, dragging = false;
-
-            function onStart(e) {
-                dragging = true;
-                startY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
-                panel.style.transition = 'none';
-            }
-            function onMove(e) {
-                if (!dragging) return;
-                currentY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
-                const diff = currentY - startY;
-                if (diff > 0) panel.style.transform = `translateY(${diff}px)`;
-            }
-            function onEnd() {
-                if (!dragging) return;
-                dragging = false;
-                panel.style.transition = 'transform 0.34s cubic-bezier(0.16, 1, 0.3, 1)';
-                if (currentY - startY > 90) closeFn();
-                else panel.style.transform = 'translateY(0)';
-                startY = 0; currentY = 0;
-            }
-
-            handle.addEventListener('mousedown', onStart);
-            window.addEventListener('mousemove', onMove);
-            window.addEventListener('mouseup', onEnd);
-
-            handle.addEventListener('touchstart', onStart, { passive: true });
-            window.addEventListener('touchmove', onMove, { passive: true });
-            window.addEventListener('touchend', onEnd);
-        }
-
-        function setupPWA() {
-            const svgIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="#141413"/><circle cx="50" cy="50" r="37" fill="none" stroke="#D96B27" stroke-width="11"/><path d="M 16 64 Q 24 77 38 82" fill="none" stroke="#F6F4EE" stroke-width="11"/><path d="M 84 36 Q 76 23 62 18" fill="none" stroke="#F6F4EE" stroke-width="11"/><circle cx="50" cy="50" r="30.5" fill="none" stroke="#141413" stroke-width="3.5"/><circle cx="50" cy="50" r="23" fill="none" stroke="#F6F4EE" stroke-width="11"/><path d="M 29 40 A 23 23 0 0 0 45 72" fill="none" stroke="#D96B27" stroke-width="11" stroke-linecap="round"/><path d="M 71 60 A 23 23 0 0 0 55 28" fill="none" stroke="#D96B27" stroke-width="11" stroke-linecap="round"/><circle cx="50" cy="50" r="16.5" fill="#141413"/></svg>`;
-            const iconUrl = 'data:image/svg+xml;utf8,' + encodeURIComponent(svgIcon);
-
-            const manifest = {
-                name: 'LinkBox // Smart Link Organizer',
-                short_name: 'LinkBox',
-                description: 'Розумний ІІ-органайзер посилань та нотаток',
-                start_url: window.location.href,
-                display: 'standalone',
-                orientation: 'portrait',
-                background_color: '#ECEAE4',
-                theme_color: '#ECEAE4',
-                icons: [
-                    { src: iconUrl, sizes: '192x192', type: 'image/svg+xml', purpose: 'any maskable' },
-                    { src: iconUrl, sizes: '512x512', type: 'image/svg+xml', purpose: 'any maskable' }
-                ]
-            };
-
-            const manifestBlob = new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' });
-            const manifestEl = document.getElementById('pwa-manifest');
-            if (manifestEl) {
-                manifestEl.setAttribute('href', URL.createObjectURL(manifestBlob));
-            }
-        }
-
-        window.onload = () => {
-            setupPWA();
-            const hadSaved = loadStateFromStorage();
-            document.getElementById('lang-btn').textContent = currentLang === 'uk' ? 'UA' : 'EN';
-            updateStaticTexts();
-            setThemeMode(themeMode || 'light');
-            const initialMode = hadSaved ? viewMode : (window.innerWidth >= 1024 ? 'large' : 'small');
-            setLayoutMode(initialMode);
-            attachSheetDrag('menu-drag-handle', 'menu-sheet-panel', closeMenuSheet);
-            attachSheetDrag('tags-drag-handle', 'tags-sheet-panel', closeTagsSheet);
-            attachSheetDrag('edit-drag-handle', 'edit-sheet-panel', closeEditSheet);
-        };
-    </script>
-</body>
-</html>
-```
+                    ? `Матеріал про кіно та серіали: «${humanTitle}» (${domain}) — збережено на перегляд.`
+  
