@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="uk">
 <head>
@@ -63,10 +64,15 @@
             padding-bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px));
             overscroll-behavior-y: none;
         }
-        /* Жёсткая блокировка скролла фона при открытой шторке */
+        /* Блокировка скролла фона БЕЗ touch-action: none, чтобы скролл внутри шторок работал по всей ширине экрана */
         body.sheet-locked {
             overflow: hidden !important;
-            touch-action: none;
+        }
+
+        /* Безопасный отступ шапки под статус-бар смартфона (HyperOS / Android / iOS) */
+        .safe-top-header {
+            padding-top: calc(max(env(safe-area-inset-top, 0px), 28px) + 0.55rem);
+            padding-bottom: 0.7rem;
         }
 
         .font-mono-code { font-family: 'JetBrains Mono', monospace; }
@@ -91,7 +97,7 @@
         .key-press { transition: transform 0.12s ease, opacity 0.12s ease; }
         .key-press:active { transform: scale(0.97); }
 
-        /* Плавные шторки снизу со стягиванием пальцем */
+        /* Плавные шторки снизу со свободным вертикальным скроллом по всему центру экрана */
         .sheet-backdrop {
             transition: opacity 0.28s cubic-bezier(0.16, 1, 0.3, 1);
             opacity: 0;
@@ -101,6 +107,8 @@
             transform: translateY(100%);
             transition: transform 0.34s cubic-bezier(0.16, 1, 0.3, 1);
             overscroll-behavior: contain;
+            touch-action: pan-y;
+            -webkit-overflow-scrolling: touch;
         }
         .sheet-backdrop.open { opacity: 1; }
         .sheet-backdrop.open .sheet-panel { transform: translateY(0); }
@@ -108,13 +116,13 @@
 </head>
 <body class="min-h-screen">
 
-    <!-- ШАПКА: Нажатие на логотип и название сбрасывает все фильтры и возвращает ко ВСЕМ ссылкам -->
-    <header class="sticky top-0 z-40 theme-header backdrop-blur-md border-b px-4 py-3">
-        <div class="max-w-4xl mx-auto flex items-center justify-between gap-3">
+    <!-- ШАПКА: Защищена от перекрытия статус-баром смартфона. Клик по логотипу сбрасывает фильтры -->
+    <header class="sticky top-0 z-40 theme-header backdrop-blur-md border-b px-4 safe-top-header">
+        <div class="max-w-4xl mx-auto flex items-center justify-between gap-2.5">
             
             <!-- Левый блок: Кнопка Домой (Логотип + Название + Количество ссылок) -->
-            <div onclick="resetToAllLinks()" title="Показати всі посилання" class="key-press flex items-center gap-3 min-w-0 cursor-pointer">
-                <div class="w-10 h-10 rounded-lg bg-[#141413] flex items-center justify-center shrink-0 p-1.5">
+            <div onclick="resetToAllLinks()" title="Показати всі посилання" class="key-press flex items-center gap-2.5 min-w-0 cursor-pointer">
+                <div class="w-10 h-10 rounded-lg bg-[#141413] flex items-center justify-center shrink-0 p-1.5 shadow-2xs">
                     <svg viewBox="0 0 100 100" class="w-full h-full">
                         <circle cx="50" cy="50" r="37" fill="none" stroke="#D96B27" stroke-width="11"/>
                         <path d="M 16 64 Q 24 77 38 82" fill="none" stroke="#F6F4EE" stroke-width="11"/>
@@ -131,7 +139,10 @@
                     <span id="total-count-pill" class="text-xs font-mono-code font-bold px-2 py-0.5 rounded-md bg-[#D96B27] text-white shrink-0">
                         6
                     </span>
-                    <span id="active-filter-pill" class="hidden text-[11px] font-mono-code font-bold px-2 py-0.5 rounded-md theme-input truncate max-w-[130px] sm:max-w-[200px]"></span>
+                    <button id="offline-queue-pill" onclick="processOfflineQueue(true)" title="Черга офлайн-посилань (натисніть для перевірки мережі)" class="hidden text-[11px] font-mono-code font-bold px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-600 border border-amber-500/40 shrink-0 items-center gap-1">
+                        <span>⏳</span><span id="offline-queue-count">0</span>
+                    </button>
+                    <span id="active-filter-pill" class="hidden text-[11px] font-mono-code font-bold px-2 py-0.5 rounded-md theme-input truncate max-w-[120px] sm:max-w-[190px]"></span>
                 </div>
             </div>
 
@@ -143,7 +154,7 @@
                         <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
                     </svg>
                 </button>
-                <button onclick="openMenuSheet()" class="key-press h-10 px-4 rounded-lg theme-input flex items-center gap-2 font-bold text-sm hover:opacity-90 transition">
+                <button onclick="openMenuSheet()" class="key-press h-10 px-3.5 sm:px-4 rounded-lg theme-input flex items-center gap-2 font-bold text-sm hover:opacity-90 transition">
                     <svg class="w-5 h-5 mono-icon" viewBox="0 0 24 24">
                         <line x1="3" y1="7" x2="21" y2="7"/>
                         <line x1="3" y1="12" x2="21" y2="12"/>
@@ -157,11 +168,11 @@
     </header>
 
     <!-- ГЛАВНЫЙ КОНТЕЙНЕР -->
-    <main class="max-w-4xl mx-auto px-4 py-4 space-y-4">
+    <main class="max-w-4xl mx-auto px-4 py-3.5 space-y-3.5">
 
-        <!-- Строка ввода ссылок: поле и интуитивная кнопка Додати (с плюсом и AI-искрой) -->
+        <!-- Строка ввода ссылок -->
         <div class="flex items-stretch gap-2">
-            <input id="url-input" type="text" onkeydown="if(event.key==='Enter') addLinkByAI()" placeholder="Вставте посилання або список посилань..." class="flex-1 theme-card border rounded-lg px-4 py-3 text-base outline-none font-medium focus:border-[#D96B27] transition">
+            <input id="url-input" type="text" onkeydown="if(event.key==='Enter') addLinkByAI()" placeholder="Вставте посилання або список посилань..." class="flex-1 theme-card border rounded-lg px-3.5 py-3 text-base outline-none font-medium focus:border-[#D96B27] transition min-w-0">
             <button onclick="addLinkByAI()" title="Розумне додавання посилання" class="key-press bg-[#D96B27] hover:bg-[#c55d1d] text-white font-black text-sm px-4 sm:px-5 rounded-lg flex items-center justify-center gap-2 shrink-0 shadow-xs">
                 <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none">
                     <path d="M11 5v14M4 12h14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
@@ -169,6 +180,11 @@
                 </svg>
                 <span id="btn-add-label">Додати</span>
             </button>
+        </div>
+
+        <!-- КОМПАКТНАЯ КАРУСЕЛЬ ЗАКРЕПЛЁННЫХ ССЫЛОК С РЕАЛЬНЫМИ ФАВИКОНАМИ САЙТОВ -->
+        <div id="pinned-bar-wrapper" class="hidden items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+            <!-- Заполняется через JS компактными кнопками с фавиконами сайтов -->
         </div>
 
         <!-- Панель массового выбора и удаления (появляется только в режиме выбора) -->
@@ -198,7 +214,7 @@
 
     <!-- ШТОРКА «МЕНЮ» -->
     <div id="menu-sheet-modal" onclick="if(event.target===this) closeMenuSheet()" class="sheet-backdrop fixed inset-0 bg-black/60 z-50 hidden items-end justify-center p-0 sm:p-4">
-        <div id="menu-sheet-panel" class="sheet-panel theme-surface w-full max-w-md rounded-t-2xl sm:rounded-xl p-5 border-t sm:border space-y-5 max-h-[88vh] overflow-y-auto">
+        <div id="menu-sheet-panel" class="sheet-panel theme-surface w-full max-w-md rounded-t-2xl sm:rounded-xl p-5 border-t sm:border space-y-4 max-h-[88vh] overflow-y-auto">
             
             <!-- Полосочка для стягивания вниз -->
             <div id="menu-drag-handle" class="w-12 h-2 bg-stone-400/50 rounded-full mx-auto -mt-1 cursor-grab active:cursor-grabbing touch-none"></div>
@@ -213,16 +229,19 @@
                 </button>
             </div>
 
-            <!-- СТРОКА 1: Поиск + Кнопка Рандомайзера -->
+            <!-- СТРОКА 1: Поиск (с крестиком очистки) + Кнопка Рандомайзера -->
             <div class="flex items-stretch gap-2">
-                <div class="flex-1 flex items-center theme-input rounded-lg px-3.5 py-2.5">
-                    <svg class="w-4 h-4 mono-icon mr-2.5 shrink-0 opacity-70" viewBox="0 0 24 24">
+                <div class="flex-1 flex items-center theme-input rounded-lg px-3 py-2.5">
+                    <svg class="w-4 h-4 mono-icon mr-2 shrink-0 opacity-70" viewBox="0 0 24 24">
                         <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/>
                     </svg>
-                    <input id="search-input" oninput="renderApp()" type="text" placeholder="Пошук..." class="w-full bg-transparent text-sm sm:text-base outline-none font-medium">
+                    <input id="search-input" oninput="onSearchInput()" type="text" placeholder="Пошук..." class="w-full bg-transparent text-sm sm:text-base outline-none font-medium min-w-0">
+                    <button id="clear-search-btn" onclick="clearSearchInput()" class="hidden w-6 h-6 rounded-md items-center justify-center theme-muted hover:text-[#D96B27] shrink-0 ml-1" title="Очистити пошук">
+                        ✕
+                    </button>
                 </div>
-                <button onclick="openRandomLink()" title="Випадкове посилання" class="key-press px-4 rounded-lg theme-input flex items-center justify-center gap-2 font-bold text-xs hover:opacity-80 shrink-0">
-                    <svg class="w-5 h-5 mono-icon" viewBox="0 0 24 24">
+                <button onclick="openRandomLink()" title="Випадкове посилання" class="key-press px-3.5 rounded-lg theme-input flex items-center justify-center gap-2 font-bold text-xs hover:opacity-80 shrink-0">
+                    <svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24">
                         <polyline points="16 3 21 3 21 8"/>
                         <line x1="4" y1="20" x2="21" y2="3"/>
                         <polyline points="21 16 21 21 16 21"/>
@@ -233,39 +252,54 @@
                 </button>
             </div>
 
-            <!-- СТРОКА 2: Раскладка и Тема -->
-            <div class="grid grid-cols-12 gap-2">
-                <!-- Переключатель вида (7 колонок) -->
-                <div class="col-span-7 grid grid-cols-3 gap-1 p-1 rounded-lg theme-input">
-                    <button onclick="setLayoutMode('small')" id="layout-small-btn" title="Малі картки" class="key-press py-2 rounded-md flex items-center justify-center gap-1.5 text-xs font-bold transition">
-                        <svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
-                    </button>
-                    <button onclick="setLayoutMode('large')" id="layout-large-btn" title="Великі картки" class="key-press py-2 rounded-md flex items-center justify-center gap-1.5 text-xs font-bold transition">
-                        <svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="6"/><rect x="3" y="14" width="18" height="6"/></svg>
-                    </button>
-                    <button onclick="setLayoutMode('list')" id="layout-list-btn" title="Список" class="key-press py-2 rounded-md flex items-center justify-center gap-1.5 text-xs font-bold transition">
-                        <svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-                    </button>
+            <!-- СТРОКА 2: Раскладка, Тема и Сортировка -->
+            <div class="space-y-2">
+                <div class="grid grid-cols-12 gap-2">
+                    <!-- Переключатель вида (7 колонок) -->
+                    <div class="col-span-7 grid grid-cols-3 gap-1 p-1 rounded-lg theme-input">
+                        <button onclick="setLayoutMode('small')" id="layout-small-btn" title="Малі картки" class="key-press py-2 rounded-md flex items-center justify-center gap-1.5 text-xs font-bold transition">
+                            <svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+                        </button>
+                        <button onclick="setLayoutMode('large')" id="layout-large-btn" title="Великі картки" class="key-press py-2 rounded-md flex items-center justify-center gap-1.5 text-xs font-bold transition">
+                            <svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="6"/><rect x="3" y="14" width="18" height="6"/></svg>
+                        </button>
+                        <button onclick="setLayoutMode('list')" id="layout-list-btn" title="Список" class="key-press py-2 rounded-md flex items-center justify-center gap-1.5 text-xs font-bold transition">
+                            <svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+                        </button>
+                    </div>
+
+                    <!-- Переключатель тем (5 колонок) -->
+                    <div class="col-span-5 grid grid-cols-3 gap-1 p-1 rounded-lg theme-input">
+                        <button onclick="setThemeMode('light')" id="theme-light-btn" title="Світла тема" class="key-press py-2 rounded-md flex items-center justify-center transition">
+                            <svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24">
+                                <circle cx="12" cy="12" r="4"/>
+                                <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+                            </svg>
+                        </button>
+                        <button onclick="setThemeMode('dim')" id="theme-dim-btn" title="Темна тема" class="key-press py-2 rounded-md flex items-center justify-center transition">
+                            <svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24">
+                                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                            </svg>
+                        </button>
+                        <button onclick="setThemeMode('device')" id="theme-device-btn" title="AMOLED" class="key-press py-2 rounded-md flex items-center justify-center transition">
+                            <svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24">
+                                <circle cx="12" cy="12" r="8"/>
+                                <path d="M12 4a8 8 0 0 0 0 16Z" fill="currentColor" stroke="none"/>
+                            </svg>
+                        </button>
+                    </div>
                 </div>
 
-                <!-- Переключатель тем (5 колонок) -->
-                <div class="col-span-5 grid grid-cols-3 gap-1 p-1 rounded-lg theme-input">
-                    <button onclick="setThemeMode('light')" id="theme-light-btn" title="Світла тема" class="key-press py-2 rounded-md flex items-center justify-center transition">
-                        <svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24">
-                            <circle cx="12" cy="12" r="4"/>
-                            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
-                        </svg>
+                <!-- Переключатель сортировки (Нові / Старі / А–Я) -->
+                <div class="grid grid-cols-3 gap-1 p-1 rounded-lg theme-input">
+                    <button onclick="setSortMode('newest')" id="sort-newest-btn" class="key-press py-1.5 rounded-md text-xs font-bold transition">
+                        ↓ Нові
                     </button>
-                    <button onclick="setThemeMode('dim')" id="theme-dim-btn" title="Темна тема" class="key-press py-2 rounded-md flex items-center justify-center transition">
-                        <svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24">
-                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-                        </svg>
+                    <button onclick="setSortMode('oldest')" id="sort-oldest-btn" class="key-press py-1.5 rounded-md text-xs font-bold transition">
+                        ↑ Старі
                     </button>
-                    <button onclick="setThemeMode('device')" id="theme-device-btn" title="AMOLED" class="key-press py-2 rounded-md flex items-center justify-center transition">
-                        <svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24">
-                            <circle cx="12" cy="12" r="8"/>
-                            <path d="M12 4a8 8 0 0 0 0 16Z" fill="currentColor" stroke="none"/>
-                        </svg>
+                    <button onclick="setSortMode('az')" id="sort-az-btn" class="key-press py-1.5 rounded-md text-xs font-bold transition">
+                        А–Я
                     </button>
                 </div>
             </div>
@@ -275,41 +309,67 @@
                 <div class="flex items-center justify-between">
                     <span class="text-[11px] font-mono-code font-bold uppercase theme-muted" id="lbl-folders-section">Категорії</span>
                 </div>
-                <div id="folders-grid" class="grid grid-cols-2 gap-1.5 max-h-56 overflow-y-auto overscroll-contain pr-0.5">
+                <div id="folders-grid" class="grid grid-cols-2 gap-1.5 max-h-52 overflow-y-auto overscroll-contain pr-0.5">
                     <!-- Заполняется через JS -->
                 </div>
             </div>
 
-            <!-- СТРОКА 4: ИИ-Импорт, Экспорт, Кнопка # (между Експорт и UA), язык и кнопка（ ͜.人 ͜.）за кнопкой UA -->
-            <div class="flex items-center gap-1.5 pt-3 border-t border-black/10">
-                <input id="ai-import-file" type="file" accept=".html,.htm,.txt,.json,.csv" class="hidden" onchange="handleAIFileImport(event)">
-                <button onclick="triggerAIFileImport()" class="key-press flex-1 py-2.5 px-2.5 rounded-lg bg-[#D96B27] text-white text-xs font-black flex items-center justify-center gap-1.5 min-w-0">
-                    <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                        <polyline points="17 8 12 3 7 8"/>
-                        <line x1="12" y1="3" x2="12" y2="15"/>
-                    </svg>
-                    <span id="btn-import-ai" class="truncate">Імпорт ІІ</span>
-                </button>
-                <button onclick="exportBrowserBookmarks()" class="key-press flex-1 py-2.5 px-2.5 rounded-lg theme-input text-xs font-bold flex items-center justify-center gap-1.5 min-w-0">
-                    <svg class="w-4 h-4 mono-icon shrink-0" viewBox="0 0 24 24">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                        <polyline points="7 10 12 15 17 10"/>
-                        <line x1="12" y1="15" x2="12" y2="3"/>
-                    </svg>
-                    <span id="btn-export-html" class="truncate">Експорт</span>
-                </button>
-                <!-- Аккуратная кнопка # между Експорт и UA -->
-                <button onclick="openTagsSheetFromMenu()" title="Усі хештеги #" class="key-press w-9 h-9 rounded-lg theme-input text-xs font-mono-code font-black flex items-center justify-center hover:text-[#D96B27] transition shrink-0">
-                    #
-                </button>
-                <button onclick="toggleLang()" id="lang-btn" class="key-press h-9 px-2.5 rounded-lg theme-input text-xs font-mono-code font-bold flex items-center justify-center shrink-0">
-                    UA
-                </button>
-                <!-- Кнопка（ ͜.人 ͜.）за кнопкой UA -->
-                <button onclick="openAboutSheetFromMenu()" title="Про додаток та авторські права" class="key-press h-9 px-2 rounded-lg theme-input text-[11px] font-bold flex items-center justify-center hover:text-[#D96B27] transition shrink-0 whitespace-nowrap">
-                    （ ͜.人 ͜.）
-                </button>
+            <!-- СТРОКА 4: Импорт, Экспорт (с выбором HTML/JSON), #, UA и кнопка Инфо -->
+            <div class="space-y-2 pt-3 border-t" style="border-color: var(--border-main)">
+                <!-- Выпадающая мини-плашка выбора формата экспорта (HTML для браузеров или полный JSON-бэкап) -->
+                <div id="export-choice-bar" class="hidden grid-cols-2 gap-1.5 p-1.5 rounded-xl theme-input">
+                    <button onclick="exportBrowserBookmarks()" class="key-press py-2 px-2.5 rounded-lg theme-card border text-xs font-bold flex items-center justify-center gap-1.5">
+                        <span class="font-mono-code text-[#D96B27]">.HTML</span>
+                        <span id="lbl-exp-html">Для браузера</span>
+                    </button>
+                    <button onclick="exportFullJsonBackup()" class="key-press py-2 px-2.5 rounded-lg theme-card border text-xs font-bold flex items-center justify-center gap-1.5">
+                        <span class="font-mono-code text-[#D96B27]">.JSON</span>
+                        <span id="lbl-exp-json">Повний бекап</span>
+                    </button>
+                </div>
+
+                <div class="flex items-center gap-1.5">
+                    <input id="ai-import-file" type="file" accept=".html,.htm,.txt,.json,.csv" class="hidden" onchange="handleAIFileImport(event)">
+                    
+                    <!-- Кнопка Импорт: иконка папки с входящей стрелкой вниз и чистая надпись -->
+                    <button onclick="triggerAIFileImport()" class="key-press flex-1 h-10 px-2.5 rounded-lg bg-[#D96B27] text-white text-xs font-black flex items-center justify-center gap-1.5 min-w-0">
+                        <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+                            <line x1="12" y1="10" x2="12" y2="16"/>
+                            <polyline points="9 13 12 16 15 13"/>
+                        </svg>
+                        <span id="btn-import-ai" class="truncate">Імпорт</span>
+                    </button>
+
+                    <!-- Кнопка Экспорт: иконка папки с исходящей стрелкой наружу -->
+                    <button onclick="toggleExportChoiceBar()" class="key-press flex-1 h-10 px-2.5 rounded-lg theme-input text-xs font-bold flex items-center justify-center gap-1.5 min-w-0">
+                        <svg class="w-4 h-4 mono-icon shrink-0" viewBox="0 0 24 24">
+                            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+                            <line x1="12" y1="16" x2="12" y2="10"/>
+                            <polyline points="9 13 12 10 15 13"/>
+                        </svg>
+                        <span id="btn-export-html" class="truncate">Експорт</span>
+                    </button>
+
+                    <!-- Кнопка # между Експорт и UA -->
+                    <button onclick="openTagsSheetFromMenu()" title="Усі хештеги #" class="key-press w-10 h-10 rounded-lg theme-input text-xs font-mono-code font-black flex items-center justify-center hover:text-[#D96B27] transition shrink-0">
+                        #
+                    </button>
+
+                    <!-- Кнопка языка UA / EN -->
+                    <button onclick="toggleLang()" id="lang-btn" class="key-press h-10 px-2.5 rounded-lg theme-input text-xs font-mono-code font-bold flex items-center justify-center shrink-0">
+                        UA
+                    </button>
+
+                    <!-- Векторная иконка «О приложении» -->
+                    <button onclick="openAboutSheetFromMenu()" title="Про додаток та авторські права" class="key-press w-10 h-10 rounded-lg theme-input flex items-center justify-center hover:text-[#D96B27] transition shrink-0">
+                        <svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="9"/>
+                            <line x1="12" y1="16" x2="12" y2="11.5"/>
+                            <circle cx="12" cy="8" r="0.6" fill="currentColor"/>
+                        </svg>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -332,24 +392,28 @@
                 </button>
             </div>
 
-            <div id="tags-cloud-container" class="flex flex-wrap gap-2 max-h-80 overflow-y-auto overscroll-contain py-1">
+            <div id="tags-cloud-container" class="flex flex-wrap gap-2 py-1">
                 <!-- Заполняется через JS -->
             </div>
         </div>
     </div>
 
-    <!-- ШТОРКА «ПРО ДОДАТОК / АВТОРСЬКІ ПРАВА» -->
+    <!-- ШТОРКА «ПРО ДОДАТОК / ЯК УСЕ ВЛАШТОВАНО» (Единый плавный скролл по всей площади окна) -->
     <div id="about-sheet-modal" onclick="if(event.target===this) closeAboutSheet()" class="sheet-backdrop fixed inset-0 bg-black/60 z-50 hidden items-end justify-center p-0 sm:p-4">
         <div id="about-sheet-panel" class="sheet-panel theme-surface w-full max-w-md rounded-t-2xl sm:rounded-xl p-5 border-t sm:border space-y-4 max-h-[88vh] overflow-y-auto">
             
-            <!-- Полосочка для стягивания вниз -->
             <div id="about-drag-handle" class="w-12 h-2 bg-stone-400/50 rounded-full mx-auto -mt-1 cursor-grab active:cursor-grabbing touch-none"></div>
             
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2.5">
-                    <span class="px-2.5 h-8 rounded-lg bg-[#D96B27] text-white text-xs font-bold flex items-center justify-center shrink-0">
-                        （ ͜.人 ͜.）
-                    </span>
+                    <div class="w-8 h-8 rounded-lg bg-[#141413] flex items-center justify-center shrink-0 p-1">
+                        <svg viewBox="0 0 100 100" class="w-full h-full">
+                            <circle cx="50" cy="50" r="37" fill="none" stroke="#D96B27" stroke-width="11"/>
+                            <path d="M 16 64 Q 24 77 38 82" fill="none" stroke="#F6F4EE" stroke-width="11"/>
+                            <path d="M 84 36 Q 76 23 62 18" fill="none" stroke="#F6F4EE" stroke-width="11"/>
+                            <circle cx="50" cy="50" r="23" fill="none" stroke="#F6F4EE" stroke-width="11"/>
+                        </svg>
+                    </div>
                     <span class="font-black text-base uppercase tracking-tight" id="about-sheet-title">Як усе влаштовано</span>
                 </div>
                 <button onclick="closeAboutSheet()" class="key-press w-9 h-9 rounded-lg theme-input flex items-center justify-center">
@@ -359,8 +423,8 @@
                 </button>
             </div>
 
-            <!-- Контент гида и авторский блок (переводится UA / EN) -->
-            <div id="about-sheet-body" class="space-y-3 text-sm leading-relaxed overflow-y-auto overscroll-contain pr-0.5">
+            <!-- Полный детальный гид + авторский блок (прокручивается вместе со всей панелью по центру экрана) -->
+            <div id="about-sheet-body" class="space-y-3 text-sm leading-relaxed pb-3">
                 <!-- Заполняется через JS -->
             </div>
         </div>
@@ -380,11 +444,18 @@
                         <span id="sheet-date" class="text-xs font-mono-code theme-muted">24/10/26</span>
                     </div>
                 </div>
-                <button onclick="closeEditSheet()" class="key-press w-9 h-9 rounded-lg theme-input flex items-center justify-center shrink-0">
-                    <svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24">
-                        <path d="M18 6L6 18M6 6l12 12"/>
-                    </svg>
-                </button>
+                <div class="flex items-center gap-1.5 shrink-0">
+                    <!-- Кнопка локального приоритета внутри своих категорий («Пріоритет у папці») -->
+                    <button type="button" onclick="toggleSheetFolderPriority()" id="sheet-priority-btn" title="Підняти посилання на самий верх у своїх папках" class="key-press h-9 px-2.5 rounded-lg theme-input flex items-center gap-1.5 text-xs font-bold transition">
+                        <span id="sheet-priority-icon" class="w-4 h-4 flex items-center justify-center"></span>
+                        <span id="sheet-priority-label">Пріоритет у папці</span>
+                    </button>
+                    <button onclick="closeEditSheet()" class="key-press w-9 h-9 rounded-lg theme-input flex items-center justify-center shrink-0">
+                        <svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24">
+                            <path d="M18 6L6 18M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
             </div>
 
             <!-- Крупная кнопка Открыть в браузере -->
@@ -429,10 +500,15 @@
                     <textarea id="sheet-note" rows="3" class="w-full mt-1 theme-input rounded-lg px-3.5 py-2.5 text-sm sm:text-base outline-none resize-none"></textarea>
                 </div>
 
-                <div class="grid grid-cols-2 gap-2.5">
+                <div class="space-y-2.5">
                     <div>
-                        <label class="text-[11px] font-mono-code font-bold uppercase theme-muted" id="lbl-folder">Папка</label>
-                        <input id="sheet-cat" type="text" class="w-full mt-1 theme-input rounded-lg px-3.5 py-2.5 text-sm font-bold outline-none">
+                        <div class="flex items-center justify-between">
+                            <label class="text-[11px] font-mono-code font-bold uppercase theme-muted" id="lbl-folder">Папки (через кому)</label>
+                            <span class="text-[10px] font-mono-code theme-muted" id="lbl-ai-cat-hint">Сірі підказки ІІ — натисніть, щоб додати</span>
+                        </div>
+                        <input id="sheet-cat" type="text" oninput="renderCategorySuggestions()" placeholder="Дизайн, Код та Технології..." class="w-full mt-1 theme-input rounded-lg px-3.5 py-2.5 text-sm font-bold outline-none">
+                        <!-- Серые интерактивные подсказки категорий от ИИ + автодополнение по мере ввода -->
+                        <div id="sheet-cat-suggestions" class="flex flex-wrap gap-1.5 mt-2"></div>
                     </div>
                     <div>
                         <label class="text-[11px] font-mono-code font-bold uppercase theme-muted" id="lbl-tags">#Теги</label>
@@ -462,9 +538,12 @@
         let selectedFolder = 'ALL';
         let selectedTag = null;
         let viewMode = 'small';
+        let sortMode = 'newest'; // 'newest' | 'oldest' | 'az'
         let themeMode = 'light';
         let editingId = null;
         let sheetTempLocked = false;
+        let sheetTempFolderPriority = false;
+        const OFFLINE_FOLDER_KEY = '__OFFLINE_QUEUE__';
 
         const DICT = {
             uk: {
@@ -475,19 +554,24 @@
                 tagsSheetTitle: 'Усі хештеги',
                 urlPlaceholder: 'Вставте посилання або список посилань...',
                 allFolders: 'Усі посилання',
-                importAi: 'Імпорт ІІ',
+                importAi: 'Імпорт',
                 exportHtml: 'Експорт',
+                expHtmlSub: 'Для браузера',
+                expJsonSub: 'Повний бекап',
                 openMain: 'Відкрити',
                 openBrowser: 'Відкрити в браузері',
                 titleLabel: 'Назва',
                 noteLabel: 'Нотатка',
                 regenBtn: 'Переписати ІІ',
-                folderLabel: 'Папка',
+                folderLabel: 'Папки (через кому)',
+                aiCatHint: 'Сірі підказки ІІ — тапніть, щоб додати',
                 tagsLabel: '#Теги',
                 deleteBtn: 'Видалити',
                 saveBtn: 'Зберегти',
                 copied: 'Скопійовано: ',
                 exported: 'Експортовано у .HTML',
+                exportedJson: 'Повний бекап збережено у .JSON',
+                restoredJson: 'Бекап відновлено: ',
                 saved: 'Збережено',
                 deleted: 'Видалено',
                 randomOpened: 'Випадкове: ',
@@ -497,15 +581,28 @@
                 folderUnlockedToast: 'Папку розблоковано',
                 allLockedRandom: 'Усі посилання заблоковані для прямого переходу',
                 duplicateFound: 'Дублікат! Вже є в базі: ',
-                aiAddedSingle: 'ІІ розібрав та додав у «{cat}» ✓',
-                aiImportReport: 'ІІ імпорт: +{added} нових (дублікатів: {dups})',
+                aiAddedSingle: 'Додано у «{cat}» ({lang}) ✓',
+                aiAddedOffline: 'Збережено в офлайн-чергу «Очікують мережі» ⏳',
+                aiImportReport: 'Імпорт: +{added} нових (дублікатів: {dups})',
                 selectAll: 'Вибрати всі',
                 selectedCount: 'вибрано',
                 deleteSelected: 'Видалити вибрані',
                 cancelSelect: 'Скасувати',
                 bulkDeleted: 'Видалено карток: ',
                 homeReset: 'Показано всі посилання',
-                aboutSheetTitle: 'Як усе влаштовано'
+                aboutSheetTitle: 'Як усе влаштовано',
+                pinBtn: 'На головну у Pin-бар',
+                pinnedToast: 'Закріплено у швидкій панелі на головній',
+                unpinnedToast: 'Відкріплено зі швидкої панелі',
+                priorityBtn: 'Пріоритет у папці',
+                priorityActiveBtn: 'У топі папки ★',
+                offlineFolderName: '⏳ Очікують мережі',
+                offlineBadge: '⏳ Очікує ІІ',
+                offlineSyncedToast: 'Мережа з’явилась! ІІ розібрав посилань: ',
+                offlineStillNoNet: 'Немає з’єднання. Посилання чекають на інтернет ⏳',
+                sortNewest: '↓ Нові',
+                sortOldest: '↑ Старі',
+                sortAZ: 'А–Я'
             },
             en: {
                 menu: 'Menu',
@@ -515,19 +612,24 @@
                 tagsSheetTitle: 'All Hashtags',
                 urlPlaceholder: 'Paste a link or multiple links...',
                 allFolders: 'All links',
-                importAi: 'AI Import',
+                importAi: 'Import',
                 exportHtml: 'Export',
+                expHtmlSub: 'For Browser',
+                expJsonSub: 'Full Backup',
                 openMain: 'Open',
                 openBrowser: 'Open in browser',
                 titleLabel: 'Title',
                 noteLabel: 'Note',
                 regenBtn: 'Rewrite AI',
-                folderLabel: 'Folder',
+                folderLabel: 'Folders (comma-separated)',
+                aiCatHint: 'Gray AI suggestions — tap to add',
                 tagsLabel: '#Tags',
                 deleteBtn: 'Delete',
                 saveBtn: 'Save',
                 copied: 'Copied: ',
                 exported: 'Exported to .HTML',
+                exportedJson: 'Full backup saved to .JSON',
+                restoredJson: 'Backup restored: ',
                 saved: 'Saved',
                 deleted: 'Deleted',
                 randomOpened: 'Random: ',
@@ -537,15 +639,28 @@
                 folderUnlockedToast: 'Folder unblocked',
                 allLockedRandom: 'All links are blocked for direct open',
                 duplicateFound: 'Duplicate! Already exists: ',
-                aiAddedSingle: 'AI analyzed & added to "{cat}" ✓',
-                aiImportReport: 'AI Import: +{added} new ({dups} duplicates)',
+                aiAddedSingle: 'Added to "{cat}" ({lang}) ✓',
+                aiAddedOffline: 'Saved to offline queue "Pending Network" ⏳',
+                aiImportReport: 'Import: +{added} new ({dups} duplicates)',
                 selectAll: 'Select all',
                 selectedCount: 'selected',
                 deleteSelected: 'Delete selected',
                 cancelSelect: 'Cancel',
                 bulkDeleted: 'Deleted items: ',
                 homeReset: 'Showing all links',
-                aboutSheetTitle: 'How It Works'
+                aboutSheetTitle: 'How It Works',
+                pinBtn: 'Pin to top bar',
+                pinnedToast: 'Pinned to home top bar',
+                unpinnedToast: 'Unpinned from top bar',
+                priorityBtn: 'Folder priority',
+                priorityActiveBtn: 'Top in folder ★',
+                offlineFolderName: '⏳ Pending Network',
+                offlineBadge: '⏳ Pending AI',
+                offlineSyncedToast: 'Back online! AI processed links: ',
+                offlineStillNoNet: 'Still offline. Links are waiting for connection ⏳',
+                sortNewest: '↓ Newest',
+                sortOldest: '↑ Oldest',
+                sortAZ: 'A–Z'
             }
         };
 
@@ -567,6 +682,10 @@
             globe: `<svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>`,
             lock: `<svg viewBox="0 0 24 24" class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>`,
             unlock: `<svg viewBox="0 0 24 24" class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 7.4-2"/></svg>`,
+            pin: `<svg viewBox="0 0 24 24" class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17v5"/><path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 1 1 0 0 0 1-1V4a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1 1 1 0 0 1 1 1z"/></svg>`,
+            pinFilled: `<svg viewBox="0 0 24 24" class="w-3.5 h-3.5" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17v5"/><path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 1 1 0 0 0 1-1V4a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1 1 1 0 0 1 1 1z"/></svg>`,
+            star: `<svg viewBox="0 0 24 24" class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`,
+            starFilled: `<svg viewBox="0 0 24 24" class="w-3.5 h-3.5" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`,
             extArrow: `<svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>`
         };
 
@@ -575,64 +694,88 @@
         const DEFAULT_ITEMS = [
             {
                 id: 1, name: 'Spotify', domain: 'spotify.com', url: 'https://open.spotify.com/playlist/synthwave2026',
-                title: 'Вечірній Синтвейв 2026', cat: 'Музика', date: '24/10/26',
+                title: 'Evening Synthwave 2026', cat: 'Музика', cats: ['Музика'], date: '24/10/26',
                 color: '#3F6A4E',
-                note: 'Підбірка інструментального синтвейву без вокалу для нічного фокусу.',
-                tags: ['#музика', '#фокус'], svg: LINE_ICONS.music,
-                lockedOverride: null
+                note: 'Instrumental synthwave playlist on Spotify for deep night focus and coding.',
+                tags: ['#music', '#focus'], svg: LINE_ICONS.music,
+                lockedOverride: null, pinned: true, folderPriority: false, pendingOffline: false
             },
             {
                 id: 2, name: 'Behance', domain: 'behance.net', url: 'https://www.behance.net/gallery/fintech-light-ui',
-                title: 'Фінтех UI — Світлі теми', cat: 'Дизайн', date: '23/10/26',
+                title: 'Fintech UI — Light Themes', cat: 'Дизайн', cats: ['Дизайн'], date: '23/10/26',
                 color: '#3D5A78',
-                note: 'Кейс мобільного банкінгу з чистою типографікою та пастельною палітрою.',
-                tags: ['#дизайн', '#ui'], svg: LINE_ICONS.design,
-                lockedOverride: null
+                note: 'Mobile banking UI case study on Behance featuring clean typography and a warm pastel palette.',
+                tags: ['#design', '#ui'], svg: LINE_ICONS.design,
+                lockedOverride: null, pinned: false, folderPriority: true, pendingOffline: false
             },
             {
                 id: 3, name: 'Airbnb', domain: 'airbnb.com', url: 'https://www.airbnb.com/rooms/carpathians-aframe',
-                title: 'Будинок А-фрейм у Карпатах', cat: 'Поїздки', date: '21/10/26',
+                title: 'Carpathians A-Frame Cabin', cat: 'Поїздки', cats: ['Поїздки'], date: '21/10/26',
                 color: '#8F4D53',
-                note: 'Котедж у лісі з панорамними вікнами, чаном на терасі та Starlink.',
-                tags: ['#карпати', '#відпочинок'], svg: LINE_ICONS.travel,
-                lockedOverride: null
+                note: 'Forest A-frame cabin listing on Airbnb with panoramic views, hot tub, and Starlink.',
+                tags: ['#travel', '#cabin'], svg: LINE_ICONS.travel,
+                lockedOverride: null, pinned: false, folderPriority: false, pendingOffline: false
             },
             {
                 id: 4, name: 'GitHub', domain: 'github.com', url: 'https://github.com/awesome-selfhosted/awesome-selfhosted',
-                title: 'Awesome Self-Hosted 2026', cat: 'Код та ІТ', date: '19/10/26',
+                title: 'Awesome Self-Hosted 2026', cat: 'Код та Технології', cats: ['Код та Технології'], date: '19/10/26',
                 color: '#43474D',
-                note: 'Каталог open-source рішень для власного домашнього медіасервера.',
-                tags: ['#код', '#сервер'], svg: LINE_ICONS.code,
-                lockedOverride: null
+                note: 'Curated directory of open-source software and self-hosted server solutions on GitHub.',
+                tags: ['#code', '#selfhosted'], svg: LINE_ICONS.code,
+                lockedOverride: null, pinned: true, folderPriority: false, pendingOffline: false
             },
             {
                 id: 5, name: 'Rozetka', domain: 'rozetka.com.ua', url: 'https://rozetka.com.ua/ecoflow-river-2/p364589/',
-                title: 'Зарядна станція EcoFlow River', cat: 'Покупки', date: '16/10/26',
+                title: 'Зарядна станція EcoFlow River', cat: 'Покупки', cats: ['Покупки', 'Код та Технології'], date: '16/10/26',
                 color: '#556B42',
-                note: 'Станція з LiFePO4 акумулятором та зарядкою за 60 хвилин для роутера.',
+                note: 'Портативна станція з LiFePO4 акумулятором та швидкою зарядкою за 60 хвилин на Rozetka.',
                 tags: ['#техніка', '#дім'], svg: LINE_ICONS.shop,
-                lockedOverride: null
+                lockedOverride: null, pinned: false, folderPriority: false, pendingOffline: false
             },
             {
                 id: 6, name: 'Netflix', domain: 'netflix.com', url: 'https://www.netflix.com/title/81024821',
-                title: 'Проблема трьох тіл', cat: 'Кіно та Серіали', date: '14/10/26',
+                title: '3 Body Problem', cat: 'Кіно та Серіали', cats: ['Кіно та Серіали'], date: '14/10/26',
                 color: '#7D3F3B',
-                note: 'Науково-фантастична екранізація про контакт із позаземною цивілізацією.',
-                tags: ['#кіно', '#scifi'], svg: LINE_ICONS.video,
-                lockedOverride: null
+                note: 'Sci-fi drama series on Netflix about humanity preparing for contact with an alien civilization.',
+                tags: ['#movies', '#scifi'], svg: LINE_ICONS.video,
+                lockedOverride: null, pinned: false, folderPriority: false, pendingOffline: false
             }
         ];
 
         let ITEMS = structuredClone(DEFAULT_ITEMS);
         const STORAGE_KEY = 'linkbox_hyperos_v2';
 
-        // Жёсткая очистка URL от запятых, точек, скобок и мусора на конце
+        // Вспомогательная функция: возвращает массив всех категорий конкретной ссылки
+        function getItemCats(item) {
+            if (Array.isArray(item.cats) && item.cats.length > 0) {
+                return item.cats.map(c => String(c).trim()).filter(Boolean);
+            }
+            if (typeof item.cat === 'string' && item.cat.trim()) {
+                return item.cat.split(',').map(c => c.trim()).filter(Boolean);
+            }
+            return [currentLang === 'uk' ? 'Веб-ресурси' : 'Web Resources'];
+        }
+
         function cleanRawUrl(raw) {
             let u = (raw || '').trim();
             u = u.replace(/^[,\s"'<>()[\]{};:]+|[,\s"'<>()[\]{}.;:]+$/g, '');
             if (!u) return '';
             if (!/^https?:\/\//i.test(u)) u = 'https://' + u;
             return u;
+        }
+
+        // Формирование HTML реального фавикона сайта с аккуратным фоллбэком на первую букву домена
+        function getSiteFaviconHtml(item, sizeClass = 'w-5 h-5') {
+            const cleanDom = (item.domain || 'example.com').replace(/^www\./i, '');
+            const favUrl = `https://www.google.com/s2/favicons?domain=${encodeURIComponent(cleanDom)}&sz=64`;
+            const letter = (item.name || cleanDom || 'W').charAt(0).toUpperCase();
+            return `
+                <span class="${sizeClass} rounded-md flex items-center justify-center overflow-hidden shrink-0 bg-white/95 border border-black/10 shadow-2xs relative">
+                    <img src="${favUrl}" alt="${item.name}" class="w-4 h-4 object-contain" loading="lazy"
+                        onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <span style="display:none; background:${item.color}" class="w-full h-full items-center justify-center text-[10px] font-black text-white">${letter}</span>
+                </span>
+            `;
         }
 
         function saveStateToStorage() {
@@ -642,6 +785,7 @@
                     lockedFolders: Array.from(LOCKED_FOLDERS),
                     themeMode,
                     viewMode,
+                    sortMode,
                     currentLang
                 };
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
@@ -664,18 +808,28 @@
                                 ...rebuilt,
                                 id: it.id,
                                 date: it.date || rebuilt.date,
-                                lockedOverride: it.lockedOverride ?? null
+                                lockedOverride: it.lockedOverride ?? null,
+                                pinned: Boolean(it.pinned),
+                                folderPriority: Boolean(it.folderPriority),
+                                pendingOffline: Boolean(it.pendingOffline)
                             };
                         }
+                        const normCats = getItemCats(it);
                         return {
                             ...it,
-                            url: cleanedUrl
+                            url: cleanedUrl,
+                            cat: normCats[0],
+                            cats: normCats,
+                            pinned: Boolean(it.pinned),
+                            folderPriority: Boolean(it.folderPriority),
+                            pendingOffline: Boolean(it.pendingOffline)
                         };
                     });
                 }
                 if (Array.isArray(parsed.lockedFolders)) LOCKED_FOLDERS = new Set(parsed.lockedFolders);
                 if (parsed.themeMode) themeMode = parsed.themeMode;
                 if (parsed.viewMode) viewMode = parsed.viewMode;
+                if (parsed.sortMode) sortMode = parsed.sortMode;
                 if (parsed.currentLang) currentLang = parsed.currentLang;
                 return true;
             } catch (e) {
@@ -713,12 +867,37 @@
             }
         }
 
+        function onSearchInput() {
+            const input = document.getElementById('search-input');
+            const clearBtn = document.getElementById('clear-search-btn');
+            if (input && clearBtn) {
+                if (input.value.trim().length > 0) {
+                    clearBtn.classList.remove('hidden');
+                    clearBtn.classList.add('flex');
+                } else {
+                    clearBtn.classList.add('hidden');
+                    clearBtn.classList.remove('flex');
+                }
+            }
+            renderApp();
+        }
+
+        function clearSearchInput() {
+            const input = document.getElementById('search-input');
+            const clearBtn = document.getElementById('clear-search-btn');
+            if (input) input.value = '';
+            if (clearBtn) {
+                clearBtn.classList.add('hidden');
+                clearBtn.classList.remove('flex');
+            }
+            renderApp();
+        }
+
         function resetToAllLinks() {
             const hadFilter = selectedFolder !== 'ALL' || selectedTag !== null || (document.getElementById('search-input')?.value || '') !== '';
             selectedFolder = 'ALL';
             selectedTag = null;
-            const searchEl = document.getElementById('search-input');
-            if (searchEl) searchEl.value = '';
+            clearSearchInput();
             if (isSelectMode) {
                 isSelectMode = false;
                 selectedIds.clear();
@@ -761,16 +940,46 @@
 
         function getFilteredItems() {
             const q = (document.getElementById('search-input')?.value || '').trim().toLowerCase();
-            let filtered = selectedFolder === 'ALL' ? ITEMS : ITEMS.filter(i => i.cat === selectedFolder);
+            let filtered = [];
+            if (selectedFolder === 'ALL') {
+                filtered = [...ITEMS];
+            } else if (selectedFolder === OFFLINE_FOLDER_KEY) {
+                filtered = ITEMS.filter(i => i.pendingOffline);
+            } else {
+                filtered = ITEMS.filter(i => getItemCats(i).includes(selectedFolder));
+            }
+
             if (selectedTag) {
                 filtered = filtered.filter(i => Array.isArray(i.tags) && i.tags.some(tg => tg.toLowerCase() === selectedTag.toLowerCase()));
             }
             if (q) {
                 filtered = filtered.filter(i =>
-                    [i.name, i.domain, i.title, i.cat, i.note, ...(i.tags || [])].join(' ').toLowerCase().includes(q)
+                    [i.name, i.domain, i.title, ...getItemCats(i), i.note, ...(i.tags || [])].join(' ').toLowerCase().includes(q)
                 );
             }
+
+            if (sortMode === 'oldest') {
+                filtered.reverse();
+            } else if (sortMode === 'az') {
+                filtered.sort((a, b) => (a.title || a.name).localeCompare(b.title || b.name, currentLang === 'uk' ? 'uk' : 'en'));
+            }
+
+            // Элементы с «Пріоритетом у папці» всегда поднимаются наверх списка внутри выбранной папки или общего списка
+            filtered.sort((a, b) => (b.folderPriority ? 1 : 0) - (a.folderPriority ? 1 : 0));
             return filtered;
+        }
+
+        function setSortMode(mode) {
+            sortMode = mode;
+            ['newest', 'oldest', 'az'].forEach(m => {
+                const btn = document.getElementById(`sort-${m}-btn`);
+                if (btn) {
+                    btn.style.backgroundColor = (m === mode) ? 'var(--bg-card)' : 'transparent';
+                    btn.style.boxShadow = (m === mode) ? '0 1px 2px rgba(0,0,0,0.12)' : 'none';
+                }
+            });
+            saveStateToStorage();
+            renderApp();
         }
 
         function selectAllVisible() {
@@ -801,7 +1010,17 @@
             if (typeof item.lockedOverride === 'boolean') {
                 return item.lockedOverride;
             }
-            return LOCKED_FOLDERS.has(item.cat);
+            return getItemCats(item).some(c => LOCKED_FOLDERS.has(c));
+        }
+
+        function toggleItemPinQuick(id, e) {
+            if (e) e.stopPropagation();
+            const item = ITEMS.find(x => x.id === id);
+            if (!item) return;
+            item.pinned = !item.pinned;
+            saveStateToStorage();
+            renderApp();
+            showToast(item.pinned ? t('pinnedToast') : t('unpinnedToast'));
         }
 
         function toggleFolderLock(cat, e) {
@@ -864,18 +1083,25 @@
             document.getElementById('url-input').placeholder = t('urlPlaceholder');
             document.getElementById('btn-import-ai').textContent = t('importAi');
             document.getElementById('btn-export-html').textContent = t('exportHtml');
+            document.getElementById('lbl-exp-html').textContent = t('expHtmlSub');
+            document.getElementById('lbl-exp-json').textContent = t('expJsonSub');
             document.getElementById('btn-open').textContent = t('openBrowser');
             document.getElementById('lbl-lock-link').textContent = t('lockToggleLabel');
             document.getElementById('lbl-card-title').textContent = t('titleLabel');
             document.getElementById('lbl-note').textContent = t('noteLabel');
             document.getElementById('btn-regen').textContent = t('regenBtn');
             document.getElementById('lbl-folder').textContent = t('folderLabel');
+            const aiHintEl = document.getElementById('lbl-ai-cat-hint');
+            if (aiHintEl) aiHintEl.textContent = t('aiCatHint');
             document.getElementById('lbl-tags').textContent = t('tagsLabel');
             document.getElementById('btn-delete').textContent = t('deleteBtn');
             document.getElementById('btn-save').textContent = t('saveBtn');
             document.getElementById('btn-select-all').textContent = t('selectAll');
             document.getElementById('btn-delete-selected').textContent = t('deleteSelected');
             document.getElementById('btn-cancel-select').textContent = t('cancelSelect');
+            document.getElementById('sort-newest-btn').textContent = t('sortNewest');
+            document.getElementById('sort-oldest-btn').textContent = t('sortOldest');
+            document.getElementById('sort-az-btn').textContent = t('sortAZ');
         }
 
         function setThemeMode(mode) {
@@ -914,6 +1140,11 @@
 
         function openMenuSheet() {
             lockBodyScroll();
+            const expBar = document.getElementById('export-choice-bar');
+            if (expBar) {
+                expBar.classList.add('hidden');
+                expBar.classList.remove('grid');
+            }
             const modal = document.getElementById('menu-sheet-modal');
             const panel = document.getElementById('menu-sheet-panel');
             panel.style.transform = '';
@@ -984,6 +1215,7 @@
             const modal = document.getElementById('about-sheet-modal');
             const panel = document.getElementById('about-sheet-panel');
             panel.style.transform = '';
+            panel.scrollTop = 0;
             modal.classList.remove('hidden');
             modal.style.display = 'flex';
             setTimeout(() => modal.classList.add('open'), 10);
@@ -1010,63 +1242,75 @@
                     <div class="theme-card border rounded-xl p-3.5 space-y-1.5">
                         <div class="font-extrabold text-sm text-[#D96B27]">Ласкаво просимо до LinkBox!</div>
                         <p class="text-xs sm:text-sm theme-muted leading-relaxed">
-                            Цей органайзер створено для того, щоб збережені посилання не перетворювалися на забутий цвинтар закладок, а завжди були під рукою у чистому, охайному та зручному вигляді.
+                            Цей розумний органайзер створено для того, щоб збережені посилання не перетворювалися на забутий цвинтар закладок, а завжди залишалися впорядкованими, захищеними та зручними для швидкого доступу.
                         </p>
                     </div>
 
                     <div class="space-y-2.5 text-xs sm:text-sm">
                         <div class="theme-card border rounded-xl p-3.5 space-y-1">
-                            <div class="font-bold">1. Головна шапка та швидке повернення</div>
+                            <div class="font-bold">1. Верхня шапка та миттєвий скид фільтрів</div>
                             <p class="theme-muted">
-                                Ліворуч угорі розташований логотип <b>LinkBox</b> із лічильником усіх збережених посилань. Натискання на логотип у будь-який момент миттєво скидає вибрану папку, тег чи пошук і повертає до повного списку. Праворуч знаходяться кнопка масового вибору (іконка з галочкою) та кнопка <b>«Меню»</b>.
+                                Ліворуч зверху розташований логотип <b>LinkBox</b> із лічильником усіх збережених посилань та індикатором активного фільтра. Натискання на логотип у будь-який момент скидає вибрану папку, хештег або пошуковий запит і повертає до повного списку.
                             </p>
                         </div>
 
                         <div class="theme-card border rounded-xl p-3.5 space-y-1">
-                            <div class="font-bold">2. Розумний рядок додавання («+ Додати»)</div>
+                            <div class="font-bold">2. Розумне додавання, мова сайту та захист від дублікатів</div>
                             <p class="theme-muted">
-                                У верхнє поле можна вставити як одне посилання, так і цілий список адрес. Після натискання кнопки <b>«Додати»</b> розумний алгоритм автоматично очистить адресу від зайвих ком чи сміття, перевірить базу на дублікати, визначить тему сторінки за заголовком та адресою, підбере відповідну папку, колір, іконку, хештеги та складе змістовну нотатку.
+                                У рядок введення можна вставити як одне посилання, так і цілий список адрес. Кнопка <b>«+ Додати»</b> автоматично очищує URL від зайвих ком чи дужок, перевіряє базу на дублікати (підсвічуючи наявну картку) і визначає <b>мову самого сайту</b> (українська, англійська, італійська, російська тощо), генеруючи заголовок та нотатку мовою оригіналу.
                             </p>
                         </div>
 
                         <div class="theme-card border rounded-xl p-3.5 space-y-1">
-                            <div class="font-bold">3. Режим «Сейф» (Захист від випадкових переходів)</div>
+                            <div class="font-bold">3. Скріпка (Pin-бар) vs «Пріоритет у папці»</div>
                             <p class="theme-muted">
-                                Для особистих або делікатних посилань передбачено блокування прямого відкриття. Замок можна увімкнути як для цілої папки у Меню, так і для окремої картки. Коли замок активний, кнопка переходу в браузер стає неактивною — випадково натиснути на неї неможливо, але адресу завжди можна скопіювати кнопкою поруч.
-                            </p>
-                        </div>
-
-                        <div class="theme-card border rounded-xl p-3.5 space-y-1">
-                            <div class="font-bold">4. Картка посилання та її поля</div>
-                            <p class="theme-muted">
-                                Натискання на будь-яку картку відкриває шторку керування, де кожне поле можна налаштувати:
+                                У додатку чітко розділено два види закріплення:
                             </p>
                             <ul class="list-disc list-inside space-y-1 theme-muted pt-1">
-                                <li><b>Відкрити в браузері та Копіювати:</b> відкриває сайт у новій вкладці або копіює чистий URL у буфер обміну.</li>
-                                <li><b>Блокувати прямий перехід:</b> індивідуальний тумблер замка (OFF / LOCKED) саме для цієї картки.</li>
-                                <li><b>URL:</b> пряма адреса сторінки, яку завжди можна підправити.</li>
-                                <li><b>Назва:</b> заголовок матеріалу або статті.</li>
-                                <li><b>Нотатка + «Переписати ІІ»:</b> короткий опис суті сторінки. Кнопка «Переписати ІІ» заново аналізує URL і назву та оновлює опис, папку й теги.</li>
-                                <li><b>Папка та #Теги:</b> категорія, в якій живе картка, та список хештегів через пробіл для швидкої фільтрації.</li>
+                                <li><b>Скріпка на картці (головний екран):</b> закріплює сайт у верхній горизонтальній панелі швидкого доступу (Pin-барі) з <b>реальними фавіконами сайтів</b> над усіма папками.</li>
+                                <li><b>Кнопка «Пріоритет у папці» (всередині редагування):</b> позначає посилання зірочкою ★ і завжди піднімає його на самий верх усередині своїх категорій, не займаючи місце у глобальному Pin-барі.</li>
                             </ul>
                         </div>
 
                         <div class="theme-card border rounded-xl p-3.5 space-y-1">
-                            <div class="font-bold">5. Можливості шторки «Меню»</div>
+                            <div class="font-bold">4. Мульти-категорії та сірі ІІ-підказки</div>
+                            <p class="theme-muted">
+                                Одне посилання може одночасно належати до кількох папок (через кому, наприклад: <i>«Дизайн, Код та Технології»</i>). Під час редагування ІІ аналізує адресу і показує <b>сірим кольором розумні підказки суміжних категорій</b> (а також підказує наявні папки під час набору тексту). Достатньо натиснути на сіру підказку — і папка миттєво додасться.
+                            </p>
+                        </div>
+
+                        <div class="theme-card border rounded-xl p-3.5 space-y-1">
+                            <div class="font-bold">5. Робота офлайн та черга «⏳ Очікують мережі»</div>
+                            <p class="theme-muted">
+                                Якщо додати посилання без інтернету, LinkBox дбайливо збереже його у тимчасову папку <b>«⏳ Очікують мережі»</b>. Як тільки з'явиться зв'язок, додаток автоматично дообробить чергу, підтягне точні заголовки з мережі та розкладе картки по цільових папках.
+                            </p>
+                        </div>
+
+                        <div class="theme-card border rounded-xl p-3.5 space-y-1">
+                            <div class="font-bold">6. Масовий вибір та видалення</div>
+                            <p class="theme-muted">
+                                Ліворуч від кнопки «Меню» розташована кнопка режиму вибору (іконка з галочкою). Вона відкриває панель групових дій, де можна відмітити потрібні картки, обрати всі видимі на екрані посилання кнопкою <b>«Вибрати всі»</b> та видалити їх одним натисканням.
+                            </p>
+                        </div>
+
+                        <div class="theme-card border rounded-xl p-3.5 space-y-1">
+                            <div class="font-bold">7. Режим «Сейф» та пріоритет замків</div>
+                            <p class="theme-muted">
+                                Для особистих або чутливих посилань передбачено блокування прямого переходу. Замок можна увімкнути для цілої папки у Меню або індивідуально для окремої картки. Індивідуальне налаштування картки має вищий пріоритет над папкою. Коли замок активний, кнопка відкриття у браузері блокується від випадкових натискань, але адресу завжди можна скопіювати кнопкою поруч.
+                            </p>
+                        </div>
+
+                        <div class="theme-card border rounded-xl p-3.5 space-y-1">
+                            <div class="font-bold">8. Інструменти меню, Сортування та Бекап (.HTML / .JSON)</div>
                             <ul class="list-disc list-inside space-y-1 theme-muted pt-1">
-                                <li><b>Пошук та Рандом:</b> миттєвий пошук за словами, доменом чи тегами, а також кнопка відкриття випадкового незаблокованого посилання.</li>
-                                <li><b>Вигляд та Теми:</b> перемикання розкладки (Малі картки, Великі картки, Список) та трьох тем оформлення (Світла, М'яка темна, Чорна AMOLED).</li>
-                                <li><b>Категорії:</b> список усіх папок із лічильниками та кнопками замків праворуч від кожної папки.</li>
-                                <li><b>Імпорт ІІ та Експорт:</b> завантаження закладок із файлів (.HTML, .TXT, .JSON, .CSV) з автоматичним ІІ-розбором по папках, а також вивантаження всієї бази у стандартний .HTML файл для будь-якого браузера.</li>
-                                <li><b>Кнопки #, UA/EN та（ ͜.人 ͜.）:</b> окреме вікно з усіма хештегами, перемикання мови інтерфейсу та ця довідка.</li>
+                                <li><b>Пошук та Рандом:</b> миттєвий пошук із кнопкою швидкого очищення ✕ та відкриття випадкового незаблокованого посилання.</li>
+                                <li><b>Вигляд, Теми та Сортування:</b> 3 режими карток (Малі, Великі, Список), 3 теми (Світла, М'яка темна, AMOLED) та сортування списку (Нові, Старі, А–Я).</li>
+                                <li><b>Імпорт та Експорт (.HTML / .JSON):</b> завантаження закладок із файлів браузера чи текстових списків, вивантаження у стандартний <b>.HTML</b> для браузерів або збереження повного <b>.JSON-бекапу</b> (який зберігає всі замки, закріплення, пріоритети, кольори та нотатки 1-в-1).</li>
                             </ul>
                         </div>
                     </div>
 
                     <div class="theme-card border border-[#D96B27]/40 rounded-xl p-4 text-center space-y-2 mt-3">
-                        <div class="inline-flex px-3 py-1 rounded-lg bg-[#D96B27]/15 text-[#D96B27] font-bold text-sm mx-auto">
-                            （ ͜.人 ͜.）
-                        </div>
                         <div class="font-black text-sm sm:text-base tracking-tight">Зробив Shans</div>
                         <div class="flex items-center justify-center gap-2 font-extrabold text-sm">
                             <span>Слава Україні!</span>
@@ -1082,7 +1326,7 @@
                     <div class="theme-card border rounded-xl p-3.5 space-y-1.5">
                         <div class="font-extrabold text-sm text-[#D96B27]">Welcome to LinkBox!</div>
                         <p class="text-xs sm:text-sm theme-muted leading-relaxed">
-                            This organizer is built so that saved links never turn into a forgotten graveyard of bookmarks, staying clean, structured, and always at hand.
+                            This smart organizer is crafted so that saved links never turn into a forgotten graveyard of bookmarks, staying clean, structured, and always at hand.
                         </p>
                     </div>
 
@@ -1090,55 +1334,53 @@
                         <div class="theme-card border rounded-xl p-3.5 space-y-1">
                             <div class="font-bold">1. Top Header & Instant Reset</div>
                             <p class="theme-muted">
-                                On the top left is the <b>LinkBox</b> logo with the total link counter. Tapping the logo at any time resets active folder, tag, or search filters and brings back the full list. On the right are the bulk selection button (checkbox icon) and the <b>"Menu"</b> button.
+                                On the top left is the <b>LinkBox</b> logo with the total link counter and active filter badge. Tapping the logo at any moment resets active folder, hashtag, or search filters and returns to the full list.
                             </p>
                         </div>
 
                         <div class="theme-card border rounded-xl p-3.5 space-y-1">
-                            <div class="font-bold">2. Smart Input Bar ("+ Add")</div>
+                            <div class="font-bold">2. Smart Adding, Site Language & Duplicate Protection</div>
                             <p class="theme-muted">
-                                Paste a single link or a whole list of URLs into the top field. Pressing <b>"Add"</b> automatically strips trailing commas or punctuation, checks for duplicates, detects the topic from the title and URL path, assigns the right folder, color, icon, hashtags, and writes a clear summary note.
+                                Paste a single link or a list of URLs into the input bar. Pressing <b>"+ Add"</b> automatically strips trailing punctuation, checks for duplicates, and detects the <b>language of the target website</b> (English, Italian, Ukrainian, Russian, etc.) to generate the title and summary note in that language.
                             </p>
                         </div>
 
                         <div class="theme-card border rounded-xl p-3.5 space-y-1">
-                            <div class="font-bold">3. Safe Lock Mode (Accidental Tap Protection)</div>
+                            <div class="font-bold">3. Pin Icon (Top Bar) vs "Folder Priority"</div>
                             <p class="theme-muted">
-                                For private or sensitive links, direct opening can be blocked. Locks can be toggled for an entire folder inside the Menu or for an individual card. When locked, the browser open button is disabled to prevent accidental taps, while the copy button next to it remains ready for use.
-                            </p>
-                        </div>
-
-                        <div class="theme-card border rounded-xl p-3.5 space-y-1">
-                            <div class="font-bold">4. Link Card & Its Fields</div>
-                            <p class="theme-muted">
-                                Tapping any card opens the details sheet where every field can be customized:
+                                LinkBox separates global and local pinning:
                             </p>
                             <ul class="list-disc list-inside space-y-1 theme-muted pt-1">
-                                <li><b>Open in Browser & Copy:</b> opens the site in a new tab or copies the clean URL to the clipboard.</li>
-                                <li><b>Block Direct Open:</b> individual lock switch (OFF / LOCKED) for this specific card.</li>
-                                <li><b>URL:</b> direct page address that can be edited anytime.</li>
-                                <li><b>Title:</b> the headline of the article or resource.</li>
-                                <li><b>Note + "Rewrite AI":</b> concise summary of the page. "Rewrite AI" re-analyzes the URL and title to refresh the note, folder, and tags.</li>
-                                <li><b>Folder & #Tags:</b> the category where the card lives and space-separated hashtags for quick filtering.</li>
+                                <li><b>Pin icon on the card (Home screen):</b> pins the website to the top horizontal quick-access bar featuring <b>real website favicons</b> across all folders.</li>
+                                <li><b>"Folder priority" button (inside Edit sheet):</b> marks the card with a star ★ and keeps it at the very top inside its own categories without cluttering the global top bar.</li>
                             </ul>
                         </div>
 
                         <div class="theme-card border rounded-xl p-3.5 space-y-1">
-                            <div class="font-bold">5. Inside the "Menu" Sheet</div>
+                            <div class="font-bold">4. Multi-Categories & Gray AI Suggestions</div>
+                            <p class="theme-muted">
+                                A single link can live in multiple folders simultaneously (comma-separated, e.g., <i>"Design, Tech & Gadgets"</i>). Inside the Edit sheet, AI highlights <b>smart gray category suggestions</b> and autocompletes existing folders as you type—tap any gray chip to assign it in one touch.
+                            </p>
+                        </div>
+
+                        <div class="theme-card border rounded-xl p-3.5 space-y-1">
+                            <div class="font-bold">5. Offline Queue ("⏳ Pending Network")</div>
+                            <p class="theme-muted">
+                                When adding links without internet access, LinkBox stores them safely in the temporary <b>"⏳ Pending Network"</b> queue. As soon as your connection returns, the app automatically enriches the queued links in the background and distributes them into their proper folders.
+                            </p>
+                        </div>
+
+                        <div class="theme-card border rounded-xl p-3.5 space-y-1">
+                            <div class="font-bold">6. Bulk Selection, Safe Locks & Full Backup</div>
                             <ul class="list-disc list-inside space-y-1 theme-muted pt-1">
-                                <li><b>Search & Random:</b> instant search by keywords, domain, or tags, plus a button to open a random unlocked link.</li>
-                                <li><b>Layout & Themes:</b> switch between Small cards, Large cards, or List view, and three color themes (Light, Soft Dim, AMOLED Black).</li>
-                                <li><b>Categories:</b> all folders with item counters and quick lock buttons on the right.</li>
-                                <li><b>AI Import & Export:</b> import bookmark files (.HTML, .TXT, .JSON, .CSV) with automatic AI sorting, or export the entire database to a standard browser .HTML file.</li>
-                                <li><b>#, UA/EN &（ ͜.人 ͜.）Buttons:</b> dedicated hashtag cloud sheet, instant interface language switch, and this guide.</li>
+                                <li><b>Bulk Actions:</b> use the top-right checkbox button to select multiple cards or all visible items and delete them in one tap.</li>
+                                <li><b>Safe Lock Mode:</b> block accidental direct opening for entire folders or individual cards while keeping the Copy URL button available.</li>
+                                <li><b>Import & Export (.HTML / .JSON):</b> export to standard browser <b>.HTML</b> or save a full <b>.JSON backup</b> preserving all locks, pins, folder priorities, and notes.</li>
                             </ul>
                         </div>
                     </div>
 
                     <div class="theme-card border border-[#D96B27]/40 rounded-xl p-4 text-center space-y-2 mt-3">
-                        <div class="inline-flex px-3 py-1 rounded-lg bg-[#D96B27]/15 text-[#D96B27] font-bold text-sm mx-auto">
-                            （ ͜.人 ͜.）
-                        </div>
                         <div class="font-black text-sm sm:text-base tracking-tight">Made by Shans</div>
                         <div class="flex items-center justify-center gap-2 font-extrabold text-sm">
                             <span>Glory to Ukraine!</span>
@@ -1200,12 +1442,17 @@
         }
 
         function renderFoldersInMenu() {
-            const cats = [];
+            const catMap = new Map();
             ITEMS.forEach(item => {
-                if (!cats.find(c => c.cat === item.cat)) {
-                    cats.push({ cat: item.cat, color: item.color, count: ITEMS.filter(x => x.cat === item.cat).length });
-                }
+                getItemCats(item).forEach(cName => {
+                    if (!catMap.has(cName)) {
+                        catMap.set(cName, { cat: cName, color: item.color, count: 0 });
+                    }
+                    catMap.get(cName).count += 1;
+                });
             });
+            const cats = Array.from(catMap.values());
+            const offlineItems = ITEMS.filter(i => i.pendingOffline);
 
             const grid = document.getElementById('folders-grid');
             const isAll = selectedFolder === 'ALL' && !selectedTag;
@@ -1218,6 +1465,18 @@
                     <span class="text-xs font-mono-code font-bold opacity-80">${ITEMS.length}</span>
                 </button>
             `;
+
+            if (offlineItems.length > 0) {
+                const isOffActive = selectedFolder === OFFLINE_FOLDER_KEY;
+                html += `
+                    <button onclick="selectFolderAndClose('${OFFLINE_FOLDER_KEY}')" class="col-span-2 key-press rounded-lg px-3.5 py-2.5 flex items-center justify-between border border-amber-500/40 transition ${
+                        isOffActive ? 'bg-amber-600 text-white' : 'bg-amber-500/15 text-amber-600'
+                    }">
+                        <span class="text-xs sm:text-sm font-bold">${t('offlineFolderName')}</span>
+                        <span class="text-xs font-mono-code font-bold">${offlineItems.length}</span>
+                    </button>
+                `;
+            }
 
             html += cats.map(c => {
                 const active = selectedFolder === c.cat;
@@ -1293,11 +1552,25 @@
             openExternalUrlInNewTab(val);
         }
 
+        function toggleExportChoiceBar() {
+            const bar = document.getElementById('export-choice-bar');
+            if (!bar) return;
+            if (bar.classList.contains('hidden')) {
+                bar.classList.remove('hidden');
+                bar.classList.add('grid');
+            } else {
+                bar.classList.add('hidden');
+                bar.classList.remove('grid');
+            }
+        }
+
         function exportBrowserBookmarks() {
             const foldersMap = {};
             ITEMS.forEach(item => {
-                if (!foldersMap[item.cat]) foldersMap[item.cat] = [];
-                foldersMap[item.cat].push(item);
+                getItemCats(item).forEach(catName => {
+                    if (!foldersMap[catName]) foldersMap[catName] = [];
+                    foldersMap[catName].push(item);
+                });
             });
             const nowUnix = Math.floor(Date.now() / 1000);
             let html = `<!DOCTYPE NETSCAPE-Bookmark-file-1><META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8"><TITLE>LinkBox Bookmarks</TITLE><H1>LinkBox</H1><DL><p>\n`;
@@ -1321,11 +1594,83 @@
             closeMenuSheet();
         }
 
+        function exportFullJsonBackup() {
+            const backup = {
+                app: 'LinkBox',
+                version: 2,
+                exportedAt: new Date().toISOString(),
+                items: ITEMS,
+                lockedFolders: Array.from(LOCKED_FOLDERS),
+                themeMode,
+                viewMode,
+                sortMode
+            };
+            const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json;charset=utf-8' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `linkbox_backup_${new Date().toISOString().slice(0, 10)}.json`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast(t('exportedJson'));
+            closeMenuSheet();
+        }
+
+        // РЕНДЕР ГОРИЗОНТАЛЬНОГО PIN-БАРА С НАСТОЯЩИМИ ФАВИКОНАМИ САЙТОВ
+        function renderPinnedBar() {
+            const bar = document.getElementById('pinned-bar-wrapper');
+            if (!bar) return;
+            const pinnedItems = ITEMS.filter(i => i.pinned);
+            if (pinnedItems.length === 0) {
+                bar.classList.add('hidden');
+                bar.classList.remove('flex');
+                bar.innerHTML = '';
+                return;
+            }
+
+            bar.classList.remove('hidden');
+            bar.classList.add('flex');
+
+            bar.innerHTML = pinnedItems.map(p => {
+                const locked = isItemLocked(p);
+                const faviconBadge = getSiteFaviconHtml(p, 'w-6 h-6');
+                return `
+                    <div class="theme-card border rounded-lg p-1 flex items-center gap-1.5 shrink-0 shadow-2xs hover:border-[#D96B27] transition">
+                        <button onclick="openItemById(${p.id}, event)" title="${p.title} (${p.domain})" class="key-press flex items-center gap-1.5 pl-0.5 pr-1.5 py-0.5 rounded-md min-w-0">
+                            ${faviconBadge}
+                            <span class="text-xs font-extrabold truncate max-w-[105px] sm:max-w-[140px]">${p.name}</span>
+                            ${locked ? `<span class="opacity-65">${LINE_ICONS.lock}</span>` : ''}
+                        </button>
+                        <button onclick="openEditSheet(${p.id})" title="Налаштування" class="key-press w-6 h-6 rounded-md theme-input flex items-center justify-center text-[10px] opacity-70 hover:opacity-100 shrink-0">
+                            •••
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        }
+
         function renderApp() {
             document.getElementById('total-count-pill').textContent = `${ITEMS.length}`;
+            const offlineCount = ITEMS.filter(i => i.pendingOffline).length;
+            const offlinePill = document.getElementById('offline-queue-pill');
+            const offlineCountEl = document.getElementById('offline-queue-count');
+            if (offlinePill && offlineCountEl) {
+                if (offlineCount > 0) {
+                    offlineCountEl.textContent = `${offlineCount}`;
+                    offlinePill.classList.remove('hidden');
+                    offlinePill.classList.add('inline-flex');
+                } else {
+                    offlinePill.classList.add('hidden');
+                    offlinePill.classList.remove('inline-flex');
+                }
+            }
+
             const filterPill = document.getElementById('active-filter-pill');
             if (selectedTag) {
                 filterPill.textContent = `${selectedTag} ✕`;
+                filterPill.classList.remove('hidden');
+            } else if (selectedFolder === OFFLINE_FOLDER_KEY) {
+                filterPill.textContent = `${t('offlineFolderName')} ✕`;
                 filterPill.classList.remove('hidden');
             } else if (selectedFolder !== 'ALL') {
                 filterPill.textContent = `${selectedFolder} ✕`;
@@ -1334,6 +1679,8 @@
                 filterPill.classList.add('hidden');
             }
 
+            renderPinnedBar();
+
             const filtered = getFilteredItems();
             const cardsEl = document.getElementById('cards-container');
 
@@ -1341,6 +1688,20 @@
                 cardsEl.className = '';
                 cardsEl.innerHTML = `<div class="py-12 text-center text-sm theme-muted font-mono-code">Порожньо</div>`;
                 return;
+            }
+
+            function renderCatBadges(item) {
+                const allCats = getItemCats(item);
+                const badges = allCats.map((cName, idx) => `
+                    <span class="text-[11px] font-bold px-2 py-0.5 rounded-md ${idx === 0 ? 'text-white' : 'theme-input opacity-85'}" style="${idx === 0 ? `background:${item.color}` : ''}">${cName}</span>
+                `).join('');
+                const offBadge = item.pendingOffline
+                    ? `<span class="text-[10px] font-mono-code font-bold px-1.5 py-0.5 rounded-md bg-amber-500/20 text-amber-600 border border-amber-500/40">${t('offlineBadge')}</span>`
+                    : '';
+                const prioBadge = item.folderPriority
+                    ? `<span class="w-6 h-6 rounded-md bg-amber-500/15 text-amber-500 flex items-center justify-center" title="${t('priorityActiveBtn')}">${LINE_ICONS.starFilled}</span>`
+                    : '';
+                return `${offBadge}${prioBadge}${badges}`;
             }
 
             // 1. МАЛЫЕ КАРТОЧКИ
@@ -1369,9 +1730,12 @@
                                         <div class="text-xs font-mono-code theme-muted truncate">${s.domain}</div>
                                     </div>
                                 </div>
-                                <div class="flex items-center gap-1.5 shrink-0">
+                                <div class="flex items-center flex-wrap justify-end gap-1 shrink-0">
+                                    <button onclick="toggleItemPinQuick(${s.id}, event)" title="${t('pinBtn')}" class="key-press w-6 h-6 rounded-md flex items-center justify-center transition ${s.pinned ? 'text-[#D96B27] bg-[#D96B27]/15' : 'theme-input opacity-55 hover:opacity-100'}">
+                                        ${s.pinned ? LINE_ICONS.pinFilled : LINE_ICONS.pin}
+                                    </button>
                                     ${locked ? `<span class="w-6 h-6 rounded-md theme-input flex items-center justify-center opacity-75" title="Прямий перехід заблоковано">${LINE_ICONS.lock}</span>` : ''}
-                                    <span class="text-[11px] font-bold px-2 py-0.5 rounded-md text-white" style="background:${s.color}">${s.cat}</span>
+                                    ${renderCatBadges(s)}
                                 </div>
                             </div>
 
@@ -1426,7 +1790,12 @@
                                         <div class="text-xs font-mono-code theme-muted truncate">${s.domain}</div>
                                     </div>
                                 </div>
-                                <span class="text-xs font-bold px-2.5 py-0.5 rounded-md text-white shrink-0" style="background:${s.color}">${s.cat}</span>
+                                <div class="flex items-center flex-wrap justify-end gap-1 shrink-0">
+                                    <button onclick="toggleItemPinQuick(${s.id}, event)" title="${t('pinBtn')}" class="key-press w-7 h-7 rounded-md flex items-center justify-center transition ${s.pinned ? 'text-[#D96B27] bg-[#D96B27]/15' : 'theme-input opacity-55 hover:opacity-100'}">
+                                        ${s.pinned ? LINE_ICONS.pinFilled : LINE_ICONS.pin}
+                                    </button>
+                                    ${renderCatBadges(s)}
+                                </div>
                             </div>
 
                             <div class="flex items-stretch gap-2">
@@ -1477,14 +1846,17 @@
                                 ${s.svg}
                             </span>
                             <div class="min-w-0 flex-1">
-                                <div class="flex items-center gap-2">
+                                <div class="flex items-center flex-wrap gap-1.5">
                                     <span class="font-bold text-sm truncate">${s.title}</span>
-                                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded text-white shrink-0" style="background:${s.color}">${s.cat}</span>
+                                    ${renderCatBadges(s)}
                                 </div>
                                 <div class="text-xs theme-muted truncate">${s.note}</div>
                             </div>
                         </div>
                         <div class="flex items-center gap-1.5 shrink-0">
+                            <button onclick="toggleItemPinQuick(${s.id}, event)" title="${t('pinBtn')}" class="key-press w-8 h-8 rounded-lg flex items-center justify-center transition ${s.pinned ? 'text-[#D96B27] bg-[#D96B27]/15' : 'theme-input opacity-55 hover:opacity-100'}">
+                                ${s.pinned ? LINE_ICONS.pinFilled : LINE_ICONS.pin}
+                            </button>
                             <button onclick="openItemById(${s.id}, event)" ${locked ? 'disabled' : ''}
                                 class="w-9 h-9 rounded-lg flex items-center justify-center transition ${
                                     locked ? 'theme-input opacity-45 cursor-not-allowed' : 'key-press bg-[#D96B27] text-white'
@@ -1514,9 +1886,9 @@
         }
 
         function extractCleanBrandName(domain) {
-            const parts = domain.split('.').filter(p => !['www', 'm', 'mobile', 'ua', 'com', 'net', 'org', 'gov', 'edu', 'info', 'io', 'co', 'uk', 'ru', 'biz'].includes(p));
+            const parts = domain.split('.').filter(p => !['www', 'm', 'mobile', 'ua', 'com', 'net', 'org', 'gov', 'edu', 'info', 'io', 'co', 'uk', 'ru', 'it', 'de', 'fr', 'es', 'pl', 'biz'].includes(p));
             const root = parts.length > 0 ? parts[parts.length - 1] : domain.split('.')[0];
-            if (!root) return 'Сайт';
+            if (!root) return 'Site';
             const mainBrand = root.charAt(0).toUpperCase() + root.slice(1);
             if (parts.length > 1) {
                 const sub = parts[0].toLowerCase();
@@ -1536,11 +1908,65 @@
             return mainBrand;
         }
 
+        // ДЕТЕКТОР ЯЗЫКА САЙТА (UK / EN / IT / RU / DE / FR / ES / PL)
+        function detectSiteLanguage(finalUrl, domain, humanTitle, slugTopic) {
+            const lowerUrl = finalUrl.toLowerCase();
+            const combinedText = `${humanTitle} ${slugTopic}`.trim();
+
+            // 1. Явный языковой сегмент в URL (/it/, /en/, /ru/, /uk/, /de/, /fr/, /es/, /pl/)
+            if (/\/(it|it-it|italiano)(\/|$)/i.test(lowerUrl)) return 'it';
+            if (/\/(uk|ua|uk-ua)(\/|$)/i.test(lowerUrl)) return 'uk';
+            if (/\/(ru|ru-ru)(\/|$)/i.test(lowerUrl)) return 'ru';
+            if (/\/(de|de-de)(\/|$)/i.test(lowerUrl)) return 'de';
+            if (/\/(fr|fr-fr)(\/|$)/i.test(lowerUrl)) return 'fr';
+            if (/\/(es|es-es)(\/|$)/i.test(lowerUrl)) return 'es';
+            if (/\/(pl|pl-pl)(\/|$)/i.test(lowerUrl)) return 'pl';
+            if (/\/(en|en-us|en-gb)(\/|$)/i.test(lowerUrl)) return 'en';
+
+            // 2. Проверка символов кириллицы и характерных слов в заголовке или декодированном слаге
+            if (/[іїєґ]/i.test(combinedText)) return 'uk';
+            if (/[ыъэё]/i.test(combinedText)) return 'ru';
+            if (/[а-я]/i.test(combinedText)) {
+                // Если есть кириллица без специфичных букв — смотрим на типичные русские/украинские слова и домен
+                if (/\b(лучших|лучшие|самые|самых|века|романов|чтение|воскресное|смешные|заголовки|каналы|выбор|редакции|недорогой|купить|обзор|новости|технологии)\b/i.test(combinedText)) {
+                    return 'ru';
+                }
+                if (/\b(найкращі| століття|недільне|читання|смішні|канали|вибір|редакції|недорогий|купити|огляд|новини|технології|посилання)\b/i.test(combinedText)) {
+                    return 'uk';
+                }
+                if (/\.(ru|su|by|рф)$/i.test(domain)) return 'ru';
+                return 'uk';
+            }
+
+            // 3. Национальные доменные зоны (TLD) и известные национальные медиа
+            if (/\.(it|sm|va)$/i.test(domain) || /(repubblica|corriere|gazzetta|ansa|subito|raiplay|ilpost|fanpage|giallozafferano|trovaprezzi|aranzulla)\./i.test(domain)) {
+                return 'it';
+            }
+            if (/\.(ru|su|рф)$/i.test(domain) || /(habr|kinopoisk|yandex|dzen|vc\.ru|rbc\.ru|lenta\.ru|ozon|wildberries|avito|4pda)\./i.test(domain)) {
+                return 'ru';
+            }
+            if (/\.(ua|укр)$/i.test(domain) || /(rozetka|pravda\.com\.ua|nv\.ua|unian|tsn\.ua|dou\.ua|itc\.ua|ain\.ua|prom\.ua|monobank|privatbank|sinoptik|liga\.net|censor\.net|babel\.ua|hromadske)\b/i.test(domain)) {
+                return 'uk';
+            }
+            if (/\.(de|at|ch)$/i.test(domain)) return 'de';
+            if (/\.(fr)$/i.test(domain)) return 'fr';
+            if (/\.(es)$/i.test(domain)) return 'es';
+            if (/\.(pl)$/i.test(domain)) return 'pl';
+
+            // 4. По характерным итальянским словам в латинском заголовке/слаге
+            if (/\b(della|delle|degli|nella|nelle|sulla|sono|anche|questo|questa|migliori|notizie|ricette|comprare|prezzo|storia|italia|italiano|guida|come)\b/i.test(combinedText)) {
+                return 'it';
+            }
+
+            // 5. Все международные домены (.com, .net, .org, .io, .dev, .ai, .co.uk, .us и др.) по умолчанию — английский (EN)
+            return 'en';
+        }
+
         function decodeUrlPathToHumanTopic(urlStr) {
             try {
                 const u = new URL(cleanRawUrl(urlStr));
                 const segments = u.pathname.split('/').filter(Boolean);
-                if (segments.length === 0) return { topic: '', sectionHint: '' };
+                if (segments.length === 0) return { topic: '', sectionHint: '', isRussianTranslit: false };
 
                 let slug = decodeURIComponent(segments[segments.length - 1]);
                 slug = slug.replace(/\.(html?|php|aspx?|jsp)$/i, '');
@@ -1550,13 +1976,14 @@
                 const sectionRaw = segments.length > 1 ? segments.slice(0, -1).join(' ').toLowerCase() : '';
 
                 const words = slug.split(/[-_]+/).filter(w => w.length > 0 && !/^\d+$/.test(w));
-                if (words.length < 2) return { topic: '', sectionHint: sectionRaw };
+                if (words.length < 2) return { topic: '', sectionHint: sectionRaw, isRussianTranslit: false };
 
                 if (/[а-яіїєґ]/i.test(slug)) {
                     const cleanCyr = words.join(' ');
                     return {
                         topic: cleanCyr.charAt(0).toUpperCase() + cleanCyr.slice(1),
-                        sectionHint: sectionRaw
+                        sectionHint: sectionRaw,
+                        isRussianTranslit: /[ыъэё]/i.test(cleanCyr)
                     };
                 }
 
@@ -1580,7 +2007,8 @@
                     'nedorogoy': 'недорогой', 'kupit': 'купить', 'cena': 'цена'
                 };
 
-                const isTranslitLike = words.some(w => SLUG_DICT[w.toLowerCase()] || /(shch|zh|kh|ts|ch|sh|yu|ya|iy|yy|oje|aya|yye|ov|ev|ih|yh)$/i.test(w));
+                const hasRuDictMatch = words.some(w => Boolean(SLUG_DICT[w.toLowerCase()]));
+                const isTranslitLike = hasRuDictMatch || words.filter(w => /(shch|zh|kh|vo|oje|yye|ih|yh)$/i.test(w)).length >= 2;
 
                 function translitWordToCyr(w) {
                     const low = w.toLowerCase();
@@ -1618,9 +2046,9 @@
                 if (phrase) {
                     phrase = phrase.charAt(0).toUpperCase() + phrase.slice(1);
                 }
-                return { topic: phrase, sectionHint: sectionRaw };
+                return { topic: phrase, sectionHint: sectionRaw, isRussianTranslit: isTranslitLike };
             } catch (e) {
-                return { topic: '', sectionHint: '' };
+                return { topic: '', sectionHint: '', isRussianTranslit: false };
             }
         }
 
@@ -1634,6 +2062,306 @@
             return tStr;
         }
 
+        // Генерация заголовка, тегов и описания на языке самого сайта (UK / EN / IT / RU / DE / FR / ES / PL)
+        function generateLocalizedMeta(siteLang, catKey, cleanName, domain, humanTitle, baseBrandTag) {
+            const L = {
+                book: {
+                    uk: {
+                        defaultTitle: `${cleanName} — Книги та наука`,
+                        tags: ['#книги', '#література', '#наука', baseBrandTag],
+                        noteWithTitle: `Літературна або наукова добірка на ${cleanName}: «${humanTitle}». Збережено для читання.`,
+                        noteGeneric: `Матеріал про книги, науку та освіту на ресурсі ${cleanName} (${domain}).`
+                    },
+                    en: {
+                        defaultTitle: `${cleanName} — Books & Science`,
+                        tags: ['#books', '#science', '#reading', baseBrandTag],
+                        noteWithTitle: `Book & science feature on ${cleanName}: "${humanTitle}". Saved to reading list.`,
+                        noteGeneric: `Educational, literature, and science resource on ${cleanName} (${domain}).`
+                    },
+                    it: {
+                        defaultTitle: `${cleanName} — Libri e Scienza`,
+                        tags: ['#libri', '#scienza', '#lettura', baseBrandTag],
+                        noteWithTitle: `Selezione letteraria o scientifica su ${cleanName}: «${humanTitle}». Salvato nella lista di lettura.`,
+                        noteGeneric: `Risorsa dedicata a libri, scienza e formazione su ${cleanName} (${domain}).`
+                    },
+                    ru: {
+                        defaultTitle: `${cleanName} — Книги и наука`,
+                        tags: ['#книги', '#литература', '#наука', baseBrandTag],
+                        noteWithTitle: `Литературная или научная подборка на ${cleanName}: «${humanTitle}». Сохранено в список для чтения.`,
+                        noteGeneric: `Материал о книгах, науке и образовании на ресурсе ${cleanName} (${domain}).`
+                    }
+                },
+                music: {
+                    uk: {
+                        defaultTitle: `${cleanName} — Музика та аудіо`,
+                        tags: ['#музика', '#аудіо', baseBrandTag],
+                        noteWithTitle: `Музична добірка або аудіоматеріал «${humanTitle}» на ${cleanName} (${domain}).`,
+                        noteGeneric: `Аудіострімінг та музичний каталог на платформі ${cleanName} (${domain}).`
+                    },
+                    en: {
+                        defaultTitle: `${cleanName} — Music & Audio`,
+                        tags: ['#music', '#audio', baseBrandTag],
+                        noteWithTitle: `Music playlist or audio release "${humanTitle}" on ${cleanName} (${domain}).`,
+                        noteGeneric: `Audio streaming and music catalog on ${cleanName} (${domain}).`
+                    },
+                    it: {
+                        defaultTitle: `${cleanName} — Musica e Audio`,
+                        tags: ['#musica', '#audio', baseBrandTag],
+                        noteWithTitle: `Playlist musicale o contenuto audio «${humanTitle}» su ${cleanName} (${domain}).`,
+                        noteGeneric: `Piattaforma di streaming audio e catalogo musicale su ${cleanName} (${domain}).`
+                    },
+                    ru: {
+                        defaultTitle: `${cleanName} — Музыка и аудио`,
+                        tags: ['#музыка', '#аудио', baseBrandTag],
+                        noteWithTitle: `Музыкальная подборка или аудиоматериал «${humanTitle}» на ${cleanName} (${domain}).`,
+                        noteGeneric: `Аудиостриминг и музыкальный каталог на платформе ${cleanName} (${domain}).`
+                    }
+                },
+                video: {
+                    uk: {
+                        defaultTitle: `${cleanName} — Кіно та серіали`,
+                        tags: ['#кіно', '#серіали', baseBrandTag],
+                        noteWithTitle: `Відео або матеріал про кіно: «${humanTitle}» (${domain}) — збережено на перегляд.`,
+                        noteGeneric: `Відеоплатформа ${cleanName}: кіно, серіали та ефіри для перегляду.`
+                    },
+                    en: {
+                        defaultTitle: `${cleanName} — Movies & Video`,
+                        tags: ['#video', '#movies', baseBrandTag],
+                        noteWithTitle: `Video or series feature "${humanTitle}" on ${cleanName} (${domain}) — saved to watchlist.`,
+                        noteGeneric: `Streaming platform ${cleanName} (${domain}): movies, series, and video broadcasts.`
+                    },
+                    it: {
+                        defaultTitle: `${cleanName} — Film e Serie TV`,
+                        tags: ['#cinema', '#serietv', baseBrandTag],
+                        noteWithTitle: `Contenuto video o serie «${humanTitle}» su ${cleanName} (${domain}) — salvato da guardare.`,
+                        noteGeneric: `Piattaforma video ${cleanName} (${domain}): film, serie TV e trasmissioni.`
+                    },
+                    ru: {
+                        defaultTitle: `${cleanName} — Кино и сериалы`,
+                        tags: ['#кино', '#сериалы', baseBrandTag],
+                        noteWithTitle: `Видео или материал о кино: «${humanTitle}» (${domain}) — сохранено к просмотру.`,
+                        noteGeneric: `Видеоплатформа ${cleanName}: кино, сериалы и эфиры для вечернего просмотра.`
+                    }
+                },
+                social: {
+                    uk: {
+                        defaultTitle: `${cleanName} — Канали та спільноти`,
+                        tags: ['#telegram', '#канали', '#медіа', baseBrandTag],
+                        noteWithTitle: `Добірка або публікація у спільноті: «${humanTitle}» (${domain}).`,
+                        noteGeneric: `Сторінка або авторський канал на платформі ${cleanName} (${domain}).`
+                    },
+                    en: {
+                        defaultTitle: `${cleanName} — Social & Channels`,
+                        tags: ['#social', '#community', baseBrandTag],
+                        noteWithTitle: `Community thread or channel spotlight: "${humanTitle}" on ${cleanName} (${domain}).`,
+                        noteGeneric: `Social feed, creator channel, or community discussion on ${cleanName} (${domain}).`
+                    },
+                    it: {
+                        defaultTitle: `${cleanName} — Social e Canali`,
+                        tags: ['#social', '#canali', baseBrandTag],
+                        noteWithTitle: `Selezione o discussione social: «${humanTitle}» su ${cleanName} (${domain}).`,
+                        noteGeneric: `Canale o pagina community sulla piattaforma ${cleanName} (${domain}).`
+                    },
+                    ru: {
+                        defaultTitle: `${cleanName} — Каналы и соцсети`,
+                        tags: ['#telegram', '#каналы', '#медиа', baseBrandTag],
+                        noteWithTitle: `Подборка или обзор каналов: «${humanTitle}» (${domain}).`,
+                        noteGeneric: `Страница или авторский канал на платформе ${cleanName} (${domain}).`
+                    }
+                },
+                code: {
+                    uk: {
+                        defaultTitle: `${cleanName} — Технології та ІТ`,
+                        tags: ['#технології', '#гаджети', baseBrandTag],
+                        noteWithTitle: `Технологічний матеріал на ${cleanName}: «${humanTitle}» (${domain}).`,
+                        noteGeneric: `Технологічний ресурс ${cleanName} (${domain}): гаджети, код та ІТ-огляди.`
+                    },
+                    en: {
+                        defaultTitle: `${cleanName} — Tech & Development`,
+                        tags: ['#tech', '#code', baseBrandTag],
+                        noteWithTitle: `Technical resource or review on ${cleanName}: "${humanTitle}" (${domain}).`,
+                        noteGeneric: `Developer & tech platform ${cleanName} (${domain}): software, gadgets, and engineering docs.`
+                    },
+                    it: {
+                        defaultTitle: `${cleanName} — Tecnologia e IT`,
+                        tags: ['#tecnologia', '#codice', baseBrandTag],
+                        noteWithTitle: `Approfondimento tecnologico su ${cleanName}: «${humanTitle}» (${domain}).`,
+                        noteGeneric: `Portale tecnologico ${cleanName} (${domain}): dispositivi, software e guide IT.`
+                    },
+                    ru: {
+                        defaultTitle: `${cleanName} — Технологии и ИТ`,
+                        tags: ['#технологии', '#гаджеты', baseBrandTag],
+                        noteWithTitle: `Технологический обзор на ${cleanName}: «${humanTitle}» (${domain}).`,
+                        noteGeneric: `Технологический раздел ${cleanName} (${domain}): гаджеты, софт и ИТ-обзоры.`
+                    }
+                },
+                shop: {
+                    uk: {
+                        defaultTitle: `${cleanName} — Товар у каталозі`,
+                        tags: ['#покупки', '#каталог', baseBrandTag],
+                        noteWithTitle: `Товарна пропозиція або добірка на ${cleanName}: «${humanTitle}».`,
+                        noteGeneric: `Онлайн-каталог ${cleanName} (${domain}): порівняння цін та характеристик.`
+                    },
+                    en: {
+                        defaultTitle: `${cleanName} — Store Listing`,
+                        tags: ['#shopping', '#deals', baseBrandTag],
+                        noteWithTitle: `Product listing or curated deal on ${cleanName}: "${humanTitle}".`,
+                        noteGeneric: `Online store ${cleanName} (${domain}): product specs, reviews, and price comparison.`
+                    },
+                    it: {
+                        defaultTitle: `${cleanName} — Catalogo Prodotti`,
+                        tags: ['#shopping', '#offerte', baseBrandTag],
+                        noteWithTitle: `Prodotto o selezione offerte su ${cleanName}: «${humanTitle}».`,
+                        noteGeneric: `Negozio online ${cleanName} (${domain}): schede tecniche, prezzi e recensioni.`
+                    },
+                    ru: {
+                        defaultTitle: `${cleanName} — Товар в каталоге`,
+                        tags: ['#покупки', '#каталог', baseBrandTag],
+                        noteWithTitle: `Товарная подборка или предложение на ${cleanName}: «${humanTitle}».`,
+                        noteGeneric: `Онлайн-каталог ${cleanName} (${domain}): сравнение цен и характеристик.`
+                    }
+                },
+                design: {
+                    uk: {
+                        defaultTitle: `${cleanName} — Дизайн-референс`,
+                        tags: ['#дизайн', '#референс', baseBrandTag],
+                        noteWithTitle: `Дизайн-проєкт «${humanTitle}» на ${cleanName}: збережено як візуальний референс.`,
+                        noteGeneric: `Колекція інтерфейсів, графіки та дизайн-рішень на платформі ${cleanName}.`
+                    },
+                    en: {
+                        defaultTitle: `${cleanName} — Design Reference`,
+                        tags: ['#design', '#ui', baseBrandTag],
+                        noteWithTitle: `Design showcase "${humanTitle}" on ${cleanName}: saved as a visual & UI reference.`,
+                        noteGeneric: `Visual inspiration, UI systems, and creative portfolio on ${cleanName} (${domain}).`
+                    },
+                    it: {
+                        defaultTitle: `${cleanName} — Design e Creatività`,
+                        tags: ['#design', '#grafica', baseBrandTag],
+                        noteWithTitle: `Progetto creativo «${humanTitle}» su ${cleanName}: salvato come riferimento visivo.`,
+                        noteGeneric: `Galleria di interfacce, grafica e ispirazione visiva su ${cleanName} (${domain}).`
+                    },
+                    ru: {
+                        defaultTitle: `${cleanName} — Дизайн-референс`,
+                        tags: ['#дизайн', '#референс', baseBrandTag],
+                        noteWithTitle: `Дизайн-проект «${humanTitle}» на ${cleanName}: сохранено как визуальный референс.`,
+                        noteGeneric: `Коллекция интерфейсов, графики и дизайн-решений на платформе ${cleanName}.`
+                    }
+                },
+                travel: {
+                    uk: {
+                        defaultTitle: `${cleanName} — Подорожі та маршрути`,
+                        tags: ['#поїздки', '#маршрут', baseBrandTag],
+                        noteWithTitle: `Локація або маршрут «${humanTitle}» на ${cleanName} для планування поїздки.`,
+                        noteGeneric: `Сервіс подорожей ${cleanName} (${domain}): маршрути, квитки та бронювання житла.`
+                    },
+                    en: {
+                        defaultTitle: `${cleanName} — Travel & Stay`,
+                        tags: ['#travel', '#booking', baseBrandTag],
+                        noteWithTitle: `Destination or stay "${humanTitle}" on ${cleanName} saved for trip planning.`,
+                        noteGeneric: `Travel platform ${cleanName} (${domain}): stays, routes, and booking options.`
+                    },
+                    it: {
+                        defaultTitle: `${cleanName} — Viaggi e Soggiorni`,
+                        tags: ['#viaggi', '#vacanze', baseBrandTag],
+                        noteWithTitle: `Destinazione o alloggio «${humanTitle}» su ${cleanName} per pianificare il viaggio.`,
+                        noteGeneric: `Portale viaggi ${cleanName} (${domain}): itinerari, prenotazioni e soggiorni.`
+                    },
+                    ru: {
+                        defaultTitle: `${cleanName} — Поездки и бронь`,
+                        tags: ['#поездки', '#маршрут', baseBrandTag],
+                        noteWithTitle: `Локация или маршрут «${humanTitle}» на ${cleanName} для планирования поездки.`,
+                        noteGeneric: `Сервис путешествий ${cleanName} (${domain}): маршруты, билеты и варианты проживания.`
+                    }
+                },
+                finance: {
+                    uk: {
+                        defaultTitle: `${cleanName} — Фінанси та бізнес`,
+                        tags: ['#фінанси', '#бізнес', baseBrandTag],
+                        noteWithTitle: `Економічний матеріал на ${cleanName}: «${humanTitle}» (${domain}).`,
+                        noteGeneric: `Діловий портал ${cleanName} (${domain}): фінанси, ринки та бізнес-аналітика.`
+                    },
+                    en: {
+                        defaultTitle: `${cleanName} — Finance & Business`,
+                        tags: ['#finance', '#business', baseBrandTag],
+                        noteWithTitle: `Market or business analysis on ${cleanName}: "${humanTitle}" (${domain}).`,
+                        noteGeneric: `Financial service & market portal ${cleanName} (${domain}): banking, analytics, and economy.`
+                    },
+                    it: {
+                        defaultTitle: `${cleanName} — Finanza ed Economia`,
+                        tags: ['#finanza', '#economia', baseBrandTag],
+                        noteWithTitle: `Analisi economica o finanziaria su ${cleanName}: «${humanTitle}» (${domain}).`,
+                        noteGeneric: `Portale economico ${cleanName} (${domain}): mercati, finanza e servizi bancari.`
+                    },
+                    ru: {
+                        defaultTitle: `${cleanName} — Финансы и бизнес`,
+                        tags: ['#финансы', '#бизнес', baseBrandTag],
+                        noteWithTitle: `Экономический материал на ${cleanName}: «${humanTitle}» (${domain}).`,
+                        noteGeneric: `Деловой портал ${cleanName} (${domain}): финансы, рынки и бизнес-обзоры.`
+                    }
+                },
+                news: {
+                    uk: {
+                        defaultTitle: `${cleanName} — Публікація`,
+                        tags: ['#новини', '#стаття', baseBrandTag],
+                        noteWithTitle: `Стаття на ${cleanName} (${domain}): «${humanTitle}».`,
+                        noteGeneric: `Публікація на медіапорталі ${cleanName} (${domain}) для швидкого перегляду.`
+                    },
+                    en: {
+                        defaultTitle: `${cleanName} — News & Editorial`,
+                        tags: ['#news', '#article', baseBrandTag],
+                        noteWithTitle: `Editorial article on ${cleanName} (${domain}): "${humanTitle}".`,
+                        noteGeneric: `News report and media coverage on ${cleanName} (${domain}).`
+                    },
+                    it: {
+                        defaultTitle: `${cleanName} — Notizie e Attualità`,
+                        tags: ['#notizie', '#attualita', baseBrandTag],
+                        noteWithTitle: `Articolo su ${cleanName} (${domain}): «${humanTitle}».`,
+                        noteGeneric: `Portale di informazione ${cleanName} (${domain}): notizie, cronaca e approfondimenti.`
+                    },
+                    ru: {
+                        defaultTitle: `${cleanName} — Публикация`,
+                        tags: ['#новости', '#статья', baseBrandTag],
+                        noteWithTitle: `Статья на ${cleanName} (${domain}): «${humanTitle}».`,
+                        noteGeneric: `Публикация на медиапортале ${cleanName} (${domain}) для быстрого чтения.`
+                    }
+                },
+                web: {
+                    uk: {
+                        defaultTitle: `${cleanName} — Веб-сторінка`,
+                        tags: ['#веб', baseBrandTag],
+                        noteWithTitle: `Сторінка «${humanTitle}» на ресурсі ${cleanName} (${domain}).`,
+                        noteGeneric: `Веб-сторінка на домені ${domain} (${cleanName}) у колекції посилань.`
+                    },
+                    en: {
+                        defaultTitle: `${cleanName} — Web Page`,
+                        tags: ['#web', baseBrandTag],
+                        noteWithTitle: `Web page "${humanTitle}" saved from ${cleanName} (${domain}).`,
+                        noteGeneric: `Bookmarked web resource on ${cleanName} (${domain}).`
+                    },
+                    it: {
+                        defaultTitle: `${cleanName} — Pagina Web`,
+                        tags: ['#web', baseBrandTag],
+                        noteWithTitle: `Pagina «${humanTitle}» salvata da ${cleanName} (${domain}).`,
+                        noteGeneric: `Risorsa web salvata sul dominio ${domain} (${cleanName}).`
+                    },
+                    ru: {
+                        defaultTitle: `${cleanName} — Веб-страница`,
+                        tags: ['#веб', baseBrandTag],
+                        noteWithTitle: `Страница «${humanTitle}» на ресурсе ${cleanName} (${domain}).`,
+                        noteGeneric: `Веб-страница на домене ${domain} (${cleanName}) в коллекции ссылок.`
+                    }
+                }
+            };
+
+            const group = L[catKey] || L.web;
+            const langPack = group[siteLang] || group.en;
+            return {
+                defaultTitle: langPack.defaultTitle,
+                tags: langPack.tags,
+                note: humanTitle ? langPack.noteWithTitle : langPack.noteGeneric
+            };
+        }
+
         function buildSmartAIItem(rawUrl, customTitle = '') {
             const finalUrl = cleanRawUrl(rawUrl);
             const domain = finalUrl.replace(/^https?:\/\//i, '').replace(/^www\./i, '').split('/')[0].toLowerCase();
@@ -1641,137 +2369,95 @@
             const { topic: slugTopic, sectionHint } = decodeUrlPathToHumanTopic(finalUrl);
             const humanTitle = sanitizeBookmarkTitle(customTitle, cleanName) || slugTopic;
 
+            // Определяем язык сайта (UK, EN, IT, RU и др.)
+            const siteLang = detectSiteLanguage(finalUrl, domain, humanTitle, slugTopic);
+
             const pageTopicSignal = `${humanTitle} ${sectionHint} ${finalUrl}`.toLowerCase();
             const domainOnlySignal = domain.toLowerCase();
 
+            let catKey = 'web';
             let cat = currentLang === 'uk' ? 'Веб-ресурси' : 'Web Resources';
             let color = '#4F6352';
             let svg = LINE_ICONS.globe;
             const baseBrandTag = `#${cleanName.toLowerCase().replace(/\s+/g, '')}`;
-            let tags = [baseBrandTag];
-            let defaultCategoryTitle = currentLang === 'uk' ? `${cleanName} — Матеріал` : `${cleanName} — Article`;
-            let note = '';
 
-            // 1. КНИГИ, ЛИТЕРАТУРА, НАУКА И ОБРАЗОВАНИЕ
-            if (/roman|роман|книг|літератур|литератур|фантастик|chtivo|чтиво|science|наук|wikipedia|coursera|udemy|prometheus|yakaboo|goodreads|duolingo|book|wiki|library|освіт|курс|словник|енциклопед|навчан/.test(pageTopicSignal)) {
+            if (/roman|роман|книг|літератур|литератур|фантастик|chtivo|чтиво|science|наук|scienza|libri|romanzo|wikipedia|coursera|udemy|prometheus|yakaboo|goodreads|duolingo|book|wiki|library|освіт|курс|словник|енциклопед|навчан/.test(pageTopicSignal)) {
+                catKey = 'book';
                 cat = currentLang === 'uk' ? 'Книги та Освіта' : 'Books & Science';
                 color = '#6B5344';
                 svg = LINE_ICONS.book;
-                tags = ['#книги', '#література', '#наука', baseBrandTag];
-                defaultCategoryTitle = currentLang === 'uk' ? `${cleanName} — Книги та наука` : `${cleanName} — Books & Science`;
-                note = humanTitle
-                    ? `Літературна або наукова добірка на ${cleanName}: «${humanTitle}». Збережено у список для читання.`
-                    : `Матеріал про книги, науку та освіту на ресурсі ${cleanName} (${domain}).`;
             }
-            // 2. МУЗЫКА И АУДИО
-            else if (/spotify|soundcloud|music\.apple|deezer|bandcamp|last\.fm|shazam|mp3|radio|podcast|audio|музик|музык|пісн|альбом|плейлист/.test(pageTopicSignal)) {
+            else if (/spotify|soundcloud|music\.apple|deezer|bandcamp|last\.fm|shazam|mp3|radio|podcast|audio|музик|музык|musica|canzoni|пісн|альбом|плейлист/.test(pageTopicSignal)) {
+                catKey = 'music';
                 cat = currentLang === 'uk' ? 'Музика' : 'Music';
                 color = '#3F6A4E';
                 svg = LINE_ICONS.music;
-                tags = ['#музика', '#аудіо', baseBrandTag];
-                defaultCategoryTitle = currentLang === 'uk' ? `${cleanName} — Музика та аудіо` : `${cleanName} — Music & Audio`;
-                note = humanTitle
-                    ? `Музична добірка або аудіоматеріал «${humanTitle}» на ${cleanName} (${domain}).`
-                    : `Аудіострімінг та музичний каталог на платформі ${cleanName} (${domain}).`;
             }
-            // 3. КИНО, СЕРИАЛЫ И ВИДЕО
-            else if (/youtube|youtu\.be|netflix|megogo|sweet\.tv|takflix|kinopoisk|imdb|vimeo|twitch|rezka|filmix|uaserial|serial|серіал|сериал|кіно|кино|фільм|фильм|мульт|movie|cinema|video/.test(pageTopicSignal)) {
+            else if (/youtube|youtu\.be|netflix|megogo|sweet\.tv|takflix|kinopoisk|imdb|vimeo|twitch|rezka|filmix|uaserial|raiplay|serial|серіал|сериал|кіно|кино|фільм|фильм|мульт|movie|cinema|video|serietv/.test(pageTopicSignal)) {
+                catKey = 'video';
                 cat = currentLang === 'uk' ? 'Кіно та Серіали' : 'Movies & Video';
                 color = '#7D3F3B';
                 svg = LINE_ICONS.video;
-                tags = ['#кіно', '#серіали', baseBrandTag];
-                defaultCategoryTitle = currentLang === 'uk' ? `${cleanName} — Кіно та серіали` : `${cleanName} — Video & Series`;
-                note = humanTitle
-                    ? `Матеріал про кіно та серіали: «${humanTitle}» (${domain}) — збережено на перегляд.`
-                    : `Відеоплатформа ${cleanName}: кіно, серіали та ефіри для вечірнього перегляду.`;
             }
-            // 4. СОЦСЕТИ, TELEGRAM-КАНАЛЫ, МЕМЫ И СООБЩЕСТВА
-            else if (/t\.me|telegram|телеграм|мемы|меми|канал|instagram|facebook|twitter|x\.com|threads|linkedin|reddit|tiktok|discord|viber|соцмереж|форум/.test(pageTopicSignal)) {
+            else if (/t\.me|telegram|телеграм|мемы|меми|канал|canali|instagram|facebook|twitter|x\.com|threads|linkedin|reddit|tiktok|discord|viber|соцмереж|форум/.test(pageTopicSignal)) {
+                catKey = 'social';
                 cat = currentLang === 'uk' ? 'Соцмережі та Канали' : 'Social & Channels';
                 color = '#485675';
                 svg = LINE_ICONS.social;
-                tags = ['#telegram', '#канали', '#медіа', baseBrandTag];
-                defaultCategoryTitle = currentLang === 'uk' ? `${cleanName} — Огляд каналів та соцмереж` : `${cleanName} — Social & Channels`;
-                note = humanTitle
-                    ? `Добірка або огляд спільнот: «${humanTitle}» (${domain}).`
-                    : `Сторінка або авторський канал на платформі ${cleanName} (${domain}).`;
             }
-            // 5. КОД, ГАДЖЕТЫ, ИИ И ТЕХНОЛОГИИ
-            else if (/techno\.|gadgets|гаджет|смартфон|github|gitlab|stackoverflow|habr|dou\.ua|dev\.to|itc\.ua|ain\.ua|gagadget|internetua|volia|kyivstar|vodafone|lifecell|chatgpt|openai|claude|gemini|vercel|docker|linux|android|apk|4pda|xda|soft|app|tehnologii|технолог|програм|код|сервер/.test(pageTopicSignal)) {
+            else if (/techno\.|gadgets|гаджет|смартфон|github|gitlab|stackoverflow|habr|dou\.ua|dev\.to|itc\.ua|ain\.ua|gagadget|internetua|volia|kyivstar|vodafone|lifecell|chatgpt|openai|claude|gemini|vercel|docker|linux|android|apk|4pda|xda|aranzulla|soft|app|tehnologii|технолог|tecnologia|програм|код|сервер/.test(pageTopicSignal)) {
+                catKey = 'code';
                 cat = currentLang === 'uk' ? 'Код та Технології' : 'Tech & Gadgets';
                 color = '#43474D';
                 svg = LINE_ICONS.code;
-                tags = ['#технології', '#гаджети', baseBrandTag];
-                defaultCategoryTitle = currentLang === 'uk' ? `${cleanName} — Технології та гаджети` : `${cleanName} — Tech & Gadgets`;
-                note = humanTitle
-                    ? `Технологічний огляд на ${cleanName}: «${humanTitle}» (${domain}).`
-                    : `Технологічний розділ ${cleanName} (${domain}): гаджети, цифрові сервіси та ІТ-огляди.`;
             }
-            // 6. ПОКУПКИ, МАРКЕТПЛЕЙСЫ И ТЕХНИКА
-            else if (/rozetka|prom\.ua|olx|epicentr|allo|comfy|foxtrot|moyo|citrus|amazon|aliexpress|ebay|makeup|shafa|kasta|zakaz|silpo|atb|shop|store|market|buy|price|nedorogoy|недорогой|купит|ціна|цена|товар|магазин|знижк/.test(pageTopicSignal)) {
+            else if (/rozetka|prom\.ua|olx|epicentr|allo|comfy|foxtrot|moyo|citrus|amazon|aliexpress|ebay|subito\.it|trovaprezzi|makeup|shafa|kasta|zakaz|silpo|atb|shop|store|market|buy|price|prezzo|offerte|nedorogoy|недорогой|купит|ціна|цена|товар|магазин|знижк/.test(pageTopicSignal)) {
+                catKey = 'shop';
                 cat = currentLang === 'uk' ? 'Покупки' : 'Shopping';
                 color = '#556B42';
                 svg = LINE_ICONS.shop;
-                tags = ['#покупки', '#каталог', baseBrandTag];
-                defaultCategoryTitle = currentLang === 'uk' ? `${cleanName} — Товар у каталозі` : `${cleanName} — Store Item`;
-                note = humanTitle
-                    ? `Товарна добірка або пропозиція на ${cleanName}: «${humanTitle}».`
-                    : `Онлайн-каталог ${cleanName} (${domain}): порівняння цін та характеристик.`;
             }
-            // 7. ДИЗАЙН И КРЕАТИВ
-            else if (/figma|behance|dribbble|awwwards|pinterest|framer|unsplash|freepik|canva|adobe|artstation|дизайн|ілюстрац|шрифт/.test(pageTopicSignal)) {
+            else if (/figma|behance|dribbble|awwwards|pinterest|framer|unsplash|freepik|canva|adobe|artstation|дизайн|ілюстрац|шрифт|grafica/.test(pageTopicSignal)) {
+                catKey = 'design';
                 cat = currentLang === 'uk' ? 'Дизайн' : 'Design';
                 color = '#3D5A78';
                 svg = LINE_ICONS.design;
-                tags = ['#дизайн', '#референс', baseBrandTag];
-                defaultCategoryTitle = currentLang === 'uk' ? `${cleanName} — Візуальний референс` : `${cleanName} — Design Reference`;
-                note = humanTitle
-                    ? `Дизайн-проєкт «${humanTitle}» на ${cleanName}: збережено як візуальний референс.`
-                    : `Колекція інтерфейсів, графіки та дизайн-рішень на платформі ${cleanName}.`;
             }
-            // 8. ПОЕЗДКИ, КАРТЫ И ТУРИЗМ
-            else if (/airbnb|booking|skyscanner|tripadvisor|ryanair|uz\.gov|tickets\.ua|infobus|maps\.google|waze|hotel|travel|карпат|подорож|маршрут|квитк|готел/.test(pageTopicSignal)) {
+            else if (/airbnb|booking|skyscanner|tripadvisor|ryanair|trenitalia|italotreno|uz\.gov|tickets\.ua|infobus|maps\.google|waze|hotel|travel|viaggi|карпат|подорож|маршрут|квитк|готел/.test(pageTopicSignal)) {
+                catKey = 'travel';
                 cat = currentLang === 'uk' ? 'Поїздки' : 'Travel';
                 color = '#8F4D53';
                 svg = LINE_ICONS.travel;
-                tags = ['#поїздки', '#маршрут', baseBrandTag];
-                defaultCategoryTitle = currentLang === 'uk' ? `${cleanName} — Маршрут та бронювання` : `${cleanName} — Travel & Stay`;
-                note = humanTitle
-                    ? `Локація або маршрут «${humanTitle}» на ${cleanName} для планування поїздки.`
-                    : `Сервіс подорожей ${cleanName} (${domain}): маршрути, квитки та варіанти проживання.`;
             }
-            // 9. ФИНАНСЫ, БАНКИ И БИЗНЕС
-            else if (/biz\.|privatbank|privat24|monobank|oschadbank|sense|minfin|finance\.ua|kurs\.com|binance|tradingview|diia\.gov|tax\.gov|market|bank|фінанс|банк|бізнес|бизнес|економік|курс|податк/.test(pageTopicSignal)) {
+            else if (/biz\.|privatbank|privat24|monobank|oschadbank|sense|minfin|finance\.ua|kurs\.com|binance|tradingview|diia\.gov|tax\.gov|ilsole24ore|market|bank|finanza|фінанс|банк|бізнес|бизнес|економік|курс|податк/.test(pageTopicSignal)) {
+                catKey = 'finance';
                 cat = currentLang === 'uk' ? 'Фінанси та Бізнес' : 'Finance & Biz';
                 color = '#3A6351';
                 svg = LINE_ICONS.finance;
-                tags = ['#фінанси', '#бізнес', baseBrandTag];
-                defaultCategoryTitle = currentLang === 'uk' ? `${cleanName} — Бізнес та економіка` : `${cleanName} — Finance & Business`;
-                note = humanTitle
-                    ? `Економічний матеріал на ${cleanName}: «${humanTitle}» (${domain}).`
-                    : `Діловий портал ${cleanName} (${domain}): фінанси, ринки та бізнес-огляди.`;
             }
-            // 10. НОВОСТИ, МЕДИА И СТАТЬИ
-            else if (/news|pravda|unian|nv\.ua|tsn|rbc|liga\.net|censor|telegraf|ukranews|24tv|hromadske|babel|forbes|bbc|reuters|bloomberg|korrespondent|zn\.ua|gazeta|obozrevatel|focus\.ua|espreso|новин|статт|медіа|преса/.test(pageTopicSignal) || /nv\.ua|pravda|unian|tsn|telegraf|ukranews/.test(domainOnlySignal)) {
+            else if (/news|pravda|unian|nv\.ua|tsn|rbc|liga\.net|censor|telegraf|ukranews|24tv|hromadske|babel|forbes|bbc|reuters|bloomberg|repubblica|corriere|ansa|gazzetta|ilpost|fanpage|korrespondent|zn\.ua|gazeta|obozrevatel|focus\.ua|espreso|новин|новости|notizie|статт|медіа|преса/.test(pageTopicSignal) || /nv\.ua|pravda|unian|tsn|telegraf|ukranews|repubblica\.it|corriere\.it|ansa\.it/.test(domainOnlySignal)) {
+                catKey = 'news';
                 cat = currentLang === 'uk' ? 'Новини та ЗМІ' : 'News & Media';
                 color = '#3B5C6E';
                 svg = LINE_ICONS.news;
-                tags = ['#новини', '#стаття', baseBrandTag];
-                defaultCategoryTitle = currentLang === 'uk' ? `${cleanName} — Публікація` : `${cleanName} — Article`;
-                note = humanTitle
-                    ? `Стаття на ${cleanName} (${domain}): «${humanTitle}».`
-                    : `Публікація на медіапорталі ${cleanName} (${domain}) для швидкого перегляду.`;
-            }
-            // 11. УНИВЕРСАЛЬНАЯ КАТЕГОРИЯ
-            else {
-                note = humanTitle
-                    ? `Сторінка «${humanTitle}» на ресурсі ${cleanName} (${domain}).`
-                    : `Веб-сторінка на домені ${domain} (${cleanName}) у колекції посилань.`;
             }
 
-            const finalTitle = humanTitle || defaultCategoryTitle;
+            const localized = generateLocalizedMeta(siteLang, catKey, cleanName, domain, humanTitle, baseBrandTag);
+            const finalTitle = humanTitle || localized.defaultTitle;
             const now = new Date();
             const dateStr = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${String(now.getFullYear()).slice(-2)}`;
+
+            // Умный подбор дополнительных (смежных) категорий от ИИ для серых подсказок
+            const suggestedCats = [];
+            if (/roman|книг|літератур|литератур|наук|science|book|wiki/i.test(pageTopicSignal)) suggestedCats.push(currentLang === 'uk' ? 'Книги та Освіта' : 'Books & Science');
+            if (/techno|gadgets|гаджет|github|code|код|ai|it|смартфон|ecoflow|starlink/i.test(pageTopicSignal)) suggestedCats.push(currentLang === 'uk' ? 'Код та Технології' : 'Tech & Gadgets');
+            if (/telegram|t\.me|канал|мем|соцмереж|social/i.test(pageTopicSignal)) suggestedCats.push(currentLang === 'uk' ? 'Соцмережі та Канали' : 'Social & Channels');
+            if (/news|новин|новости|notizie|pravda|nv\.ua|unian|bbc|reuters/i.test(pageTopicSignal)) suggestedCats.push(currentLang === 'uk' ? 'Новини та ЗМІ' : 'News & Media');
+            if (/design|дизайн|ui|ux|figma|behance/i.test(pageTopicSignal)) suggestedCats.push(currentLang === 'uk' ? 'Дизайн' : 'Design');
+            if (/shop|rozetka|amazon|купит|ціна|товар|покупки/i.test(pageTopicSignal)) suggestedCats.push(currentLang === 'uk' ? 'Покупки' : 'Shopping');
+            if (/movie|кіно|кино|серіал|сериал|netflix|youtube/i.test(pageTopicSignal)) suggestedCats.push(currentLang === 'uk' ? 'Кіно та Серіали' : 'Movies & Video');
+            if (/music|музик|музык|spotify|soundcloud/i.test(pageTopicSignal)) suggestedCats.push(currentLang === 'uk' ? 'Музика' : 'Music');
+            if (/travel|airbnb|booking|карпат|подорож/i.test(pageTopicSignal)) suggestedCats.push(currentLang === 'uk' ? 'Поїздки' : 'Travel');
 
             return {
                 id: Date.now() + Math.floor(Math.random() * 100000),
@@ -1780,16 +2466,23 @@
                 url: finalUrl,
                 title: finalTitle,
                 cat,
+                cats: [cat],
+                aiSuggestedCats: Array.from(new Set([cat, ...suggestedCats])),
                 date: dateStr,
                 color,
-                note,
-                tags,
+                note: localized.note,
+                tags: localized.tags,
                 svg,
-                lockedOverride: null
+                siteLang: siteLang.toUpperCase(),
+                lockedOverride: null,
+                pinned: false,
+                folderPriority: false,
+                pendingOffline: false
             };
         }
 
         async function enrichItemWithLiveTitle(itemId, targetUrl) {
+            if (!navigator.onLine) return false;
             try {
                 const controller = new AbortController();
                 const timer = setTimeout(() => controller.abort(), 3500);
@@ -1797,21 +2490,80 @@
                 clearTimeout(timer);
                 if (resp.ok) {
                     const data = await resp.json();
-                    if (data && data.title) {
-                        const idx = ITEMS.findIndex(x => x.id === itemId);
-                        if (idx !== -1) {
-                            const updated = buildSmartAIItem(targetUrl, data.title);
-                            ITEMS[idx] = { ...updated, id: itemId, date: ITEMS[idx].date, lockedOverride: ITEMS[idx].lockedOverride };
-                            saveStateToStorage();
-                            renderApp();
-                        }
+                    const idx = ITEMS.findIndex(x => x.id === itemId);
+                    if (idx !== -1) {
+                        const updated = buildSmartAIItem(targetUrl, data && data.title ? data.title : '');
+                        ITEMS[idx] = {
+                            ...updated,
+                            id: itemId,
+                            date: ITEMS[idx].date,
+                            lockedOverride: ITEMS[idx].lockedOverride,
+                            pinned: ITEMS[idx].pinned,
+                            folderPriority: ITEMS[idx].folderPriority,
+                            pendingOffline: false
+                        };
+                        saveStateToStorage();
+                        renderApp();
+                        return true;
                     }
                 }
             } catch (e) {}
+            // Даже если у сайта нет oEmbed, при наличии сети снимаем флаг ожидания офлайна и распиливаем локальным ИИ
+            const idx = ITEMS.findIndex(x => x.id === itemId);
+            if (idx !== -1 && ITEMS[idx].pendingOffline) {
+                const rebuilt = buildSmartAIItem(targetUrl, ITEMS[idx].title);
+                ITEMS[idx] = {
+                    ...rebuilt,
+                    id: itemId,
+                    date: ITEMS[idx].date,
+                    lockedOverride: ITEMS[idx].lockedOverride,
+                    pinned: ITEMS[idx].pinned,
+                    folderPriority: ITEMS[idx].folderPriority,
+                    pendingOffline: false
+                };
+                saveStateToStorage();
+                renderApp();
+                return true;
+            }
+            return false;
         }
 
+        // Автоматическая обработка офлайн-очереди при появлении интернета
+        async function processOfflineQueue(manualTap = false) {
+            const pending = ITEMS.filter(i => i.pendingOffline);
+            if (pending.length === 0) return;
+
+            if (!navigator.onLine) {
+                if (manualTap) {
+                    selectedFolder = OFFLINE_FOLDER_KEY;
+                    renderApp();
+                    showToast(t('offlineStillNoNet'));
+                }
+                return;
+            }
+
+            let processedCount = 0;
+            for (const item of pending) {
+                const ok = await enrichItemWithLiveTitle(item.id, item.url);
+                if (ok) processedCount++;
+            }
+
+            if (processedCount > 0) {
+                if (selectedFolder === OFFLINE_FOLDER_KEY && ITEMS.filter(i => i.pendingOffline).length === 0) {
+                    selectedFolder = 'ALL';
+                }
+                saveStateToStorage();
+                renderApp();
+                showToast(`${t('offlineSyncedToast')}${processedCount} ✓`);
+            }
+        }
+
+        window.addEventListener('online', () => {
+            processOfflineQueue(false);
+        });
+
         function highlightExistingCard(item) {
-            if (selectedFolder !== 'ALL' && selectedFolder !== item.cat) {
+            if (selectedFolder !== 'ALL' && !getItemCats(item).includes(selectedFolder)) {
                 selectedFolder = 'ALL';
             }
             selectedTag = null;
@@ -1832,6 +2584,7 @@
             const rawText = input.value.trim();
             if (!rawText) return;
 
+            const isOfflineNow = !navigator.onLine;
             const urlMatches = rawText.match(/(?:https?:\/\/|www\.)[^\s"'<>]+/gi);
             const rawCandidates = urlMatches && urlMatches.length > 0 ? urlMatches : [rawText];
             const candidates = rawCandidates.map(u => cleanRawUrl(u)).filter(Boolean);
@@ -1840,17 +2593,24 @@
                 const singleUrl = candidates[0];
                 const existing = findDuplicateItem(singleUrl);
                 if (existing) {
-                    showToast(`${t('duplicateFound')}${existing.name} (${existing.cat})`);
+                    showToast(`${t('duplicateFound')}${existing.name} (${getItemCats(existing).join(', ')})`);
                     highlightExistingCard(existing);
                     return;
                 }
                 const newItem = buildSmartAIItem(singleUrl);
+                if (isOfflineNow) {
+                    newItem.pendingOffline = true;
+                }
                 ITEMS.unshift(newItem);
                 input.value = '';
                 saveStateToStorage();
                 renderApp();
-                showToast(t('aiAddedSingle').replace('{cat}', newItem.cat));
-                enrichItemWithLiveTitle(newItem.id, singleUrl);
+                if (isOfflineNow) {
+                    showToast(t('aiAddedOffline'));
+                } else {
+                    showToast(t('aiAddedSingle').replace('{cat}', newItem.cat).replace('{lang}', newItem.siteLang || 'AUTO'));
+                    enrichItemWithLiveTitle(newItem.id, singleUrl);
+                }
             } else if (candidates.length > 1) {
                 let added = 0;
                 let dups = 0;
@@ -1859,15 +2619,19 @@
                         dups++;
                     } else {
                         const created = buildSmartAIItem(u);
+                        if (isOfflineNow) {
+                            created.pendingOffline = true;
+                        } else {
+                            enrichItemWithLiveTitle(created.id, u);
+                        }
                         ITEMS.unshift(created);
-                        enrichItemWithLiveTitle(created.id, u);
                         added++;
                     }
                 });
                 input.value = '';
                 saveStateToStorage();
                 renderApp();
-                showToast(t('aiImportReport').replace('{added}', added).replace('{dups}', dups));
+                showToast(isOfflineNow ? t('aiAddedOffline') : t('aiImportReport').replace('{added}', added).replace('{dups}', dups));
             }
         }
 
@@ -1886,67 +2650,129 @@
             const reader = new FileReader();
             reader.onload = (e) => {
                 const content = String(e.target?.result || '');
-                const extracted = [];
+
+                // Проверяем, не является ли файл полным JSON-бэкапом LinkBox
+                try {
+                    const maybeJson = JSON.parse(content);
+                    if (maybeJson && Array.isArray(maybeJson.items)) {
+                        let added = 0;
+                        let dups = 0;
+                        maybeJson.items.forEach(it => {
+                            if (findDuplicateItem(it.url)) {
+                                dups++;
+                            } else {
+                                const normCats = getItemCats(it);
+                                ITEMS.push({
+                                    ...it,
+                                    url: cleanRawUrl(it.url),
+                                    cat: normCats[0],
+                                    cats: normCats,
+                                    pinned: Boolean(it.pinned),
+                                    folderPriority: Boolean(it.folderPriority),
+                                    pendingOffline: Boolean(it.pendingOffline)
+                                });
+                                added++;
+                            }
+                        });
+                        if (Array.isArray(maybeJson.lockedFolders)) {
+                            maybeJson.lockedFolders.forEach(f => LOCKED_FOLDERS.add(f));
+                        }
+                        saveStateToStorage();
+                        renderFoldersInMenu();
+                        renderApp();
+                        closeMenuSheet();
+                        showToast(t('restoredJson') + `+${added} (${dups} dups)`);
+                        return;
+                    }
+                } catch (err) {}
 
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(content, 'text/html');
-                const anchors = doc.querySelectorAll('a[href]');
+                const anchors = Array.from(doc.querySelectorAll('a[href]'));
+
+                let added = 0;
+                let dups = 0;
+                const isOfflineNow = !navigator.onLine;
 
                 if (anchors.length > 0) {
                     anchors.forEach(a => {
                         const href = cleanRawUrl(a.getAttribute('href') || '');
-                        if (/^https?:\/\//i.test(href)) {
-                            extracted.push({ url: href, title: (a.textContent || '').trim() });
+                        if (!/^https?:\/\//i.test(href)) return;
+                        if (findDuplicateItem(href)) {
+                            dups++;
+                        } else {
+                            const textTitle = (a.textContent || '').trim();
+                            const created = buildSmartAIItem(href, textTitle);
+                            if (isOfflineNow) created.pendingOffline = true;
+                            ITEMS.unshift(created);
+                            added++;
                         }
                     });
                 } else {
-                    const rawUrls = content.match(/https?:\/\/[^\s"'<>]+/gi) || [];
-                    rawUrls.forEach(u => {
-                        const clean = cleanRawUrl(u);
-                        if (clean) extracted.push({ url: clean, title: '' });
+                    const rawMatches = content.match(/(?:https?:\/\/|www\.)[^\s"'<>]+/gi) || [];
+                    rawMatches.forEach(rawU => {
+                        const cleanU = cleanRawUrl(rawU);
+                        if (!cleanU) return;
+                        if (findDuplicateItem(cleanU)) {
+                            dups++;
+                        } else {
+                            const created = buildSmartAIItem(cleanU);
+                            if (isOfflineNow) created.pendingOffline = true;
+                            ITEMS.unshift(created);
+                            added++;
+                        }
                     });
                 }
 
-                let added = 0;
-                let dups = 0;
-
-                extracted.forEach(entry => {
-                    if (findDuplicateItem(entry.url)) {
-                        dups++;
-                    } else {
-                        ITEMS.unshift(buildSmartAIItem(entry.url, entry.title));
-                        added++;
-                    }
-                });
-
-                closeMenuSheet();
                 saveStateToStorage();
+                renderFoldersInMenu();
                 renderApp();
+                closeMenuSheet();
                 showToast(t('aiImportReport').replace('{added}', added).replace('{dups}', dups));
             };
             reader.readAsText(file);
         }
 
         function syncSheetLockUI() {
+            const toggleBtn = document.getElementById('sheet-lock-toggle');
+            const stateBadge = document.getElementById('sheet-lock-state');
+            const lockIcon = document.getElementById('sheet-lock-icon');
             const openBtn = document.getElementById('sheet-open-btn');
             const openIcon = document.getElementById('sheet-open-icon');
-            const lockIcon = document.getElementById('sheet-lock-icon');
-            const lockState = document.getElementById('sheet-lock-state');
 
             if (sheetTempLocked) {
-                openBtn.disabled = true;
+                toggleBtn.className = 'key-press w-full py-2.5 px-3.5 rounded-lg bg-[#D96B27]/15 text-[#D96B27] border border-[#D96B27]/40 flex items-center justify-between text-xs font-bold transition';
+                stateBadge.textContent = 'LOCKED';
+                stateBadge.className = 'font-mono-code text-[11px] px-2 py-0.5 rounded bg-[#D96B27] text-white';
+                lockIcon.innerHTML = LINE_ICONS.lock;
+
                 openBtn.className = 'flex-1 py-3.5 px-4 rounded-lg theme-input opacity-45 cursor-not-allowed font-black text-sm sm:text-base flex items-center justify-center gap-2 transition';
                 openIcon.innerHTML = LINE_ICONS.lock;
-                lockIcon.innerHTML = LINE_ICONS.lock;
-                lockState.textContent = 'LOCKED';
-                lockState.className = 'font-mono-code text-[11px] px-2 py-0.5 rounded bg-[#D96B27] text-white font-bold';
             } else {
-                openBtn.disabled = false;
+                toggleBtn.className = 'key-press w-full py-2.5 px-3.5 rounded-lg theme-input flex items-center justify-between text-xs font-bold transition';
+                stateBadge.textContent = 'OFF';
+                stateBadge.className = 'font-mono-code text-[11px] px-2 py-0.5 rounded bg-black/10';
+                lockIcon.innerHTML = LINE_ICONS.unlock;
+
                 openBtn.className = 'key-press flex-1 py-3.5 px-4 rounded-lg bg-[#D96B27] text-white font-black text-sm sm:text-base flex items-center justify-center gap-2 transition';
                 openIcon.innerHTML = LINE_ICONS.extArrow;
-                lockIcon.innerHTML = LINE_ICONS.unlock;
-                lockState.textContent = 'OFF';
-                lockState.className = 'font-mono-code text-[11px] px-2 py-0.5 rounded bg-black/10';
+            }
+        }
+
+        function syncSheetPriorityUI() {
+            const prioBtn = document.getElementById('sheet-priority-btn');
+            const prioIcon = document.getElementById('sheet-priority-icon');
+            const prioLabel = document.getElementById('sheet-priority-label');
+            if (!prioBtn || !prioIcon || !prioLabel) return;
+
+            if (sheetTempFolderPriority) {
+                prioBtn.className = 'key-press h-9 px-2.5 rounded-lg bg-amber-500 text-white flex items-center gap-1.5 text-xs font-bold transition';
+                prioIcon.innerHTML = LINE_ICONS.starFilled;
+                prioLabel.textContent = t('priorityActiveBtn');
+            } else {
+                prioBtn.className = 'key-press h-9 px-2.5 rounded-lg theme-input flex items-center gap-1.5 text-xs font-bold transition';
+                prioIcon.innerHTML = LINE_ICONS.star;
+                prioLabel.textContent = t('priorityBtn');
             }
         }
 
@@ -1955,12 +2781,98 @@
             syncSheetLockUI();
         }
 
+        function toggleSheetFolderPriority() {
+            sheetTempFolderPriority = !sheetTempFolderPriority;
+            syncSheetPriorityUI();
+        }
+
+        // Рендер серых ИИ-подсказок категорий + живого автодополнения по мере набора через запятую
+        function renderCategorySuggestions() {
+            const container = document.getElementById('sheet-cat-suggestions');
+            const inputEl = document.getElementById('sheet-cat');
+            if (!container || !inputEl) return;
+
+            const rawVal = inputEl.value;
+            const parts = rawVal.split(',').map(s => s.trim());
+            const activeCats = parts.filter(Boolean);
+            const lastToken = (parts[parts.length - 1] || '').toLowerCase();
+
+            // 1. Все существующие в базе категории
+            const allExisting = new Set();
+            ITEMS.forEach(it => getItemCats(it).forEach(c => allExisting.add(c)));
+
+            // 2. Предложенные ИИ категории для текущей редактируемой ссылки
+            const currentUrl = cleanRawUrl(document.getElementById('sheet-url')?.value || '');
+            const currentTitle = document.getElementById('sheet-title')?.value || '';
+            const aiAnalyzed = currentUrl ? buildSmartAIItem(currentUrl, currentTitle) : null;
+            const aiSuggested = new Set(aiAnalyzed?.aiSuggestedCats || []);
+
+            // Объединяем ИИ-рекомендации и существующие категории
+            const combined = Array.from(new Set([...aiSuggested, ...allExisting]));
+
+            // Если пользователь сейчас дописывает слово после запятой — приоритизируем совпадения
+            const sorted = combined.sort((a, b) => {
+                const aMatch = lastToken && a.toLowerCase().includes(lastToken) ? 1 : 0;
+                const bMatch = lastToken && b.toLowerCase().includes(lastToken) ? 1 : 0;
+                if (aMatch !== bMatch) return bMatch - aMatch;
+                const aAi = aiSuggested.has(a) ? 1 : 0;
+                const bAi = aiSuggested.has(b) ? 1 : 0;
+                return bAi - aAi;
+            });
+
+            container.innerHTML = sorted.map(catName => {
+                const isSelected = activeCats.some(c => c.toLowerCase() === catName.toLowerCase());
+                const isAiRecommended = aiSuggested.has(catName);
+                const safeCat = catName.replace(/'/g, "\\'");
+                return `
+                    <button type="button" onclick="toggleSuggestedCategory('${safeCat}')"
+                        class="key-press px-2.5 py-1 rounded-md text-xs font-mono-code font-bold flex items-center gap-1 transition border ${
+                            isSelected
+                                ? 'bg-[#D96B27]/15 text-[#D96B27] border-[#D96B27]/40'
+                                : 'theme-input theme-muted border-transparent opacity-75 hover:opacity-100'
+                        }">
+                        <span>${isSelected ? '✓' : '+'}</span>
+                        <span>${catName}</span>
+                        ${isAiRecommended && !isSelected ? '<span class="text-[9px] uppercase opacity-70 ml-0.5">AI</span>' : ''}
+                    </button>
+                `;
+            }).join('');
+        }
+
+        function toggleSuggestedCategory(catName) {
+            const inputEl = document.getElementById('sheet-cat');
+            if (!inputEl) return;
+            let cats = inputEl.value.split(',').map(s => s.trim()).filter(Boolean);
+            const existingIdx = cats.findIndex(c => c.toLowerCase() === catName.toLowerCase());
+
+            if (existingIdx !== -1) {
+                if (cats.length > 1) {
+                    cats.splice(existingIdx, 1);
+                }
+            } else {
+                // Если последняя часть была недописанным префиксом этой категории — заменяем её
+                if (cats.length > 0) {
+                    const last = cats[cats.length - 1];
+                    if (catName.toLowerCase().startsWith(last.toLowerCase()) && last.length < catName.length) {
+                        cats[cats.length - 1] = catName;
+                    } else {
+                        cats.push(catName);
+                    }
+                } else {
+                    cats.push(catName);
+                }
+            }
+            inputEl.value = cats.join(', ');
+            renderCategorySuggestions();
+        }
+
         function openEditSheet(id) {
             const item = ITEMS.find(x => x.id === id);
             if (!item) return;
             lockBodyScroll();
             editingId = id;
             sheetTempLocked = isItemLocked(item);
+            sheetTempFolderPriority = Boolean(item.folderPriority);
 
             const fav = document.getElementById('sheet-favicon');
             fav.style.background = item.color;
@@ -1971,10 +2883,12 @@
             document.getElementById('sheet-url').value = cleanRawUrl(item.url);
             document.getElementById('sheet-title').value = item.title;
             document.getElementById('sheet-note').value = item.note;
-            document.getElementById('sheet-cat').value = item.cat;
+            document.getElementById('sheet-cat').value = getItemCats(item).join(', ');
             document.getElementById('sheet-tags').value = (item.tags || []).join(' ');
 
             syncSheetLockUI();
+            syncSheetPriorityUI();
+            renderCategorySuggestions();
 
             const modal = document.getElementById('edit-sheet-modal');
             const panel = document.getElementById('edit-sheet-panel');
@@ -2004,8 +2918,9 @@
             const currentTitle = document.getElementById('sheet-title').value.trim();
             const smart = buildSmartAIItem(currentUrl, currentTitle);
             document.getElementById('sheet-note').value = smart.note;
-            document.getElementById('sheet-cat').value = smart.cat;
+            document.getElementById('sheet-cat').value = (smart.aiSuggestedCats || [smart.cat]).join(', ');
             document.getElementById('sheet-tags').value = smart.tags.join(' ');
+            renderCategorySuggestions();
         }
 
         function saveSheet() {
@@ -2018,13 +2933,23 @@
             }
             item.title = document.getElementById('sheet-title').value.trim() || item.title;
             item.note = document.getElementById('sheet-note').value.trim() || item.note;
-            item.cat = document.getElementById('sheet-cat').value.trim() || item.cat;
+
+            const parsedCats = document.getElementById('sheet-cat').value
+                .split(',')
+                .map(c => c.trim())
+                .filter(Boolean);
+            if (parsedCats.length > 0) {
+                item.cats = Array.from(new Set(parsedCats));
+                item.cat = item.cats[0];
+            }
+
             const rawTags = document.getElementById('sheet-tags').value.trim();
             if (rawTags) {
                 item.tags = rawTags.split(/\s+/).map(tg => tg.startsWith('#') ? tg : `#${tg}`);
             }
 
             item.lockedOverride = sheetTempLocked;
+            item.folderPriority = sheetTempFolderPriority;
 
             saveStateToStorage();
             closeEditSheet();
@@ -2108,10 +3033,14 @@
             setThemeMode(themeMode || 'light');
             const initialMode = hadSaved ? viewMode : (window.innerWidth >= 1024 ? 'large' : 'small');
             setLayoutMode(initialMode);
+            setSortMode(sortMode || 'newest');
             attachSheetDrag('menu-drag-handle', 'menu-sheet-panel', closeMenuSheet);
             attachSheetDrag('tags-drag-handle', 'tags-sheet-panel', closeTagsSheet);
             attachSheetDrag('about-drag-handle', 'about-sheet-panel', closeAboutSheet);
             attachSheetDrag('edit-drag-handle', 'edit-sheet-panel', closeEditSheet);
+            if (navigator.onLine) {
+                processOfflineQueue(false);
+            }
         };
     </script>
 </body>
