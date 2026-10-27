@@ -164,9 +164,7 @@
             <input id="url-input" type="text" onkeydown="if(event.key==='Enter') addLinkByAI()" placeholder="Вставте посилання або список посилань..." class="flex-1 theme-card border rounded-lg px-4 py-3 text-base outline-none font-medium focus:border-[#D96B27] transition">
             <button onclick="addLinkByAI()" title="Розумне додавання посилання" class="key-press bg-[#D96B27] hover:bg-[#c55d1d] text-white font-black text-sm px-4 sm:px-5 rounded-lg flex items-center justify-center gap-2 shrink-0 shadow-xs">
                 <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none">
-                    <!-- Чёткий жирный плюс (добавление) -->
                     <path d="M11 5v14M4 12h14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
-                    <!-- Аккуратная искра ИИ в правом верхнем углу -->
                     <path d="M19 2.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8.8-2.2z" fill="currentColor"/>
                 </svg>
                 <span id="btn-add-label">Додати</span>
@@ -282,10 +280,10 @@
                 </div>
             </div>
 
-            <!-- СТРОКА 4: ИИ-Импорт, Экспорт, Кнопка # (между Експорт и UA), язык и фирменная иконка Автора/Справки -->
-            <div class="flex items-center gap-2 pt-3 border-t border-black/10">
+            <!-- СТРОКА 4: ИИ-Импорт, Экспорт, Кнопка # (между Експорт и UA), язык и кнопка（ ͜.人 ͜.）за кнопкой UA -->
+            <div class="flex items-center gap-1.5 pt-3 border-t border-black/10">
                 <input id="ai-import-file" type="file" accept=".html,.htm,.txt,.json,.csv" class="hidden" onchange="handleAIFileImport(event)">
-                <button onclick="triggerAIFileImport()" class="key-press flex-1 py-2.5 px-3 rounded-lg bg-[#D96B27] text-white text-xs font-black flex items-center justify-center gap-1.5">
+                <button onclick="triggerAIFileImport()" class="key-press flex-1 py-2.5 px-2.5 rounded-lg bg-[#D96B27] text-white text-xs font-black flex items-center justify-center gap-1.5 min-w-0">
                     <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                         <polyline points="17 8 12 3 7 8"/>
@@ -293,7 +291,7 @@
                     </svg>
                     <span id="btn-import-ai" class="truncate">Імпорт ІІ</span>
                 </button>
-                <button onclick="exportBrowserBookmarks()" class="key-press flex-1 py-2.5 px-3 rounded-lg theme-input text-xs font-bold flex items-center justify-center gap-1.5">
+                <button onclick="exportBrowserBookmarks()" class="key-press flex-1 py-2.5 px-2.5 rounded-lg theme-input text-xs font-bold flex items-center justify-center gap-1.5 min-w-0">
                     <svg class="w-4 h-4 mono-icon shrink-0" viewBox="0 0 24 24">
                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                         <polyline points="7 10 12 15 17 10"/>
@@ -305,16 +303,12 @@
                 <button onclick="openTagsSheetFromMenu()" title="Усі хештеги #" class="key-press w-9 h-9 rounded-lg theme-input text-xs font-mono-code font-black flex items-center justify-center hover:text-[#D96B27] transition shrink-0">
                     #
                 </button>
-                <button onclick="toggleLang()" id="lang-btn" class="key-press h-9 px-3 rounded-lg theme-input text-xs font-mono-code font-bold flex items-center justify-center shrink-0">
+                <button onclick="toggleLang()" id="lang-btn" class="key-press h-9 px-2.5 rounded-lg theme-input text-xs font-mono-code font-bold flex items-center justify-center shrink-0">
                     UA
                 </button>
-                <!-- Фирменная векторная иконка «О приложении / Авторские права» за кнопкой UA -->
-                <button onclick="openAboutSheetFromMenu()" title="Про додаток та автора" class="key-press w-9 h-9 rounded-lg theme-input flex items-center justify-center hover:text-[#D96B27] transition shrink-0">
-                    <svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24">
-                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                        <path d="M12 8h.01"/>
-                        <path d="M11 12h1v4h1"/>
-                    </svg>
+                <!-- Кнопка（ ͜.人 ͜.）за кнопкой UA -->
+                <button onclick="openAboutSheetFromMenu()" title="Про додаток та авторські права" class="key-press h-9 px-2 rounded-lg theme-input text-[11px] font-bold flex items-center justify-center hover:text-[#D96B27] transition shrink-0 whitespace-nowrap">
+                    （ ͜.人 ͜.）
                 </button>
             </div>
         </div>
@@ -353,12 +347,8 @@
             
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2.5">
-                    <span class="w-8 h-8 rounded-lg bg-[#D96B27] text-white flex items-center justify-center shrink-0">
-                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                            <path d="M12 8h.01"/>
-                            <path d="M11 12h1v4h1"/>
-                        </svg>
+                    <span class="px-2.5 h-8 rounded-lg bg-[#D96B27] text-white text-xs font-bold flex items-center justify-center shrink-0">
+                        （ ͜.人 ͜.）
                     </span>
                     <span class="font-black text-base uppercase tracking-tight" id="about-sheet-title">Як усе влаштовано</span>
                 </div>
@@ -1068,17 +1058,14 @@
                                 <li><b>Вигляд та Теми:</b> перемикання розкладки (Малі картки, Великі картки, Список) та трьох тем оформлення (Світла, М'яка темна, Чорна AMOLED).</li>
                                 <li><b>Категорії:</b> список усіх папок із лічильниками та кнопками замків праворуч від кожної папки.</li>
                                 <li><b>Імпорт ІІ та Експорт:</b> завантаження закладок із файлів (.HTML, .TXT, .JSON, .CSV) з автоматичним ІІ-розбором по папках, а також вивантаження всієї бази у стандартний .HTML файл для будь-якого браузера.</li>
-                                <li><b>Кнопка # та Мова (UA/EN):</b> окреме вікно з усіма хештегами та миттєве перемикання мови інтерфейсу.</li>
+                                <li><b>Кнопки #, UA/EN та（ ͜.人 ͜.）:</b> окреме вікно з усіма хештегами, перемикання мови інтерфейсу та ця довідка.</li>
                             </ul>
                         </div>
                     </div>
 
                     <div class="theme-card border border-[#D96B27]/40 rounded-xl p-4 text-center space-y-2 mt-3">
-                        <div class="w-9 h-9 rounded-lg bg-[#D96B27]/15 text-[#D96B27] flex items-center justify-center mx-auto">
-                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                                <path d="M9 12l2 2 4-4"/>
-                            </svg>
+                        <div class="inline-flex px-3 py-1 rounded-lg bg-[#D96B27]/15 text-[#D96B27] font-bold text-sm mx-auto">
+                            （ ͜.人 ͜.）
                         </div>
                         <div class="font-black text-sm sm:text-base tracking-tight">Зробив Shans</div>
                         <div class="flex items-center justify-center gap-2 font-extrabold text-sm">
@@ -1143,17 +1130,14 @@
                                 <li><b>Layout & Themes:</b> switch between Small cards, Large cards, or List view, and three color themes (Light, Soft Dim, AMOLED Black).</li>
                                 <li><b>Categories:</b> all folders with item counters and quick lock buttons on the right.</li>
                                 <li><b>AI Import & Export:</b> import bookmark files (.HTML, .TXT, .JSON, .CSV) with automatic AI sorting, or export the entire database to a standard browser .HTML file.</li>
-                                <li><b># Button & Language (UA/EN):</b> dedicated hashtag cloud sheet and instant interface language switch.</li>
+                                <li><b>#, UA/EN &（ ͜.人 ͜.）Buttons:</b> dedicated hashtag cloud sheet, instant interface language switch, and this guide.</li>
                             </ul>
                         </div>
                     </div>
 
                     <div class="theme-card border border-[#D96B27]/40 rounded-xl p-4 text-center space-y-2 mt-3">
-                        <div class="w-9 h-9 rounded-lg bg-[#D96B27]/15 text-[#D96B27] flex items-center justify-center mx-auto">
-                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                                <path d="M9 12l2 2 4-4"/>
-                            </svg>
+                        <div class="inline-flex px-3 py-1 rounded-lg bg-[#D96B27]/15 text-[#D96B27] font-bold text-sm mx-auto">
+                            （ ͜.人 ͜.）
                         </div>
                         <div class="font-black text-sm sm:text-base tracking-tight">Made by Shans</div>
                         <div class="flex items-center justify-center gap-2 font-extrabold text-sm">
@@ -1621,10 +1605,9 @@
                         .replace(/oye/g, 'ое');
                     const map = {
                         a:'а', b:'б', v:'в', g:'г', d:'д', e:'е', z:'з', i:'и', j:'й', y:'й',
-                        k:'k', l:'л', m:'м', n:'н', o:'о', p:'п', r:'р', s:'с', t:'т', u:'у',
+                        k:'к', l:'л', m:'м', n:'н', o:'о', p:'п', r:'р', s:'с', t:'т', u:'у',
                         f:'ф', h:'х', c:'ц', w:'в', x:'кс', q:'к'
                     };
-                    map.k = 'к';
                     let out = '';
                     for (const ch of s) out += map[ch] || ch;
                     return out;
@@ -1700,4 +1683,436 @@
                 defaultCategoryTitle = currentLang === 'uk' ? `${cleanName} — Кіно та серіали` : `${cleanName} — Video & Series`;
                 note = humanTitle
                     ? `Матеріал про кіно та серіали: «${humanTitle}» (${domain}) — збережено на перегляд.`
-  
+                    : `Відеоплатформа ${cleanName}: кіно, серіали та ефіри для вечірнього перегляду.`;
+            }
+            // 4. СОЦСЕТИ, TELEGRAM-КАНАЛЫ, МЕМЫ И СООБЩЕСТВА
+            else if (/t\.me|telegram|телеграм|мемы|меми|канал|instagram|facebook|twitter|x\.com|threads|linkedin|reddit|tiktok|discord|viber|соцмереж|форум/.test(pageTopicSignal)) {
+                cat = currentLang === 'uk' ? 'Соцмережі та Канали' : 'Social & Channels';
+                color = '#485675';
+                svg = LINE_ICONS.social;
+                tags = ['#telegram', '#канали', '#медіа', baseBrandTag];
+                defaultCategoryTitle = currentLang === 'uk' ? `${cleanName} — Огляд каналів та соцмереж` : `${cleanName} — Social & Channels`;
+                note = humanTitle
+                    ? `Добірка або огляд спільнот: «${humanTitle}» (${domain}).`
+                    : `Сторінка або авторський канал на платформі ${cleanName} (${domain}).`;
+            }
+            // 5. КОД, ГАДЖЕТЫ, ИИ И ТЕХНОЛОГИИ
+            else if (/techno\.|gadgets|гаджет|смартфон|github|gitlab|stackoverflow|habr|dou\.ua|dev\.to|itc\.ua|ain\.ua|gagadget|internetua|volia|kyivstar|vodafone|lifecell|chatgpt|openai|claude|gemini|vercel|docker|linux|android|apk|4pda|xda|soft|app|tehnologii|технолог|програм|код|сервер/.test(pageTopicSignal)) {
+                cat = currentLang === 'uk' ? 'Код та Технології' : 'Tech & Gadgets';
+                color = '#43474D';
+                svg = LINE_ICONS.code;
+                tags = ['#технології', '#гаджети', baseBrandTag];
+                defaultCategoryTitle = currentLang === 'uk' ? `${cleanName} — Технології та гаджети` : `${cleanName} — Tech & Gadgets`;
+                note = humanTitle
+                    ? `Технологічний огляд на ${cleanName}: «${humanTitle}» (${domain}).`
+                    : `Технологічний розділ ${cleanName} (${domain}): гаджети, цифрові сервіси та ІТ-огляди.`;
+            }
+            // 6. ПОКУПКИ, МАРКЕТПЛЕЙСЫ И ТЕХНИКА
+            else if (/rozetka|prom\.ua|olx|epicentr|allo|comfy|foxtrot|moyo|citrus|amazon|aliexpress|ebay|makeup|shafa|kasta|zakaz|silpo|atb|shop|store|market|buy|price|nedorogoy|недорогой|купит|ціна|цена|товар|магазин|знижк/.test(pageTopicSignal)) {
+                cat = currentLang === 'uk' ? 'Покупки' : 'Shopping';
+                color = '#556B42';
+                svg = LINE_ICONS.shop;
+                tags = ['#покупки', '#каталог', baseBrandTag];
+                defaultCategoryTitle = currentLang === 'uk' ? `${cleanName} — Товар у каталозі` : `${cleanName} — Store Item`;
+                note = humanTitle
+                    ? `Товарна добірка або пропозиція на ${cleanName}: «${humanTitle}».`
+                    : `Онлайн-каталог ${cleanName} (${domain}): порівняння цін та характеристик.`;
+            }
+            // 7. ДИЗАЙН И КРЕАТИВ
+            else if (/figma|behance|dribbble|awwwards|pinterest|framer|unsplash|freepik|canva|adobe|artstation|дизайн|ілюстрац|шрифт/.test(pageTopicSignal)) {
+                cat = currentLang === 'uk' ? 'Дизайн' : 'Design';
+                color = '#3D5A78';
+                svg = LINE_ICONS.design;
+                tags = ['#дизайн', '#референс', baseBrandTag];
+                defaultCategoryTitle = currentLang === 'uk' ? `${cleanName} — Візуальний референс` : `${cleanName} — Design Reference`;
+                note = humanTitle
+                    ? `Дизайн-проєкт «${humanTitle}» на ${cleanName}: збережено як візуальний референс.`
+                    : `Колекція інтерфейсів, графіки та дизайн-рішень на платформі ${cleanName}.`;
+            }
+            // 8. ПОЕЗДКИ, КАРТЫ И ТУРИЗМ
+            else if (/airbnb|booking|skyscanner|tripadvisor|ryanair|uz\.gov|tickets\.ua|infobus|maps\.google|waze|hotel|travel|карпат|подорож|маршрут|квитк|готел/.test(pageTopicSignal)) {
+                cat = currentLang === 'uk' ? 'Поїздки' : 'Travel';
+                color = '#8F4D53';
+                svg = LINE_ICONS.travel;
+                tags = ['#поїздки', '#маршрут', baseBrandTag];
+                defaultCategoryTitle = currentLang === 'uk' ? `${cleanName} — Маршрут та бронювання` : `${cleanName} — Travel & Stay`;
+                note = humanTitle
+                    ? `Локація або маршрут «${humanTitle}» на ${cleanName} для планування поїздки.`
+                    : `Сервіс подорожей ${cleanName} (${domain}): маршрути, квитки та варіанти проживання.`;
+            }
+            // 9. ФИНАНСЫ, БАНКИ И БИЗНЕС
+            else if (/biz\.|privatbank|privat24|monobank|oschadbank|sense|minfin|finance\.ua|kurs\.com|binance|tradingview|diia\.gov|tax\.gov|market|bank|фінанс|банк|бізнес|бизнес|економік|курс|податк/.test(pageTopicSignal)) {
+                cat = currentLang === 'uk' ? 'Фінанси та Бізнес' : 'Finance & Biz';
+                color = '#3A6351';
+                svg = LINE_ICONS.finance;
+                tags = ['#фінанси', '#бізнес', baseBrandTag];
+                defaultCategoryTitle = currentLang === 'uk' ? `${cleanName} — Бізнес та економіка` : `${cleanName} — Finance & Business`;
+                note = humanTitle
+                    ? `Економічний матеріал на ${cleanName}: «${humanTitle}» (${domain}).`
+                    : `Діловий портал ${cleanName} (${domain}): фінанси, ринки та бізнес-огляди.`;
+            }
+            // 10. НОВОСТИ, МЕДИА И СТАТЬИ
+            else if (/news|pravda|unian|nv\.ua|tsn|rbc|liga\.net|censor|telegraf|ukranews|24tv|hromadske|babel|forbes|bbc|reuters|bloomberg|korrespondent|zn\.ua|gazeta|obozrevatel|focus\.ua|espreso|новин|статт|медіа|преса/.test(pageTopicSignal) || /nv\.ua|pravda|unian|tsn|telegraf|ukranews/.test(domainOnlySignal)) {
+                cat = currentLang === 'uk' ? 'Новини та ЗМІ' : 'News & Media';
+                color = '#3B5C6E';
+                svg = LINE_ICONS.news;
+                tags = ['#новини', '#стаття', baseBrandTag];
+                defaultCategoryTitle = currentLang === 'uk' ? `${cleanName} — Публікація` : `${cleanName} — Article`;
+                note = humanTitle
+                    ? `Стаття на ${cleanName} (${domain}): «${humanTitle}».`
+                    : `Публікація на медіапорталі ${cleanName} (${domain}) для швидкого перегляду.`;
+            }
+            // 11. УНИВЕРСАЛЬНАЯ КАТЕГОРИЯ
+            else {
+                note = humanTitle
+                    ? `Сторінка «${humanTitle}» на ресурсі ${cleanName} (${domain}).`
+                    : `Веб-сторінка на домені ${domain} (${cleanName}) у колекції посилань.`;
+            }
+
+            const finalTitle = humanTitle || defaultCategoryTitle;
+            const now = new Date();
+            const dateStr = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${String(now.getFullYear()).slice(-2)}`;
+
+            return {
+                id: Date.now() + Math.floor(Math.random() * 100000),
+                name: cleanName,
+                domain,
+                url: finalUrl,
+                title: finalTitle,
+                cat,
+                date: dateStr,
+                color,
+                note,
+                tags,
+                svg,
+                lockedOverride: null
+            };
+        }
+
+        async function enrichItemWithLiveTitle(itemId, targetUrl) {
+            try {
+                const controller = new AbortController();
+                const timer = setTimeout(() => controller.abort(), 3500);
+                const resp = await fetch(`https://noembed.com/embed?url=${encodeURIComponent(targetUrl)}`, { signal: controller.signal });
+                clearTimeout(timer);
+                if (resp.ok) {
+                    const data = await resp.json();
+                    if (data && data.title) {
+                        const idx = ITEMS.findIndex(x => x.id === itemId);
+                        if (idx !== -1) {
+                            const updated = buildSmartAIItem(targetUrl, data.title);
+                            ITEMS[idx] = { ...updated, id: itemId, date: ITEMS[idx].date, lockedOverride: ITEMS[idx].lockedOverride };
+                            saveStateToStorage();
+                            renderApp();
+                        }
+                    }
+                }
+            } catch (e) {}
+        }
+
+        function highlightExistingCard(item) {
+            if (selectedFolder !== 'ALL' && selectedFolder !== item.cat) {
+                selectedFolder = 'ALL';
+            }
+            selectedTag = null;
+            highlightedDuplicateId = item.id;
+            renderApp();
+            setTimeout(() => {
+                const el = document.getElementById(`card-${item.id}`);
+                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 60);
+            setTimeout(() => {
+                highlightedDuplicateId = null;
+                renderApp();
+            }, 2600);
+        }
+
+        function addLinkByAI() {
+            const input = document.getElementById('url-input');
+            const rawText = input.value.trim();
+            if (!rawText) return;
+
+            const urlMatches = rawText.match(/(?:https?:\/\/|www\.)[^\s"'<>]+/gi);
+            const rawCandidates = urlMatches && urlMatches.length > 0 ? urlMatches : [rawText];
+            const candidates = rawCandidates.map(u => cleanRawUrl(u)).filter(Boolean);
+
+            if (candidates.length === 1) {
+                const singleUrl = candidates[0];
+                const existing = findDuplicateItem(singleUrl);
+                if (existing) {
+                    showToast(`${t('duplicateFound')}${existing.name} (${existing.cat})`);
+                    highlightExistingCard(existing);
+                    return;
+                }
+                const newItem = buildSmartAIItem(singleUrl);
+                ITEMS.unshift(newItem);
+                input.value = '';
+                saveStateToStorage();
+                renderApp();
+                showToast(t('aiAddedSingle').replace('{cat}', newItem.cat));
+                enrichItemWithLiveTitle(newItem.id, singleUrl);
+            } else if (candidates.length > 1) {
+                let added = 0;
+                let dups = 0;
+                candidates.forEach(u => {
+                    if (findDuplicateItem(u)) {
+                        dups++;
+                    } else {
+                        const created = buildSmartAIItem(u);
+                        ITEMS.unshift(created);
+                        enrichItemWithLiveTitle(created.id, u);
+                        added++;
+                    }
+                });
+                input.value = '';
+                saveStateToStorage();
+                renderApp();
+                showToast(t('aiImportReport').replace('{added}', added).replace('{dups}', dups));
+            }
+        }
+
+        function triggerAIFileImport() {
+            const fileInput = document.getElementById('ai-import-file');
+            if (fileInput) {
+                fileInput.value = '';
+                fileInput.click();
+            }
+        }
+
+        function handleAIFileImport(event) {
+            const file = event.target.files?.[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const content = String(e.target?.result || '');
+                const extracted = [];
+
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(content, 'text/html');
+                const anchors = doc.querySelectorAll('a[href]');
+
+                if (anchors.length > 0) {
+                    anchors.forEach(a => {
+                        const href = cleanRawUrl(a.getAttribute('href') || '');
+                        if (/^https?:\/\//i.test(href)) {
+                            extracted.push({ url: href, title: (a.textContent || '').trim() });
+                        }
+                    });
+                } else {
+                    const rawUrls = content.match(/https?:\/\/[^\s"'<>]+/gi) || [];
+                    rawUrls.forEach(u => {
+                        const clean = cleanRawUrl(u);
+                        if (clean) extracted.push({ url: clean, title: '' });
+                    });
+                }
+
+                let added = 0;
+                let dups = 0;
+
+                extracted.forEach(entry => {
+                    if (findDuplicateItem(entry.url)) {
+                        dups++;
+                    } else {
+                        ITEMS.unshift(buildSmartAIItem(entry.url, entry.title));
+                        added++;
+                    }
+                });
+
+                closeMenuSheet();
+                saveStateToStorage();
+                renderApp();
+                showToast(t('aiImportReport').replace('{added}', added).replace('{dups}', dups));
+            };
+            reader.readAsText(file);
+        }
+
+        function syncSheetLockUI() {
+            const openBtn = document.getElementById('sheet-open-btn');
+            const openIcon = document.getElementById('sheet-open-icon');
+            const lockIcon = document.getElementById('sheet-lock-icon');
+            const lockState = document.getElementById('sheet-lock-state');
+
+            if (sheetTempLocked) {
+                openBtn.disabled = true;
+                openBtn.className = 'flex-1 py-3.5 px-4 rounded-lg theme-input opacity-45 cursor-not-allowed font-black text-sm sm:text-base flex items-center justify-center gap-2 transition';
+                openIcon.innerHTML = LINE_ICONS.lock;
+                lockIcon.innerHTML = LINE_ICONS.lock;
+                lockState.textContent = 'LOCKED';
+                lockState.className = 'font-mono-code text-[11px] px-2 py-0.5 rounded bg-[#D96B27] text-white font-bold';
+            } else {
+                openBtn.disabled = false;
+                openBtn.className = 'key-press flex-1 py-3.5 px-4 rounded-lg bg-[#D96B27] text-white font-black text-sm sm:text-base flex items-center justify-center gap-2 transition';
+                openIcon.innerHTML = LINE_ICONS.extArrow;
+                lockIcon.innerHTML = LINE_ICONS.unlock;
+                lockState.textContent = 'OFF';
+                lockState.className = 'font-mono-code text-[11px] px-2 py-0.5 rounded bg-black/10';
+            }
+        }
+
+        function toggleSheetItemLock() {
+            sheetTempLocked = !sheetTempLocked;
+            syncSheetLockUI();
+        }
+
+        function openEditSheet(id) {
+            const item = ITEMS.find(x => x.id === id);
+            if (!item) return;
+            lockBodyScroll();
+            editingId = id;
+            sheetTempLocked = isItemLocked(item);
+
+            const fav = document.getElementById('sheet-favicon');
+            fav.style.background = item.color;
+            fav.innerHTML = item.svg;
+
+            document.getElementById('sheet-domain').textContent = item.domain;
+            document.getElementById('sheet-date').textContent = item.date;
+            document.getElementById('sheet-url').value = cleanRawUrl(item.url);
+            document.getElementById('sheet-title').value = item.title;
+            document.getElementById('sheet-note').value = item.note;
+            document.getElementById('sheet-cat').value = item.cat;
+            document.getElementById('sheet-tags').value = (item.tags || []).join(' ');
+
+            syncSheetLockUI();
+
+            const modal = document.getElementById('edit-sheet-modal');
+            const panel = document.getElementById('edit-sheet-panel');
+            panel.style.transform = '';
+            modal.classList.remove('hidden');
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('open'), 10);
+        }
+
+        function closeEditSheet() {
+            const modal = document.getElementById('edit-sheet-modal');
+            const panel = document.getElementById('edit-sheet-panel');
+            modal.classList.remove('open');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.style.display = 'none';
+                panel.style.transform = '';
+                unlockBodyScrollIfNoneOpen();
+            }, 340);
+            editingId = null;
+        }
+
+        function regenerateAINote() {
+            const item = ITEMS.find(x => x.id === editingId);
+            if (!item) return;
+            const currentUrl = cleanRawUrl(document.getElementById('sheet-url').value || item.url);
+            const currentTitle = document.getElementById('sheet-title').value.trim();
+            const smart = buildSmartAIItem(currentUrl, currentTitle);
+            document.getElementById('sheet-note').value = smart.note;
+            document.getElementById('sheet-cat').value = smart.cat;
+            document.getElementById('sheet-tags').value = smart.tags.join(' ');
+        }
+
+        function saveSheet() {
+            const item = ITEMS.find(x => x.id === editingId);
+            if (!item) return;
+            const newUrl = cleanRawUrl(document.getElementById('sheet-url').value);
+            if (newUrl) {
+                item.url = newUrl;
+                item.domain = newUrl.replace(/^https?:\/\//i, '').replace(/^www\./i, '').split('/')[0].toLowerCase();
+            }
+            item.title = document.getElementById('sheet-title').value.trim() || item.title;
+            item.note = document.getElementById('sheet-note').value.trim() || item.note;
+            item.cat = document.getElementById('sheet-cat').value.trim() || item.cat;
+            const rawTags = document.getElementById('sheet-tags').value.trim();
+            if (rawTags) {
+                item.tags = rawTags.split(/\s+/).map(tg => tg.startsWith('#') ? tg : `#${tg}`);
+            }
+
+            item.lockedOverride = sheetTempLocked;
+
+            saveStateToStorage();
+            closeEditSheet();
+            renderApp();
+            showToast(t('saved'));
+        }
+
+        function deleteCurrentItem() {
+            ITEMS = ITEMS.filter(x => x.id !== editingId);
+            saveStateToStorage();
+            closeEditSheet();
+            renderApp();
+            showToast(t('deleted'));
+        }
+
+        function attachSheetDrag(handleId, panelId, closeFn) {
+            const handle = document.getElementById(handleId);
+            const panel = document.getElementById(panelId);
+            let startY = 0, currentY = 0, dragging = false;
+
+            function onStart(e) {
+                dragging = true;
+                startY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
+                panel.style.transition = 'none';
+            }
+            function onMove(e) {
+                if (!dragging) return;
+                currentY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
+                const diff = currentY - startY;
+                if (diff > 0) panel.style.transform = `translateY(${diff}px)`;
+            }
+            function onEnd() {
+                if (!dragging) return;
+                dragging = false;
+                panel.style.transition = 'transform 0.34s cubic-bezier(0.16, 1, 0.3, 1)';
+                if (currentY - startY > 90) closeFn();
+                else panel.style.transform = 'translateY(0)';
+                startY = 0; currentY = 0;
+            }
+
+            handle.addEventListener('mousedown', onStart);
+            window.addEventListener('mousemove', onMove);
+            window.addEventListener('mouseup', onEnd);
+
+            handle.addEventListener('touchstart', onStart, { passive: true });
+            window.addEventListener('touchmove', onMove, { passive: true });
+            window.addEventListener('touchend', onEnd);
+        }
+
+        function setupPWA() {
+            const svgIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="#141413"/><circle cx="50" cy="50" r="37" fill="none" stroke="#D96B27" stroke-width="11"/><path d="M 16 64 Q 24 77 38 82" fill="none" stroke="#F6F4EE" stroke-width="11"/><path d="M 84 36 Q 76 23 62 18" fill="none" stroke="#F6F4EE" stroke-width="11"/><circle cx="50" cy="50" r="30.5" fill="none" stroke="#141413" stroke-width="3.5"/><circle cx="50" cy="50" r="23" fill="none" stroke="#F6F4EE" stroke-width="11"/><path d="M 29 40 A 23 23 0 0 0 45 72" fill="none" stroke="#D96B27" stroke-width="11" stroke-linecap="round"/><path d="M 71 60 A 23 23 0 0 0 55 28" fill="none" stroke="#D96B27" stroke-width="11" stroke-linecap="round"/><circle cx="50" cy="50" r="16.5" fill="#141413"/></svg>`;
+            const iconUrl = 'data:image/svg+xml;utf8,' + encodeURIComponent(svgIcon);
+
+            const manifest = {
+                name: 'LinkBox // Smart Link Organizer',
+                short_name: 'LinkBox',
+                description: 'Розумний ІІ-органайзер посилань та нотаток',
+                start_url: window.location.href,
+                display: 'standalone',
+                orientation: 'portrait',
+                background_color: '#ECEAE4',
+                theme_color: '#ECEAE4',
+                icons: [
+                    { src: iconUrl, sizes: '192x192', type: 'image/svg+xml', purpose: 'any maskable' },
+                    { src: iconUrl, sizes: '512x512', type: 'image/svg+xml', purpose: 'any maskable' }
+                ]
+            };
+
+            const manifestBlob = new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' });
+            const manifestEl = document.getElementById('pwa-manifest');
+            if (manifestEl) {
+                manifestEl.setAttribute('href', URL.createObjectURL(manifestBlob));
+            }
+        }
+
+        window.onload = () => {
+            setupPWA();
+            const hadSaved = loadStateFromStorage();
+            document.getElementById('lang-btn').textContent = currentLang === 'uk' ? 'UA' : 'EN';
+            updateStaticTexts();
+            setThemeMode(themeMode || 'light');
+            const initialMode = hadSaved ? viewMode : (window.innerWidth >= 1024 ? 'large' : 'small');
+            setLayoutMode(initialMode);
+            attachSheetDrag('menu-drag-handle', 'menu-sheet-panel', closeMenuSheet);
+            attachSheetDrag('tags-drag-handle', 'tags-sheet-panel', closeTagsSheet);
+            attachSheetDrag('about-drag-handle', 'about-sheet-panel', closeAboutSheet);
+            attachSheetDrag('edit-drag-handle', 'edit-sheet-panel', closeEditSheet);
+        };
+    </script>
+</body>
+</html>
