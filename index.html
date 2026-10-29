@@ -10,7 +10,7 @@
     <meta name="application-name" content="LinkBox">
     <title>LinkBox // Smart Link Organizer</title>
     <link rel="manifest" id="pwa-manifest">
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%230F1115'/%3E%3Ccircle cx='50' cy='50' r='37' fill='none' stroke='%23D96B27' stroke-width='11'/%3E%3Cpath d='M 16 64 Q 24 77 38 82' fill='none' stroke='%23FFFFFF' stroke-width='11'/%3E%3Cpath d='M 84 36 Q 76 23 62 18' fill='none' stroke='%23FFFFFF' stroke-width='11'/%3E%3Ccircle cx='50' cy='50' r='30.5' fill='none' stroke='%230F1115' stroke-width='3.5'/%3E%3Ccircle cx='50' cy='50' r='23' fill='none' stroke='%23FFFFFF' stroke-width='11'/%3E%3Cpath d='M 29 40 A 23 23 0 0 0 45 72' fill='none' stroke='%23D96B27' stroke-width='11' stroke-linecap='round'/%3E%3Cpath d='M 71 60 A 23 23 0 0 0 55 28' fill='none' stroke='%23D96B27' stroke-width='11' stroke-linecap='round'/%3E%3Ccircle cx='50' cy='50' r='16.5' fill='%230F1115'/%3E%3C/svg%3E">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M 44 10 L 44 50 L 58 45 L 58 21 C 58 18 61 17 66 17 C 75 17 80 22 80 30 C 80 37 74 42 58 47 L 58 58 C 76 58 82 65 82 74 C 82 82 75 87 63 87 L 48 95 C 78 95 95 87 95 72 C 95 60 86 52 72 49 C 86 45 94 37 94 26 C 94 12 81 5 63 5 C 51 5 44 7 44 10 Z' fill='%23231F20'/%3E%3Cpath d='M 6 6 L 21 21 L 21 68 C 21 78 27 84 37 84 C 46 84 52 78 55 64 L 58 76 C 53 90 43 95 29 95 C 14 95 6 84 6 66 Z' fill='%23231F20'/%3E%3Cpath d='M 44 45 L 44 22 C 44 10 54 5 68 5 C 83 5 94 14 94 28 C 94 41 83 49 58 57 C 35 65 24 72 22 80' fill='none' stroke='%23DF6D27' stroke-width='14' stroke-linecap='butt'/%3E%3Cpath d='M 64 54 C 83 54 95 62 95 74 C 95 86 83 95 62 95' fill='none' stroke='%23DF6D27' stroke-width='14' stroke-linecap='butt'/%3E%3Cpath d='M 6 58 C 6 82 20 95 41 95 C 55 95 63 85 63 63' fill='none' stroke='%23DF6D27' stroke-width='13' stroke-linecap='butt'/%3E%3C/svg%3E">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = { theme: { extend: { colors: {
@@ -38,20 +38,20 @@
             --on-ink: #FFFFFF;
         }
 
-        /* 2. ТЁМНАЯ ТЕМА: Мягкий сланец («золотая середина») */
+        /* 2. ТЁМНАЯ ТЕМА: Светлый мягкий сланец */
         body[data-theme="dim"] {
-            --bg-body: #26282F;
-            --text-main: #ECEEF3;
-            --text-muted: #A3A9B6;
-            --bg-surface: #2E3038;
-            --bg-header: rgba(38, 40, 47, 0.88);
-            --border-main: #42454F;
-            --bg-input: #1E2026;
-            --bg-card: #343640;
-            --icon-stroke: #ECEEF3;
+            --bg-body: #30333C;
+            --text-main: #F3F4F7;
+            --text-muted: #B5BBC7;
+            --bg-surface: #373B45;
+            --bg-header: rgba(48, 51, 60, 0.88);
+            --border-main: #4D5260;
+            --bg-input: #272A32;
+            --bg-card: #3E424E;
+            --icon-stroke: #F3F4F7;
             --accent-rgb: 217 107 39;
             --on-accent: #FFFFFF;
-            --ink: #ECEEF3;
+            --ink: #F3F4F7;
             --on-ink: #0F1115;
         }
 
@@ -107,6 +107,10 @@
             padding-top: calc(max(env(safe-area-inset-top, 0px), 16px) + 0.35rem);
             padding-bottom: 0.7rem;
         }
+        .safe-top-sidebar {
+            padding-top: calc(max(env(safe-area-inset-top, 0px), 16px) + 0.35rem);
+            padding-bottom: 0.75rem;
+        }
 
         .font-mono-code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, 'Roboto Mono', monospace; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -158,19 +162,21 @@
     <!-- БОКОВОЕ МЕНЮ (ВЕРСИЯ 2.0 + ВЕСЬ ОРИГИНАЛЬНЫЙ ФУНКЦИОНАЛ) -->
     <aside id="app-sidebar" class="fixed md:sticky top-0 left-0 z-50 h-[100dvh] w-80 max-w-[86vw] theme-surface border-r flex flex-col transition-transform duration-300 ease-out -translate-x-full md:translate-x-0 shrink-0 overscroll-contain select-none">
         
-        <!-- Шапка сайдбара: Фирменный логотип LinkBox (клик сбрасывает фильтры) -->
-        <div class="p-4 border-b flex items-center justify-between gap-2 touch-none" style="border-color: var(--border-main)">
+        <!-- Шапка сайдбара: Фирменный прозрачный логотип LinkBox (клик сбрасывает фильтры) -->
+        <div class="px-4 safe-top-sidebar border-b flex items-center justify-between gap-2 touch-none" style="border-color: var(--border-main)">
             <div onclick="resetToAllLinks(); closeMobileSidebar();" title="Показати всі посилання" class="key-press flex items-center gap-2.5 min-w-0 cursor-pointer">
-                <div class="w-10 h-10 rounded-lg bg-[#0F1115] flex items-center justify-center shrink-0 p-1.5 shadow-xs">
-                    <svg viewBox="0 0 100 100" class="w-full h-full">
-                        <circle cx="50" cy="50" r="37" fill="none" stroke="#D96B27" stroke-width="11"/>
-                        <path d="M 16 64 Q 24 77 38 82" fill="none" stroke="#FFFFFF" stroke-width="11"/>
-                        <path d="M 84 36 Q 76 23 62 18" fill="none" stroke="#FFFFFF" stroke-width="11"/>
-                        <circle cx="50" cy="50" r="30.5" fill="none" stroke="#0F1115" stroke-width="3.5"/>
-                        <circle cx="50" cy="50" r="23" fill="none" stroke="#FFFFFF" stroke-width="11"/>
-                        <path d="M 29 40 A 23 23 0 0 0 45 72" fill="none" stroke="#D96B27" stroke-width="11" stroke-linecap="round"/>
-                        <path d="M 71 60 A 23 23 0 0 0 55 28" fill="none" stroke="#D96B27" stroke-width="11" stroke-linecap="round"/>
-                        <circle cx="50" cy="50" r="16.5" fill="#0F1115"/>
+                <div class="w-10 h-10 flex items-center justify-center shrink-0">
+                    <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-xs">
+                        <!-- Тёмные внутренние грани и стойки L и B (прозрачный фон снаружи) -->
+                        <path d="M 43 48 L 58 43 L 58 18 C 69 18 76 23 76 31 C 76 39 68 44 43 52 Z" fill="#1F1D1E"/>
+                        <path d="M 43 60 L 57 55 L 57 83 C 69 83 77 78 77 70 C 77 62 68 58 55 58 Z" fill="#1F1D1E"/>
+                        <path d="M 6 6 L 22 22 L 22 68 C 22 77 27 83 36 83 C 45 83 51 77 54 62 L 58 75 C 53 89 43 95 29 95 C 14 95 6 83 6 65 Z" fill="#1F1D1E"/>
+                        <!-- Оранжевая лента B (верхняя дуга и диагональ) -->
+                        <path d="M 43 45 L 43 22 C 43 10 53 5 67 5 C 83 5 94 14 94 28 C 94 41 82 49 57 57 C 35 64 24 71 21 79" fill="none" stroke="#DF6D27" stroke-width="14" stroke-linecap="butt"/>
+                        <!-- Нижняя правая оранжевая дуга B -->
+                        <path d="M 63 54 C 83 54 95 62 95 74 C 95 86 82 95 60 95" fill="none" stroke="#DF6D27" stroke-width="14" stroke-linecap="butt"/>
+                        <!-- Нижний оранжевый изгиб L -->
+                        <path d="M 6 58 C 6 82 20 95 40 95 C 54 95 62 84 62 62" fill="none" stroke="#DF6D27" stroke-width="13" stroke-linecap="butt"/>
                     </svg>
                 </div>
                 <div class="min-w-0">
@@ -216,7 +222,13 @@
             <!-- 2. КАТЕГОРИИ С ЗАМКАМИ БЛОКИРОВКИ -->
             <div class="space-y-2">
                 <div class="flex items-center justify-end">
-                    <button type="button" onclick="openCategoriesSheet()" title="Відкрити всі категорії" class="key-press text-[11px] font-mono-code font-bold uppercase theme-muted hover:text-accent transition cursor-pointer text-right" id="lbl-folders-section">Категорії</button>
+                    <button type="button" onclick="openCategoriesSheet()" title="Відкрити всі категорії" class="key-press px-3 py-1.5 rounded-lg theme-card border shadow-2xs flex items-center gap-1.5 text-xs font-mono-code font-extrabold uppercase hover:border-accent hover:text-accent transition cursor-pointer">
+                        <svg class="w-3.5 h-3.5 text-accent shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+                        </svg>
+                        <span id="lbl-folders-section">Категорії</span>
+                        <span class="text-accent text-[11px] leading-none">›</span>
+                    </button>
                 </div>
                 <div id="folders-grid" class="grid grid-cols-1 gap-1.5">
                     <!-- Заполняется через JS -->
@@ -226,7 +238,11 @@
             <!-- 3. ХЕШТЕГИ -->
             <div class="space-y-2 pt-2 border-t" style="border-color: var(--border-main)">
                 <div class="flex items-center justify-end">
-                    <button type="button" onclick="openTagsSheet()" title="Відкрити всі хештеги" class="key-press text-[11px] font-mono-code font-bold uppercase theme-muted hover:text-accent transition cursor-pointer text-right" id="lbl-hashtags-section"># хештеги</button>
+                    <button type="button" onclick="openTagsSheet()" title="Відкрити всі хештеги" class="key-press px-3 py-1.5 rounded-lg theme-card border shadow-2xs flex items-center gap-1.5 text-xs font-mono-code font-extrabold uppercase hover:border-accent hover:text-accent transition cursor-pointer">
+                        <span class="text-accent font-black leading-none">#</span>
+                        <span id="lbl-hashtags-section">хештеги</span>
+                        <span class="text-accent text-[11px] leading-none">›</span>
+                    </button>
                 </div>
                 <div id="sidebar-tags-preview" class="flex flex-wrap gap-1.5">
                     <!-- Заполняется через JS -->
@@ -339,18 +355,16 @@
         <header class="sticky top-0 z-30 theme-header backdrop-blur-md border-b px-4 safe-top-header">
             <div class="max-w-5xl mx-auto flex items-center justify-between gap-2.5">
                 
-                <!-- Левый блок: На мобильном логотип + активный фильтр, на ПК индикатор раздела -->
+                <!-- Левый блок: На мобильном прозрачный логотип + активный фильтр, на ПК индикатор раздела -->
                 <div class="flex items-center gap-2.5 min-w-0">
-                    <div onclick="resetToAllLinks()" class="md:hidden key-press w-9 h-9 rounded-lg bg-[#0F1115] flex items-center justify-center shrink-0 p-1.5 cursor-pointer">
-                        <svg viewBox="0 0 100 100" class="w-full h-full">
-                            <circle cx="50" cy="50" r="37" fill="none" stroke="#D96B27" stroke-width="11"/>
-                            <path d="M 16 64 Q 24 77 38 82" fill="none" stroke="#FFFFFF" stroke-width="11"/>
-                            <path d="M 84 36 Q 76 23 62 18" fill="none" stroke="#FFFFFF" stroke-width="11"/>
-                            <circle cx="50" cy="50" r="30.5" fill="none" stroke="#0F1115" stroke-width="3.5"/>
-                            <circle cx="50" cy="50" r="23" fill="none" stroke="#FFFFFF" stroke-width="11"/>
-                            <path d="M 29 40 A 23 23 0 0 0 45 72" fill="none" stroke="#D96B27" stroke-width="11" stroke-linecap="round"/>
-                            <path d="M 71 60 A 23 23 0 0 0 55 28" fill="none" stroke="#D96B27" stroke-width="11" stroke-linecap="round"/>
-                            <circle cx="50" cy="50" r="16.5" fill="#0F1115"/>
+                    <div onclick="resetToAllLinks()" class="md:hidden key-press w-9 h-9 flex items-center justify-center shrink-0 cursor-pointer">
+                        <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-xs">
+                            <path d="M 43 48 L 58 43 L 58 18 C 69 18 76 23 76 31 C 76 39 68 44 43 52 Z" fill="#1F1D1E"/>
+                            <path d="M 43 60 L 57 55 L 57 83 C 69 83 77 78 77 70 C 77 62 68 58 55 58 Z" fill="#1F1D1E"/>
+                            <path d="M 6 6 L 22 22 L 22 68 C 22 77 27 83 36 83 C 45 83 51 77 54 62 L 58 75 C 53 89 43 95 29 95 C 14 95 6 83 6 65 Z" fill="#1F1D1E"/>
+                            <path d="M 43 45 L 43 22 C 43 10 53 5 67 5 C 83 5 94 14 94 28 C 94 41 82 49 57 57 C 35 64 24 71 21 79" fill="none" stroke="#DF6D27" stroke-width="14" stroke-linecap="butt"/>
+                            <path d="M 63 54 C 83 54 95 62 95 74 C 95 86 82 95 60 95" fill="none" stroke="#DF6D27" stroke-width="14" stroke-linecap="butt"/>
+                            <path d="M 6 58 C 6 82 20 95 40 95 C 54 95 62 84 62 62" fill="none" stroke="#DF6D27" stroke-width="13" stroke-linecap="butt"/>
                         </svg>
                     </div>
 
@@ -521,12 +535,14 @@
             
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2.5">
-                    <div class="w-8 h-8 rounded-lg bg-[#0F1115] flex items-center justify-center shrink-0 p-1">
-                        <svg viewBox="0 0 100 100" class="w-full h-full">
-                            <circle cx="50" cy="50" r="37" fill="none" stroke="#D96B27" stroke-width="11"/>
-                            <path d="M 16 64 Q 24 77 38 82" fill="none" stroke="#FFFFFF" stroke-width="11"/>
-                            <path d="M 84 36 Q 76 23 62 18" fill="none" stroke="#FFFFFF" stroke-width="11"/>
-                            <circle cx="50" cy="50" r="23" fill="none" stroke="#FFFFFF" stroke-width="11"/>
+                    <div class="w-8 h-8 flex items-center justify-center shrink-0">
+                        <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-xs">
+                            <path d="M 43 48 L 58 43 L 58 18 C 69 18 76 23 76 31 C 76 39 68 44 43 52 Z" fill="#1F1D1E"/>
+                            <path d="M 43 60 L 57 55 L 57 83 C 69 83 77 78 77 70 C 77 62 68 58 55 58 Z" fill="#1F1D1E"/>
+                            <path d="M 6 6 L 22 22 L 22 68 C 22 77 27 83 36 83 C 45 83 51 77 54 62 L 58 75 C 53 89 43 95 29 95 C 14 95 6 83 6 65 Z" fill="#1F1D1E"/>
+                            <path d="M 43 45 L 43 22 C 43 10 53 5 67 5 C 83 5 94 14 94 28 C 94 41 82 49 57 57 C 35 64 24 71 21 79" fill="none" stroke="#DF6D27" stroke-width="14" stroke-linecap="butt"/>
+                            <path d="M 63 54 C 83 54 95 62 95 74 C 95 86 82 95 60 95" fill="none" stroke="#DF6D27" stroke-width="14" stroke-linecap="butt"/>
+                            <path d="M 6 58 C 6 82 20 95 40 95 C 54 95 62 84 62 62" fill="none" stroke="#DF6D27" stroke-width="13" stroke-linecap="butt"/>
                         </svg>
                     </div>
                     <span class="font-black text-base uppercase tracking-tight" id="about-sheet-title">Як усе влаштовано</span>
@@ -664,7 +680,7 @@
                 addBtn: 'Додати',
                 random: 'Рандом',
                 foldersSection: 'Категорії',
-                hashtagsSection: '# хештеги',
+                hashtagsSection: 'хештеги',
                 catsSheetTitle: 'Усі категорії',
                 tagsSheetTitle: 'Усі хештеги',
                 urlPlaceholder: 'Вставте посилання або список посилань...',
@@ -801,7 +817,7 @@
         ];
 
         let ITEMS = structuredClone(DEFAULT_ITEMS);
-        const STORAGE_KEY = 'linkbox_hyperos_v2';
+        const STORAGE_KEY = 'linkbox_android_v2';
 
         function openMobileSidebar() {
             const sb = document.getElementById('app-sidebar');
@@ -1075,7 +1091,7 @@
 
         function loadStateFromStorage() {
             try {
-                const raw = localStorage.getItem(STORAGE_KEY) || localStorage.getItem('linkbox_hyperos_v1');
+                const raw = localStorage.getItem(STORAGE_KEY) || localStorage.getItem('linkbox_hyperos_v2') || localStorage.getItem('linkbox_hyperos_v1');
                 if (!raw) return false;
                 const parsed = JSON.parse(raw);
                 if (Array.isArray(parsed.items)) {
@@ -1381,7 +1397,7 @@
                 if (metaTheme) metaTheme.setAttribute('content', '#F3F4F7');
             } else if (mode === 'dim') {
                 body.setAttribute('data-theme', 'dim');
-                if (metaTheme) metaTheme.setAttribute('content', '#26282F');
+                if (metaTheme) metaTheme.setAttribute('content', '#30333C');
             } else if (mode === 'device') {
                 body.setAttribute('data-theme', 'oled');
                 if (metaTheme) metaTheme.setAttribute('content', '#000000');
@@ -3050,7 +3066,7 @@
         }
 
         function setupPWA() {
-            const svgIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="#0F1115"/><circle cx="50" cy="50" r="37" fill="none" stroke="#D96B27" stroke-width="11"/><path d="M 16 64 Q 24 77 38 82" fill="none" stroke="#FFFFFF" stroke-width="11"/><path d="M 84 36 Q 76 23 62 18" fill="none" stroke="#FFFFFF" stroke-width="11"/><circle cx="50" cy="50" r="30.5" fill="none" stroke="#0F1115" stroke-width="3.5"/><circle cx="50" cy="50" r="23" fill="none" stroke="#FFFFFF" stroke-width="11"/><path d="M 29 40 A 23 23 0 0 0 45 72" fill="none" stroke="#D96B27" stroke-width="11" stroke-linecap="round"/><path d="M 71 60 A 23 23 0 0 0 55 28" fill="none" stroke="#D96B27" stroke-width="11" stroke-linecap="round"/><circle cx="50" cy="50" r="16.5" fill="#0F1115"/></svg>`;
+            const svgIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M 43 48 L 58 43 L 58 18 C 69 18 76 23 76 31 C 76 39 68 44 43 52 Z" fill="#1F1D1E"/><path d="M 43 60 L 57 55 L 57 83 C 69 83 77 78 77 70 C 77 62 68 58 55 58 Z" fill="#1F1D1E"/><path d="M 6 6 L 22 22 L 22 68 C 22 77 27 83 36 83 C 45 83 51 77 54 62 L 58 75 C 53 89 43 95 29 95 C 14 95 6 83 6 65 Z" fill="#1F1D1E"/><path d="M 43 45 L 43 22 C 43 10 53 5 67 5 C 83 5 94 14 94 28 C 94 41 82 49 57 57 C 35 64 24 71 21 79" fill="none" stroke="#DF6D27" stroke-width="14" stroke-linecap="butt"/><path d="M 63 54 C 83 54 95 62 95 74 C 95 86 82 95 60 95" fill="none" stroke="#DF6D27" stroke-width="14" stroke-linecap="butt"/><path d="M 6 58 C 6 82 20 95 40 95 C 54 95 62 84 62 62" fill="none" stroke="#DF6D27" stroke-width="13" stroke-linecap="butt"/></svg>`;
             const iconUrl = 'data:image/svg+xml;utf8,' + encodeURIComponent(svgIcon);
 
             const manifest = {
