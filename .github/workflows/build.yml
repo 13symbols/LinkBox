@@ -23,9 +23,9 @@ jobs:
           npx cap init LinkBox com.shans.linkbox --web-dir=www
           npx cap add android
           mkdir -p assets
-          cp icon.jpg assets/icon-only.jpg
-          cp icon.jpg assets/icon-foreground.jpg
-          cp icon.jpg assets/icon-background.jpg
+          cp icon.png assets/icon-only.png
+          cp icon.png assets/icon-foreground.png
+          cp icon.png assets/icon-background.png
           npm i -D @capacitor/assets
           npx capacitor-assets generate --android
           npx cap sync android
