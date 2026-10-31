@@ -24,10 +24,10 @@ jobs:
           npx cap add android
           mkdir -p assets
           cp icon.png assets/icon-only.png
-          cp icon.png assets/icon-foreground.png
-          cp icon.png assets/icon-background.png
           npm i -D @capacitor/assets
           npx capacitor-assets generate --android
+          rm -rf android/app/src/main/res/mipmap-anydpi-v26
+          for d in android/app/src/main/res/mipmap-*dpi; do cp $d/ic_launcher.png $d/ic_launcher_round.png; done
           npx cap sync android
       - name: Build
         run: |
