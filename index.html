@@ -559,7 +559,7 @@
         let ITEMS = structuredClone(DEFAULT_ITEMS);
         const STORAGE_KEY = 'linkbox_android_v3';
 
-        // --- ІДЕАЛЬНА НАВІГАЦІЯ ЖЕСТАМИ (ПОДВІЙНИЙ СВАЙП ДЛЯ ВИХОДУ) ---
+        // --- НАВІГАЦІЯ СИСТЕМНИМИ ЖЕСТАМИ (ЗАКРИТТЯ БУДЬ-ЯКОГО ВІКНА + ПОДВІЙНИЙ СВАЙП ДЛЯ ВИХОДУ) ---
         let historyInitialized = false;
         let exitConfirm = false;
         let exitToastTimeout = null;
@@ -575,18 +575,42 @@
         document.addEventListener('click', initHistory, { once: true });
 
         function isAnyModalOpen() {
-            return isMobileSidebarOpen || document.querySelector('.sheet-backdrop.open');
+            return isMobileSidebarOpen || Boolean(document.querySelector('.sheet-backdrop.open'));
+        }
+
+        function hasActiveFilterOrSearch() {
+            const searchVal = (document.getElementById('search-input')?.value || '').trim();
+            return selectedFolder !== 'ALL' || selectedTag !== null || searchVal.length > 0;
         }
 
         window.addEventListener('popstate', (e) => {
             const state = e.state;
-            
+
+            // 1. Якщо відкрито бокове меню або будь-яке вікно/шторка — закриваємо його
             if (isAnyModalOpen()) {
+                exitConfirm = false;
                 _forceCloseAllUI();
                 history.pushState({ id: 'main' }, '');
                 return;
             }
 
+            // 2. Якщо активний режим масового вибору — скасовуємо його
+            if (isSelectMode) {
+                exitConfirm = false;
+                toggleSelectMode();
+                history.pushState({ id: 'main' }, '');
+                return;
+            }
+
+            // 3. Якщо обрана категорія, тег або введений пошук — скидаємо на всі посилання
+            if (hasActiveFilterOrSearch()) {
+                exitConfirm = false;
+                resetToAllLinks();
+                history.pushState({ id: 'main' }, '');
+                return;
+            }
+
+            // 4. Подвійний свайп для виходу з головної сторінки
             if (!state || state.id === 'root') {
                 if (!exitConfirm) {
                     exitConfirm = true;
@@ -604,7 +628,9 @@
 
         function _pushModalState() {
             initHistory();
-            history.pushState({ id: 'modal' }, '');
+            if (!history.state || history.state.id !== 'modal') {
+                history.pushState({ id: 'modal' }, '');
+            }
         }
 
         function safeCloseModal(hideFn) {
