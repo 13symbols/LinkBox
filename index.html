@@ -10,8 +10,8 @@
     <meta name="application-name" content="LinkBox">
     <title>LinkBox // Smart Link Organizer</title>
     <link rel="manifest" id="pwa-manifest">
-    <!-- Favicon жорстко використовує оригінальні кольори (помаранчевий та темний), бо він не може читати CSS змінні -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3CclipPath id='tl'%3E%3Cpolygon points='0,0 100,0 0,100'/%3E%3C/clipPath%3E%3C/defs%3E%3Ccircle cx='64' cy='36' r='22' fill='none' stroke='%23DF6D27' stroke-width='14'/%3E%3Ccircle cx='36' cy='64' r='22' fill='none' stroke='%231F1D1E' stroke-width='14'/%3E%3Ccircle cx='64' cy='36' r='22' fill='none' stroke='%23DF6D27' stroke-width='14' clip-path='url(%23tl)'/%3E%3Ccircle cx='36' cy='64' r='9' fill='%23DF6D27'/%3E%3Ccircle cx='64' cy='36' r='9' fill='%231F1D1E'/%3E%3C/svg%3E">
+    <!-- Favicon перемальовано під справжні переплетені кільця як на Logo_2.svg -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3CclipPath id='c'%3E%3Crect x='50' y='50' width='50' height='50'/%3E%3C/clipPath%3E%3C/defs%3E%3Ccircle cx='62' cy='38' r='23' fill='none' stroke='%23DF6D27' stroke-width='12'/%3E%3Ccircle cx='38' cy='62' r='23' fill='none' stroke='%231F1D1E' stroke-width='12'/%3E%3Ccircle cx='62' cy='38' r='23' fill='none' stroke='%23DF6D27' stroke-width='12' clip-path='url(%23c)'/%3E%3Ccircle cx='62' cy='38' r='8' fill='%231F1D1E'/%3E%3Ccircle cx='38' cy='62' r='8' fill='%23DF6D27'/%3E%3C/svg%3E">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = { theme: { extend: { colors: {
@@ -39,21 +39,21 @@
             --on-ink: #FFFFFF;
         }
 
-        /* 2. ТЁМНАЯ ТЕМА */
+        /* 2. ТЁМНАЯ ТЕМА (сбалансированная: темнее предыдущей, но мягче оригинальной) */
         body[data-theme="dim"] {
-            --bg-body: #2B2D31;
+            --bg-body: #2C2E33;
             --text-main: #F2F3F5;
             --text-muted: #949BA4;
-            --bg-surface: #313338;
-            --bg-header: rgba(43, 45, 49, 0.88);
-            --border-main: #494C54;
-            --bg-input: #1E1F22;
+            --bg-surface: #33353B;
+            --bg-header: rgba(44, 46, 51, 0.88);
+            --border-main: #494D54;
+            --bg-input: #1F2124;
             --bg-card: #383A40;
             --icon-stroke: #F2F3F5;
             --accent-rgb: 217 107 39;
             --on-accent: #FFFFFF;
             --ink: #F2F3F5;
-            --on-ink: #1E1F22;
+            --on-ink: #1F2124;
         }
 
         /* 3. ЧЁРНАЯ ТЕМА (AMOLED) */
@@ -165,14 +165,14 @@
         <div class="px-4 safe-top-sidebar border-b flex items-center justify-between gap-2 touch-none" style="border-color: var(--border-main)">
             <div onclick="resetToAllLinks(); closeMobileSidebar();" title="Показати всі посилання" class="key-press flex items-center gap-2.5 min-w-0 cursor-pointer">
                 <div class="w-10 h-10 flex items-center justify-center shrink-0">
-                    <!-- ЛОГОТИП -->
+                    <!-- ПРАВИЛЬНИЙ ЛОГОТИП (Переплетені ланки ланцюга) -->
                     <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-xs text-ink" xmlns="http://www.w3.org/2000/svg">
-                        <defs><clipPath id="clip-logo-sidebar"><polygon points="0,0 100,0 0,100"/></clipPath></defs>
-                        <circle cx="64" cy="36" r="22" fill="none" stroke="#DF6D27" stroke-width="14"/>
-                        <circle cx="36" cy="64" r="22" fill="none" stroke="currentColor" stroke-width="14"/>
-                        <circle cx="64" cy="36" r="22" fill="none" stroke="#DF6D27" stroke-width="14" clip-path="url(#clip-logo-sidebar)"/>
-                        <circle cx="36" cy="64" r="9" fill="#DF6D27"/>
-                        <circle cx="64" cy="36" r="9" fill="currentColor"/>
+                        <defs><clipPath id="clip-logo-sidebar"><rect x="50" y="50" width="50" height="50"/></clipPath></defs>
+                        <circle cx="62" cy="38" r="23" fill="none" stroke="#DF6D27" stroke-width="12"/>
+                        <circle cx="38" cy="62" r="23" fill="none" stroke="currentColor" stroke-width="12"/>
+                        <circle cx="62" cy="38" r="23" fill="none" stroke="#DF6D27" stroke-width="12" clip-path="url(#clip-logo-sidebar)"/>
+                        <circle cx="62" cy="38" r="8" fill="currentColor"/>
+                        <circle cx="38" cy="62" r="8" fill="#DF6D27"/>
                     </svg>
                 </div>
                 <div class="min-w-0">
@@ -345,22 +345,23 @@
     <div class="flex-1 flex flex-col min-w-0 w-full">
 
         <!-- ВЕРХНЯЯ ШАПКА -->
-        <header class="sticky top-0 z-30 theme-header backdrop-blur-md border-b px-4 safe-top-header">
+        <header onclick="window.scrollTo({ top: 0, behavior: 'smooth' })" class="sticky top-0 z-30 theme-header backdrop-blur-md border-b px-4 safe-top-header cursor-pointer select-none" title="Натисніть, щоб прокрутити наверх">
             <div class="max-w-5xl mx-auto flex items-center justify-between gap-2.5">
                 
                 <div class="flex items-center gap-2.5 min-w-0">
-                    <div onclick="resetToAllLinks()" class="key-press w-9 h-9 flex items-center justify-center shrink-0 cursor-pointer">
+                    <div onclick="event.stopPropagation(); resetToAllLinks()" class="key-press w-9 h-9 flex items-center justify-center shrink-0 cursor-pointer">
+                        <!-- ПРАВИЛЬНИЙ ЛОГОТИП -->
                         <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-xs text-ink" xmlns="http://www.w3.org/2000/svg">
-                            <defs><clipPath id="clip-logo-header"><polygon points="0,0 100,0 0,100"/></clipPath></defs>
-                            <circle cx="64" cy="36" r="22" fill="none" stroke="#DF6D27" stroke-width="14"/>
-                            <circle cx="36" cy="64" r="22" fill="none" stroke="currentColor" stroke-width="14"/>
-                            <circle cx="64" cy="36" r="22" fill="none" stroke="#DF6D27" stroke-width="14" clip-path="url(#clip-logo-header)"/>
-                            <circle cx="36" cy="64" r="9" fill="#DF6D27"/>
-                            <circle cx="64" cy="36" r="9" fill="currentColor"/>
+                            <defs><clipPath id="clip-logo-header"><rect x="50" y="50" width="50" height="50"/></clipPath></defs>
+                            <circle cx="62" cy="38" r="23" fill="none" stroke="#DF6D27" stroke-width="12"/>
+                            <circle cx="38" cy="62" r="23" fill="none" stroke="currentColor" stroke-width="12"/>
+                            <circle cx="62" cy="38" r="23" fill="none" stroke="#DF6D27" stroke-width="12" clip-path="url(#clip-logo-header)"/>
+                            <circle cx="62" cy="38" r="8" fill="currentColor"/>
+                            <circle cx="38" cy="62" r="8" fill="#DF6D27"/>
                         </svg>
                     </div>
 
-                    <div onclick="resetToAllLinks()" class="key-press flex flex-col min-w-0 cursor-pointer" title="Натисніть, щоб скинути фільтри">
+                    <div onclick="event.stopPropagation(); resetToAllLinks()" class="key-press flex flex-col min-w-0 cursor-pointer" title="Натисніть, щоб скинути фільтри">
                         <div class="flex items-center gap-2">
                             <h1 class="text-base sm:text-lg font-black tracking-tight uppercase truncate">LinkBox</h1>
                             <span id="mobile-count-pill" class="text-[11px] font-mono-code font-bold px-1.5 py-0.5 rounded-md bg-accent text-onaccent shrink-0">6</span>
@@ -376,13 +377,13 @@
                 </div>
 
                 <div class="flex items-center gap-2 shrink-0">
-                    <button onclick="toggleSelectMode()" id="select-mode-btn" title="Масовий вибір та видалення" class="key-press w-10 h-10 rounded-lg theme-input flex items-center justify-center transition">
+                    <button onclick="event.stopPropagation(); toggleSelectMode()" id="select-mode-btn" title="Масовий вибір та видалення" class="key-press w-10 h-10 rounded-lg theme-input flex items-center justify-center transition">
                         <svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24">
                             <polyline points="9 11 12 14 22 4"/>
                             <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
                         </svg>
                     </button>
-                    <button onclick="openMobileSidebar()" class="key-press h-10 px-3.5 rounded-lg theme-input flex items-center gap-2 font-bold text-sm hover:opacity-90 transition">
+                    <button onclick="event.stopPropagation(); openMobileSidebar()" class="key-press h-10 px-3.5 rounded-lg theme-input flex items-center gap-2 font-bold text-sm hover:opacity-90 transition">
                         <svg class="w-5 h-5 mono-icon" viewBox="0 0 24 24">
                             <line x1="3" y1="7" x2="21" y2="7"/>
                             <line x1="3" y1="12" x2="21" y2="12"/>
@@ -547,13 +548,14 @@
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2.5">
                     <div class="w-8 h-8 flex items-center justify-center shrink-0">
+                        <!-- ПРАВИЛЬНИЙ ЛОГОТИП -->
                         <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-xs text-ink" xmlns="http://www.w3.org/2000/svg">
-                            <defs><clipPath id="clip-logo-about"><polygon points="0,0 100,0 0,100"/></clipPath></defs>
-                            <circle cx="64" cy="36" r="22" fill="none" stroke="#DF6D27" stroke-width="14"/>
-                            <circle cx="36" cy="64" r="22" fill="none" stroke="currentColor" stroke-width="14"/>
-                            <circle cx="64" cy="36" r="22" fill="none" stroke="#DF6D27" stroke-width="14" clip-path="url(#clip-logo-about)"/>
-                            <circle cx="36" cy="64" r="9" fill="#DF6D27"/>
-                            <circle cx="64" cy="36" r="9" fill="currentColor"/>
+                            <defs><clipPath id="clip-logo-about"><rect x="50" y="50" width="50" height="50"/></clipPath></defs>
+                            <circle cx="62" cy="38" r="23" fill="none" stroke="#DF6D27" stroke-width="12"/>
+                            <circle cx="38" cy="62" r="23" fill="none" stroke="currentColor" stroke-width="12"/>
+                            <circle cx="62" cy="38" r="23" fill="none" stroke="#DF6D27" stroke-width="12" clip-path="url(#clip-logo-about)"/>
+                            <circle cx="62" cy="38" r="8" fill="currentColor"/>
+                            <circle cx="38" cy="62" r="8" fill="#DF6D27"/>
                         </svg>
                     </div>
                     <span class="font-black text-base uppercase tracking-tight" id="about-sheet-title">Як усе влаштовано</span>
@@ -740,7 +742,7 @@
                 priorityBtn: 'Пріоритет у папці',
                 priorityActiveBtn: 'У топі папки ★',
                 offlineFolderName: '⏳ Очікують мережі',
-                offlineBadge: '⏳ Очіє ІІ',
+                offlineBadge: '⏳ Очікує ІІ',
                 offlineSyncedToast: 'Мережа з’явилась! ІІ розібрав посилань: ',
                 offlineStillNoNet: 'Немає з’єднання. Посилання чекають на інтернет ⏳',
                 sortNewest: '↓ Нові',
@@ -832,7 +834,33 @@
         let ITEMS = structuredClone(DEFAULT_ITEMS);
         const STORAGE_KEY = 'linkbox_android_v3';
 
+        // --- HISTORY API MODAL MANAGER (НАВІГАЦІЯ ЖЕСТАМИ) ---
+        let isPopStateActive = false;
+        window.addEventListener('popstate', (e) => {
+            isPopStateActive = true;
+            const activeModal = e.state ? e.state.modal : null;
+            if (activeModal !== 'confirm') _hideConfirmModal();
+            if (activeModal !== 'edit' && activeModal !== 'confirm') _hideEditSheet();
+            if (activeModal !== 'about') _hideAboutSheet();
+            if (activeModal !== 'tags') _hideTagsSheet();
+            if (activeModal !== 'cats') _hideCatsSheet();
+            if (activeModal !== 'sidebar') _hideSidebar();
+            isPopStateActive = false;
+        });
+
+        function _pushModal(id) {
+            if (isPopStateActive) return;
+            if (history.state && history.state.modal === 'sidebar' && id !== 'sidebar') {
+                history.replaceState({ modal: id }, '');
+            } else if (history.state && history.state.modal === id) {
+                return;
+            } else {
+                history.pushState({ modal: id }, '');
+            }
+        }
+
         function openMobileSidebar() {
+            _pushModal('sidebar');
             const sb = document.getElementById('app-sidebar');
             const ov = document.getElementById('sidebar-overlay');
             if (!sb || !ov) return;
@@ -848,6 +876,11 @@
         }
 
         function closeMobileSidebar() {
+            if (history.state && history.state.modal === 'sidebar') { history.back(); return; }
+            _hideSidebar();
+        }
+
+        function _hideSidebar() {
             const sb = document.getElementById('app-sidebar');
             const ov = document.getElementById('sidebar-overlay');
             if (!sb || !ov) return;
@@ -1027,6 +1060,7 @@
         }
 
         function showConfirmModal(title, desc) {
+            _pushModal('confirm');
             document.getElementById('confirm-title').textContent = title;
             document.getElementById('confirm-desc').textContent = desc;
             const okBtn = document.getElementById('confirm-ok-btn');
@@ -1042,6 +1076,11 @@
         }
 
         function closeConfirmModal() {
+            if (history.state && history.state.modal === 'confirm') { history.back(); return; }
+            _hideConfirmModal();
+        }
+
+        function _hideConfirmModal() {
             const modal = document.getElementById('confirm-modal');
             modal.classList.remove('open');
             setTimeout(() => {
@@ -1394,7 +1433,6 @@
             document.getElementById('btn-delete').textContent = t('deleteBtn');
             document.getElementById('btn-save').textContent = t('saveBtn');
             
-            // Встановлюємо title для нових кнопок-іконок замість textContent
             const selAllBtn = document.getElementById('btn-select-all');
             if (selAllBtn) selAllBtn.title = t('selectAll');
             const delSelBtn = document.getElementById('btn-delete-selected');
@@ -1419,7 +1457,7 @@
                 if (metaTheme) metaTheme.setAttribute('content', '#F3F4F7');
             } else if (mode === 'dim') {
                 body.setAttribute('data-theme', 'dim');
-                if (metaTheme) metaTheme.setAttribute('content', '#1F2228');
+                if (metaTheme) metaTheme.setAttribute('content', '#2C2E33');
             } else if (mode === 'device') {
                 body.setAttribute('data-theme', 'oled');
                 if (metaTheme) metaTheme.setAttribute('content', '#000000');
@@ -1495,7 +1533,8 @@
         // -------------------------------------
 
         function openCategoriesSheet() {
-            closeMobileSidebar();
+            _pushModal('cats');
+            _hideSidebar();
             const searchIn = document.getElementById('cats-search-input');
             if (searchIn) searchIn.value = '';
             setCatsSortMode(catsSortMode || 'popular');
@@ -1508,6 +1547,11 @@
         }
 
         function closeCategoriesSheet() {
+            if (history.state && history.state.modal === 'cats') { history.back(); return; }
+            _hideCatsSheet();
+        }
+
+        function _hideCatsSheet() {
             const modal = document.getElementById('cats-sheet-modal');
             const panel = document.getElementById('cats-sheet-panel');
             modal.classList.remove('open');
@@ -1606,7 +1650,8 @@
         }
 
         function openTagsSheet() {
-            closeMobileSidebar();
+            _pushModal('tags');
+            _hideSidebar();
             const searchIn = document.getElementById('tags-search-input');
             if (searchIn) searchIn.value = '';
             setTagsSortMode(tagsSortMode || 'popular');
@@ -1619,6 +1664,11 @@
         }
 
         function closeTagsSheet() {
+            if (history.state && history.state.modal === 'tags') { history.back(); return; }
+            _hideTagsSheet();
+        }
+
+        function _hideTagsSheet() {
             const modal = document.getElementById('tags-sheet-modal');
             const panel = document.getElementById('tags-sheet-panel');
             modal.classList.remove('open');
@@ -1642,7 +1692,8 @@
         }
 
         function openAboutSheet() {
-            closeMobileSidebar();
+            _pushModal('about');
+            _hideSidebar();
             renderAboutContent();
             const modal = document.getElementById('about-sheet-modal');
             const panel = document.getElementById('about-sheet-panel');
@@ -1654,6 +1705,11 @@
         }
 
         function closeAboutSheet() {
+            if (history.state && history.state.modal === 'about') { history.back(); return; }
+            _hideAboutSheet();
+        }
+
+        function _hideAboutSheet() {
             const modal = document.getElementById('about-sheet-modal');
             const panel = document.getElementById('about-sheet-panel');
             modal.classList.remove('open');
@@ -1863,11 +1919,9 @@
             if (!grid) return;
             const isAll = selectedFolder === 'ALL' && !selectedTag;
 
-            // Обновляем плашку-счётчик возле заголовка КАТЕГОРІЇ
             const catsInlineCounterEl = document.getElementById('sidebar-cats-inline-counter');
             if (catsInlineCounterEl) catsInlineCounterEl.textContent = cats.length;
 
-            // Обновляем плашку-счётчик возле заголовка ХЕШТЕГИ
             const tagsInlineCounterEl = document.getElementById('sidebar-tags-inline-counter');
             if (tagsInlineCounterEl) tagsInlineCounterEl.textContent = getTagMapSorted('popular').length;
 
@@ -1885,7 +1939,6 @@
                 `;
             }
 
-            // Ограничение: не более 7 категорий в боковом меню
             const limitedCats = cats.slice(0, 7);
             html += limitedCats.map(c => {
                 const active = selectedFolder === c.cat;
@@ -3012,6 +3065,7 @@
         }
 
         function openEditSheet(id) {
+            _pushModal('edit');
             const item = ITEMS.find(x => x.id === id);
             if (!item) return;
             editingId = id;
@@ -3043,6 +3097,11 @@
         }
 
         function closeEditSheet() {
+            if (history.state && history.state.modal === 'edit') { history.back(); return; }
+            _hideEditSheet();
+        }
+
+        function _hideEditSheet() {
             const modal = document.getElementById('edit-sheet-modal');
             const panel = document.getElementById('edit-sheet-panel');
             modal.classList.remove('open');
@@ -3088,7 +3147,7 @@
 
             const rawTags = document.getElementById('sheet-tags').value.trim();
             if (rawTags) {
-                item.tags = rawTags.split(/\s+/).map(tg => tg.startsWith('#') ? tg : `#${tg}`);
+                item.tags = rawTags.split(/\s+/).map(tg => tg.startsWith('#' ) ? tg : `#${tg}`);
             }
 
             item.lockedOverride = sheetTempLocked;
@@ -3136,8 +3195,7 @@
         }
 
         function setupPWA() {
-            // Для маніфесту теж підлаштовано SVG з використанням чорного/помаранчевого
-            const svgIcon = `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><defs><clipPath id="tl_pwa"><polygon points="0,0 100,0 0,100"/></clipPath></defs><circle cx="64" cy="36" r="22" fill="none" stroke="#DF6D27" stroke-width="14"/><circle cx="36" cy="64" r="22" fill="none" stroke="#1F1D1E" stroke-width="14"/><circle cx="64" cy="36" r="22" fill="none" stroke="#DF6D27" stroke-width="14" clip-path="url(#tl_pwa)"/><circle cx="36" cy="64" r="9" fill="#DF6D27"/><circle cx="64" cy="36" r="9" fill="#1F1D1E"/></svg>`;
+            const svgIcon = `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><defs><clipPath id="br_pwa"><rect x="50" y="50" width="50" height="50"/></clipPath></defs><circle cx="62" cy="38" r="23" fill="none" stroke="#DF6D27" stroke-width="12"/><circle cx="38" cy="62" r="23" fill="none" stroke="#1F1D1E" stroke-width="12"/><circle cx="62" cy="38" r="23" fill="none" stroke="#DF6D27" stroke-width="12" clip-path="url(#br_pwa)"/><circle cx="62" cy="38" r="8" fill="#1F1D1E"/><circle cx="38" cy="62" r="8" fill="#DF6D27"/></svg>`;
             const iconUrl = 'data:image/svg+xml;utf8,' + encodeURIComponent(svgIcon);
 
             const manifest = {
