@@ -42,6 +42,78 @@ jobs:
           cp icon.jpg assets/icon-background.jpg
           npm i -D @capacitor/assets
           npx capacitor-assets generate --android
+          python3 - <<'PY'
+          p = 'www/index.html'
+          s = open(p, encoding='utf-8').read()
+          js = '''<script>
+          window.addEventListener("load", function () { setTimeout(function () { window.__shareReady = true; }, 800); });
+          window.receiveShared = function (t) {
+            try {
+              if (!window.__shareReady || typeof addLinkByAI !== "function") return false;
+              var i = document.getElementById("url-input");
+              if (!i) return false;
+              i.value = t;
+              addLinkByAI();
+              return true;
+            } catch (e) { return false; }
+          };
+          </script>'''
+          s = s.replace('</body>', js + '</body>', 1)
+          open(p, 'w', encoding='utf-8').write(s)
+          m = 'android/app/src/main/AndroidManifest.xml'
+          x = open(m, encoding='utf-8').read()
+          f = '<intent-filter><action android:name="android.intent.action.SEND" /><category android:name="android.intent.category.DEFAULT" /><data android:mimeType="text/plain" /></intent-filter>'
+          x = x.replace('</activity>', f + '</activity>', 1)
+          open(m, 'w', encoding='utf-8').write(x)
+          PY
+          cat > android/app/src/main/java/com/shans/linkbox/MainActivity.java <<'JAVA'
+          package com.shans.linkbox;
+          import android.content.Intent;
+          import android.os.Bundle;
+          import android.os.Handler;
+          import android.os.Looper;
+          import com.getcapacitor.BridgeActivity;
+          import org.json.JSONObject;
+          public class MainActivity extends BridgeActivity {
+            @Override
+            protected void onCreate(Bundle savedInstanceState) {
+              super.onCreate(savedInstanceState);
+              handleShare(getIntent());
+            }
+            @Override
+            protected void onNewIntent(Intent intent) {
+              super.onNewIntent(intent);
+              setIntent(intent);
+              handleShare(intent);
+            }
+            private void handleShare(Intent intent) {
+              if (intent == null || !Intent.ACTION_SEND.equals(intent.getAction())) return;
+              String text = intent.getStringExtra(Intent.EXTRA_TEXT);
+              if (text == null || text.isEmpty()) return;
+              intent.removeExtra(Intent.EXTRA_TEXT);
+              trySend(JSONObject.quote(text), 0);
+            }
+            private void trySend(final String quoted, final int attempt) {
+              new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                  if (getBridge() == null || getBridge().getWebView() == null) {
+                    if (attempt < 30) trySend(quoted, attempt + 1);
+                    return;
+                  }
+                  getBridge().getWebView().evaluateJavascript(
+                    "(function(){return window.receiveShared ? window.receiveShared(" + quoted + ") : false;})()",
+                    new android.webkit.ValueCallback<String>() {
+                      @Override
+                      public void onReceiveValue(String value) {
+                        if (!"true".equals(value) && attempt < 30) trySend(quoted, attempt + 1);
+                      }
+                    });
+                }
+              }, 500);
+            }
+          }
+          JAVA
           npx cap sync android
       - name: Build
         run: |
