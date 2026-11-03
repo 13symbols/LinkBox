@@ -34,7 +34,7 @@ jobs:
           cp index.html www/index.html
           npm init -y
           npm i @capacitor/core @capacitor/cli @capacitor/android
-          npx cap init LinkBox com.shans.linkbox --web-dir=www
+          npx cap init LinkBox com.shans.linkbox2 --web-dir=www
           npx cap add android
           mkdir -p assets
           cp icon.jpg assets/icon-only.jpg
@@ -66,8 +66,8 @@ jobs:
           x = x.replace('</activity>', f + '</activity>', 1)
           open(m, 'w', encoding='utf-8').write(x)
           PY
-          cat > android/app/src/main/java/com/shans/linkbox/MainActivity.java <<'JAVA'
-          package com.shans.linkbox;
+          cat > android/app/src/main/java/com/shans/linkbox2/MainActivity.java <<'JAVA'
+          package com.shans.linkbox2;
           import android.content.Intent;
           import android.os.Bundle;
           import android.os.Handler;
