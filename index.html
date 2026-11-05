@@ -9,20 +9,337 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="application-name" content="LinkBox">
     <title>LinkBox // Smart Link Organizer</title>
-    <link rel="manifest" id="pwa-manifest">
+    <link rel="manifest" id="pwa-manifest" href="data:application/manifest+json;utf8,%7B%22name%22%3A%22LinkBox%20//%20Smart%20Link%20Organizer%22%2C%22short_name%22%3A%22LinkBox%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23F3F4F7%22%2C%22theme_color%22%3A%22%23DF6D27%22%7D">
     
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,%3Csvg viewBox='0 0 2048 2048' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%231F1D1E' d='M 820.745 774.484 C 843.943 773.99 873.918 775.257 896.837 776.679 C 976.15 781.6 1061.49 792.356 1128.78 838.041 C 1194.53 882.69 1242.68 950.654 1257.85 1029.03 C 1208.06 1030.81 1114.09 1032.21 1070.34 1012.39 C 1057.54 1006.59 1048.04 997.356 1037.19 988.759 C 1026.23 980.074 1014.43 972.7 1001.26 967.858 C 926.976 940.551 772.06 945.932 690.612 955.345 C 544.138 972.273 403.224 1022 309.048 1140.88 C 237.059 1230.09 204.079 1344.56 217.568 1458.39 C 231.435 1569.88 289.137 1671.25 377.917 1740.09 C 465.695 1809.18 578.939 1849.08 690.998 1834.81 C 903.421 1807.77 1039.63 1638.79 1082.95 1438.5 C 1088.66 1412.8 1092.59 1386.74 1094.72 1360.5 C 1095.11 1355.7 1095.66 1338.72 1097.53 1336.33 L 1102 1335.91 C 1122.33 1336.33 1146.1 1338.33 1167.22 1339.02 C 1201.81 1339.88 1236.42 1340.02 1271.01 1339.43 C 1266.42 1377.03 1265.41 1411.49 1258.02 1450.12 C 1230.46 1594.11 1175.15 1722.01 1073.17 1828.16 C 964.32 1939.53 816.106 2003.75 660.404 2006.98 C 493.262 2010.27 337.212 1952.99 216.275 1837.64 C -28.8002 1603.91 -23.8879 1230.94 211.223 991.613 C 372.412 827.536 598.052 777.654 820.745 774.484 z'/%3E%3Cpath fill='%23DF6D27' d='M 1396.31 39.4755 C 1512.61 37.6317 1629.32 66.1793 1727.77 129.345 C 1864.71 218.317 1960.59 358.153 1994.23 517.959 C 2028.26 673.494 1996.72 832.794 1909.46 968.647 C 1732.09 1244.52 1388.18 1291.96 1087.03 1264.59 C 1048.66 1261.11 1009.23 1251.21 973.5 1236.71 C 886.848 1201.56 809.795 1113.6 790.003 1021.45 C 832.844 1021.23 946.663 1019.89 981.612 1037.17 C 998.635 1045.58 1010.96 1060.85 1027.08 1070.83 C 1056.87 1089.28 1097.11 1093.28 1131.48 1096.35 C 1235.42 1105.62 1351.69 1098.17 1453.25 1074.63 C 1620.82 1041.23 1770.82 924.626 1816.58 756.08 C 1854.48 616.481 1821.61 459.393 1726.31 349.829 C 1654.8 266.642 1552.75 215.815 1443.27 208.849 C 1329.89 200.394 1217.92 238.271 1132.96 313.824 C 1017.91 415.124 972.93 564.552 963.56 712.937 C 951.318 713.323 939.91 712.409 927.711 712.049 L 856.285 710.134 C 833.991 709.611 807.256 711.231 786.079 709.852 L 786.001 708.387 C 784.917 684.003 793.699 644.934 797.397 620.219 C 844.945 302.493 1060.97 53.5881 1396.31 39.4755 z'/%3E%3Cpath fill='%23DF6D27' d='M 629.683 1234.44 C 728.899 1227.18 815.058 1302.08 821.686 1401.34 C 828.315 1500.6 752.879 1586.29 653.58 1592.29 C 555.159 1598.24 470.396 1523.62 463.826 1425.24 C 457.257 1326.85 531.345 1241.62 629.683 1234.44 z'/%3E%3Cpath fill='%231F1D1E' d='M 1389.32 459.332 C 1486.96 448.395 1574.96 518.749 1585.79 616.408 C 1596.61 714.067 1526.16 801.986 1428.49 812.698 C 1330.98 823.393 1243.23 753.077 1232.42 655.577 C 1221.62 558.078 1291.83 470.252 1389.32 459.332 z'/%3E%3C/svg%3E">
     
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = { theme: { extend: { colors: {
-            accent: 'rgb(var(--accent-rgb) / <alpha-value>)',
-            onaccent: 'var(--on-accent)',
-            ink: 'var(--ink)',
-            onink: 'var(--on-ink)'
-        } } } };
-    </script>
     <style>
+        /* --- ВСТРОЕННЫЙ TAILWIND CSS (100% OFFLINE READY) --- */
+        *, ::before, ::after { box-sizing: border-box; border-width: 0; border-style: solid; border-color: var(--border-main, #E3E5EB); }
+        html { line-height: 1.5; -webkit-text-size-adjust: 100%; tab-size: 4; }
+        body { margin: 0; line-height: inherit; }
+        hr { height: 0; color: inherit; border-top-width: 1px; }
+        h1, h2, h3, h4, h5, h6 { font-size: inherit; font-weight: inherit; margin: 0; }
+        p { margin: 0; }
+        a { color: inherit; text-decoration: inherit; }
+        b, strong { font-weight: bolder; }
+        code, kbd, samp, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 1em; }
+        button, input, optgroup, select, textarea { font-family: inherit; font-feature-settings: inherit; font-variation-settings: inherit; font-size: 100%; font-weight: inherit; line-height: inherit; color: inherit; margin: 0; padding: 0; background-color: transparent; }
+        button, select { text-transform: none; }
+        button, [type='button'], [type='reset'], [type='submit'] { -webkit-appearance: button; cursor: pointer; }
+        button:disabled { cursor: default; }
+        img, svg, video, canvas, audio, iframe, embed, object { display: block; vertical-align: middle; }
+        img, video { max-width: 100%; height: auto; }
+        ol, ul, menu { list-style: none; margin: 0; padding: 0; }
+        textarea { resize: vertical; }
+        input::placeholder, textarea::placeholder { opacity: 1; color: var(--text-muted, #6B7280); }
+
+        /* Layout & Display */
+        .block { display: block; }
+        .flex { display: flex; }
+        .inline-flex { display: inline-flex; }
+        .grid { display: grid; }
+        .hidden { display: none !important; }
+        .relative { position: relative; }
+        .absolute { position: absolute; }
+        .fixed { position: fixed; }
+        .sticky { position: sticky; }
+        .inset-0 { top: 0; right: 0; bottom: 0; left: 0; }
+        .inset-x-4 { left: 1rem; right: 1rem; }
+        .top-0 { top: 0; }
+        .left-0 { left: 0; }
+        .bottom-4 { bottom: 1rem; }
+        .z-0 { z-index: 0; }
+        .z-10 { z-index: 10; }
+        .z-20 { z-index: 20; }
+        .z-30 { z-index: 30; }
+        .z-40 { z-index: 40; }
+        .z-50 { z-index: 50; }
+        .z-60 { z-index: 60; }
+
+        /* Flexbox & Grid */
+        .flex-1 { flex: 1 1 0%; }
+        .shrink-0 { flex-shrink: 0; }
+        .flex-col { flex-direction: column; }
+        .flex-wrap { flex-wrap: wrap; }
+        .items-center { align-items: center; }
+        .items-end { align-items: flex-end; }
+        .items-stretch { align-items: stretch; }
+        .justify-center { justify-content: center; }
+        .justify-between { justify-content: space-between; }
+        .justify-end { justify-content: flex-end; }
+        .grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+        .grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        .grid-cols-12 { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+        .col-span-5 { grid-column: span 5 / span 5; }
+        .col-span-7 { grid-column: span 7 / span 7; }
+        .gap-1 { gap: 0.25rem; }
+        .gap-1\.5 { gap: 0.375rem; }
+        .gap-2 { gap: 0.5rem; }
+        .gap-2\.5 { gap: 0.625rem; }
+        .gap-3 { gap: 0.75rem; }
+        .gap-4 { gap: 1rem; }
+
+        /* Spacing & Space-Y */
+        .space-y-1 > :not([hidden]) ~ :not([hidden]) { margin-top: 0.25rem; }
+        .space-y-1\.5 > :not([hidden]) ~ :not([hidden]) { margin-top: 0.375rem; }
+        .space-y-2 > :not([hidden]) ~ :not([hidden]) { margin-top: 0.5rem; }
+        .space-y-2\.5 > :not([hidden]) ~ :not([hidden]) { margin-top: 0.625rem; }
+        .space-y-3 > :not([hidden]) ~ :not([hidden]) { margin-top: 0.75rem; }
+        .space-y-4 > :not([hidden]) ~ :not([hidden]) { margin-top: 1rem; }
+
+        /* Sizing */
+        .w-2\.5 { width: 0.625rem; }
+        .w-3\.5 { width: 0.875rem; }
+        .w-4 { width: 1rem; }
+        .w-5 { width: 1.25rem; }
+        .w-6 { width: 1.5rem; }
+        .w-7 { width: 1.75rem; }
+        .w-8 { width: 2rem; }
+        .w-9 { width: 2.25rem; }
+        .w-10 { width: 2.5rem; }
+        .w-11 { width: 2.75rem; }
+        .w-12 { width: 3rem; }
+        .w-80 { width: 20rem; }
+        .w-\[46px\] { width: 46px; }
+        .w-fit { width: fit-content; }
+        .w-full { width: 100%; }
+        .min-w-0 { min-width: 0px; }
+        .max-w-sm { max-width: 24rem; }
+        .max-w-md { max-width: 28rem; }
+        .max-w-5xl { max-width: 64rem; }
+        .max-w-\[86vw\] { max-width: 86vw; }
+        .max-w-\[105px\] { max-width: 105px; }
+        .max-w-\[120px\] { max-width: 120px; }
+
+        .h-2 { height: 0.5rem; }
+        .h-2\.5 { height: 0.625rem; }
+        .h-3\.5 { height: 0.875rem; }
+        .h-4 { height: 1rem; }
+        .h-5 { height: 1.25rem; }
+        .h-6 { height: 1.5rem; }
+        .h-7 { height: 1.75rem; }
+        .h-8 { height: 2rem; }
+        .h-9 { height: 2.25rem; }
+        .h-10 { height: 2.5rem; }
+        .h-1\/2 { height: 50%; }
+        .h-full { height: 100%; }
+        .h-\[100dvh\] { height: 100dvh; }
+        .min-h-screen { min-height: 100vh; }
+        .max-h-\[85vh\] { max-height: 85vh; }
+        .max-h-\[88vh\] { max-height: 88vh; }
+        .max-h-\[90vh\] { max-height: 90vh; }
+
+        /* Padding & Margin */
+        .p-0 { padding: 0px; }
+        .p-1 { padding: 0.25rem; }
+        .p-1\.5 { padding: 0.375rem; }
+        .p-3 { padding: 0.75rem; }
+        .p-3\.5 { padding: 0.875rem; }
+        .p-4 { padding: 1rem; }
+        .p-5 { padding: 1.25rem; }
+        .px-1\.5 { padding-left: 0.375rem; padding-right: 0.375rem; }
+        .px-2 { padding-left: 0.5rem; padding-right: 0.5rem; }
+        .px-2\.5 { padding-left: 0.625rem; padding-right: 0.625rem; }
+        .px-3 { padding-left: 0.75rem; padding-right: 0.75rem; }
+        .px-3\.5 { padding-left: 0.875rem; padding-right: 0.875rem; }
+        .px-4 { padding-left: 1rem; padding-right: 1rem; }
+        .px-5 { padding-left: 1.25rem; padding-right: 1.25rem; }
+        .px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
+        .py-0\.2 { padding-top: 0.05rem; padding-bottom: 0.05rem; }
+        .py-0\.5 { padding-top: 0.125rem; padding-bottom: 0.125rem; }
+        .py-1 { padding-top: 0.25rem; padding-bottom: 0.25rem; }
+        .py-1\.5 { padding-top: 0.375rem; padding-bottom: 0.375rem; }
+        .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+        .py-2\.5 { padding-top: 0.625rem; padding-bottom: 0.625rem; }
+        .py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
+        .py-3\.5 { padding-top: 0.875rem; padding-bottom: 0.875rem; }
+        .py-4 { padding-top: 1rem; padding-bottom: 1rem; }
+        .py-12 { padding-top: 3rem; padding-bottom: 3rem; }
+        .pt-1 { padding-top: 0.25rem; }
+        .pt-2 { padding-top: 0.5rem; }
+        .pt-3 { padding-top: 0.75rem; }
+        .pb-3 { padding-bottom: 0.75rem; }
+        .pl-0\.5 { padding-left: 0.125rem; }
+        .pr-1\.5 { padding-right: 0.375rem; }
+
+        .mx-auto { margin-left: auto; margin-right: auto; }
+        .-mt-1 { margin-top: -0.25rem; }
+        .mt-0\.5 { margin-top: 0.125rem; }
+        .mt-1 { margin-top: 0.25rem; }
+        .mt-1\.5 { margin-top: 0.375rem; }
+        .mt-2 { margin-top: 0.5rem; }
+        .mt-2\.5 { margin-top: 0.625rem; }
+        .mt-3 { margin-top: 0.75rem; }
+        .mt-4 { margin-top: 1rem; }
+        .ml-0\.5 { margin-left: 0.125rem; }
+        .ml-1 { margin-left: 0.25rem; }
+        .ml-2 { margin-left: 0.5rem; }
+        .ml-3 { margin-left: 0.75rem; }
+        .mr-2 { margin-right: 0.5rem; }
+
+        /* Typography */
+        .text-\[9px\] { font-size: 9px; line-height: 1.2; }
+        .text-\[10px\] { font-size: 10px; line-height: 1.25; }
+        .text-\[11px\] { font-size: 11px; line-height: 1.3; }
+        .text-\[13px\] { font-size: 13px; line-height: 1.35; }
+        .text-xs { font-size: 0.75rem; line-height: 1rem; }
+        .text-sm { font-size: 0.875rem; line-height: 1.25rem; }
+        .text-base { font-size: 1rem; line-height: 1.5rem; }
+        .text-lg { font-size: 1.125rem; line-height: 1.75rem; }
+        .font-medium { font-weight: 500; }
+        .font-bold { font-weight: 700; }
+        .font-extrabold { font-weight: 800; }
+        .font-black { font-weight: 900; }
+        .uppercase { text-transform: uppercase; }
+        .tracking-tight { letter-spacing: -0.025em; }
+        .leading-none { line-height: 1; }
+        .leading-tight { line-height: 1.25; }
+        .leading-snug { line-height: 1.375; }
+        .leading-relaxed { line-height: 1.625; }
+        .text-left { text-align: left; }
+        .text-center { text-align: center; }
+        .truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .line-clamp-1 { overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 1; }
+        .line-clamp-2 { overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+        .list-disc { list-style-type: disc; }
+        .list-inside { list-style-position: inside; }
+
+        /* Colors & Backgrounds */
+        .bg-transparent { background-color: transparent; }
+        .bg-accent { background-color: rgb(var(--accent-rgb)); }
+        .bg-accent\/15 { background-color: rgb(var(--accent-rgb) / 0.15); }
+        .bg-ink { background-color: var(--ink); }
+        .bg-amber-500 { background-color: #f59e0b; }
+        .bg-amber-500\/15 { background-color: rgba(245, 158, 11, 0.15); }
+        .bg-amber-500\/20 { background-color: rgba(245, 158, 11, 0.2); }
+        .bg-amber-600 { background-color: #d97706; }
+        .bg-rose-500 { background-color: #f43f5e; }
+        .bg-rose-500\/15 { background-color: rgba(244, 63, 94, 0.15); }
+        .bg-stone-400\/50 { background-color: rgba(168, 162, 158, 0.5); }
+        .bg-black\/10 { background-color: rgba(0, 0, 0, 0.1); }
+        .bg-black\/25 { background-color: rgba(0, 0, 0, 0.25); }
+        .bg-black\/60 { background-color: rgba(0, 0, 0, 0.6); }
+        .bg-white\/95 { background-color: rgba(255, 255, 255, 0.95); }
+        .bg-\[#0057B7\] { background-color: #0057B7; }
+        .bg-\[#FFD700\] { background-color: #FFD700; }
+        .bg-\[#0F1115\] { background-color: #0F1115; }
+
+        .text-white { color: #ffffff; }
+        .text-\[#FFFFFF\] { color: #FFFFFF; }
+        .text-\[#9CA3AF\] { color: #9CA3AF; }
+        .text-accent { color: rgb(var(--accent-rgb)); }
+        .text-onaccent { color: var(--on-accent); }
+        .text-ink { color: var(--ink); }
+        .text-onink { color: var(--on-ink); }
+        .text-amber-500 { color: #f59e0b; }
+        .text-amber-600 { color: #d97706; }
+        .text-rose-500 { color: #f43f5e; }
+
+        /* Borders & Rings */
+        .border { border-width: 1px; }
+        .border-t { border-top-width: 1px; }
+        .border-b { border-bottom-width: 1px; }
+        .border-l { border-left-width: 1px; }
+        .border-r { border-right-width: 1px; }
+        .border-transparent { border-color: transparent; }
+        .border-accent { border-color: rgb(var(--accent-rgb)) !important; }
+        .border-accent\/30 { border-color: rgb(var(--accent-rgb) / 0.3) !important; }
+        .border-accent\/40 { border-color: rgb(var(--accent-rgb) / 0.4) !important; }
+        .border-amber-500\/40 { border-color: rgba(245, 158, 11, 0.4) !important; }
+        .border-black\/10 { border-color: rgba(0, 0, 0, 0.1) !important; }
+        .ring-2 { box-shadow: 0 0 0 2px rgb(var(--accent-rgb)); }
+
+        /* Border Radius */
+        .rounded-xs { border-radius: 0.125rem; }
+        .rounded { border-radius: 0.25rem; }
+        .rounded-md { border-radius: 0.375rem; }
+        .rounded-lg { border-radius: 0.5rem; }
+        .rounded-xl { border-radius: 0.75rem; }
+        .rounded-t-2xl { border-top-left-radius: 1rem; border-top-right-radius: 1rem; }
+        .rounded-full { border-radius: 9999px; }
+
+        /* Effects & Filters */
+        .shadow-2xs { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.04); }
+        .shadow-xs { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.06); }
+        .shadow-sm { box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1); }
+        .shadow-xl { box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1); }
+        .shadow-2xl { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.28); }
+        .drop-shadow-xs { filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.05)); }
+        .backdrop-blur-xs { backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); }
+        .backdrop-blur-md { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+
+        .opacity-0 { opacity: 0; }
+        .opacity-45 { opacity: 0.45; }
+        .opacity-50 { opacity: 0.5; }
+        .opacity-55 { opacity: 0.55; }
+        .opacity-65 { opacity: 0.65; }
+        .opacity-70 { opacity: 0.7; }
+        .opacity-75 { opacity: 0.75; }
+        .opacity-80 { opacity: 0.8; }
+        .opacity-85 { opacity: 0.85; }
+
+        /* Overflow, Scroll & Touch */
+        .overflow-hidden { overflow: hidden; }
+        .overflow-x-auto { overflow-x: auto; }
+        .overflow-y-auto { overflow-y: auto; }
+        .overscroll-contain { overscroll-behavior: contain; }
+        .object-contain { object-fit: contain; }
+        .outline-none { outline: 2px solid transparent; outline-offset: 2px; }
+        .resize-none { resize: none; }
+        .select-none { user-select: none; -webkit-user-select: none; }
+        .touch-none { touch-action: none; }
+        .touch-pan-x { touch-action: pan-x; }
+        .touch-pan-y { touch-action: pan-y; }
+        .cursor-pointer { cursor: pointer; }
+        .cursor-not-allowed { cursor: not-allowed; }
+        .cursor-grab { cursor: grab; }
+        .active\:cursor-grabbing:active { cursor: grabbing; }
+
+        /* Transforms & Transitions */
+        .-translate-x-full { transform: translateX(-100%); }
+        .transition { transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 150ms; }
+        .transition-all { transition-property: all; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 150ms; }
+        .transition-transform { transition-property: transform; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 150ms; }
+        .duration-300 { transition-duration: 300ms; }
+        .ease-out { transition-timing-function: cubic-bezier(0, 0, 0.2, 1); }
+
+        /* Hover & Focus states */
+        .hover\:border-accent:hover { border-color: rgb(var(--accent-rgb)) !important; }
+        .hover\:text-accent:hover { color: rgb(var(--accent-rgb)) !important; }
+        .hover\:bg-rose-600:hover { background-color: #e11d48; }
+        .hover\:opacity-80:hover { opacity: 0.8; }
+        .hover\:opacity-85:hover { opacity: 0.85; }
+        .hover\:opacity-90:hover { opacity: 0.9; }
+        .hover\:opacity-100:hover { opacity: 1; }
+        .hover\:underline:hover { text-decoration-line: underline; }
+        .focus\:border-accent:focus { border-color: rgb(var(--accent-rgb)) !important; }
+
+        /* Responsive Breakpoints (sm: 640px, md: 768px) */
+        @media (min-width: 640px) {
+            .sm\:hidden { display: none !important; }
+            .sm\:items-center { align-items: center; }
+            .sm\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .sm\:p-4 { padding: 1rem; }
+            .sm\:p-5 { padding: 1.25rem; }
+            .sm\:px-5 { padding-left: 1.25rem; padding-right: 1.25rem; }
+            .sm\:rounded-xl { border-radius: 0.75rem; }
+            .sm\:border { border-width: 1px; }
+            .sm\:text-sm { font-size: 0.875rem; line-height: 1.25rem; }
+            .sm\:text-base { font-size: 1rem; line-height: 1.5rem; }
+            .sm\:text-lg { font-size: 1.125rem; line-height: 1.75rem; }
+            .sm\:max-w-\[140px\] { max-width: 140px; }
+            .sm\:max-w-\[180px\] { max-width: 180px; }
+        }
+        @media (min-width: 768px) {
+            .md\:grid-cols-12 { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+            .md\:col-span-5 { grid-column: span 5 / span 5; }
+            .md\:col-span-7 { grid-column: span 7 / span 7; }
+            .md\:border-l { border-left-width: 1px; }
+            .md\:pl-4 { padding-left: 1rem; }
+        }
+
         :root {
             --bg-body: #F3F4F7;
             --text-main: #0F1115;
@@ -235,6 +552,7 @@
     </aside>
 
     <div class="flex-1 flex flex-col min-w-0 w-full">
+        <!-- ВЕРХНЯЯ ШАПКА -->
         <header onclick="window.scrollTo({ top: 0, behavior: 'smooth' })" class="sticky top-0 z-30 theme-header backdrop-blur-md border-b px-4 safe-top-header cursor-pointer select-none" title="Натисніть, щоб прокрутити наверх">
             <div class="max-w-5xl mx-auto flex items-center justify-between gap-2.5">
                 <div class="flex items-center gap-2.5 min-w-0">
@@ -521,11 +839,18 @@
                 priorityBtn: 'Пріоритет у папці', priorityActiveBtn: 'У топі папки ★',
                 offlineFolderName: '⏳ Очікують мережі', offlineBadge: '⏳ Очікує ІІ',
                 offlineSyncedToast: 'Мережа з’явилась! ІІ розібрав посилань: ', offlineStillNoNet: 'Немає з’єднання. Посилання чекають на інтернет ⏳',
-                sortNewest: '↓ Нові', sortOldest: '↑ Старі', sortAZ: 'А–Я', tagSortPopular: 'Популярні'
+                sortNewest: '↓ Нові', sortOldest: '↑ Старі', sortAZ: 'А–Я', tagSortPopular: 'Популярні',
+                fontScaleLabel: 'Розмір тексту'
             }
         };
 
         function t(key) { return DICT.uk[key] || key; }
+        function esc(str) {
+            return String(str ?? '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+        }
+        function escJsAttr(str) {
+            return esc(String(str ?? '').replace(/\\/g, '\\\\').replace(/'/g, "\\'"));
+        }
 
         const LINE_ICONS = {
             music: `<svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>`,
@@ -560,6 +885,88 @@
         ];
         let ITEMS = structuredClone(DEFAULT_ITEMS);
         const STORAGE_KEY = 'linkbox_android_v3';
+
+        // --- INDEXED_DB СХОВИЩЕ (НАДІЙНЕ ЗБЕРЕЖЕННЯ) ---
+        const DB_NAME = 'LinkBoxDB';
+        const DB_VERSION = 1;
+        const STORE_NAME = 'StateStore';
+
+        function getDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME, DB_VERSION);
+                request.onupgradeneeded = (event) => {
+                    const db = event.target.result;
+                    if (!db.objectStoreNames.contains(STORE_NAME)) {
+                        db.createObjectStore(STORE_NAME);
+                    }
+                };
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        async function saveStateToStorage() {
+            try {
+                const state = { items: ITEMS, lockedFolders: Array.from(LOCKED_FOLDERS), themeMode, viewMode, sortMode, fontScale };
+                const db = await getDB();
+                const tx = db.transaction(STORE_NAME, 'readwrite');
+                tx.objectStore(STORE_NAME).put(state, 'app_state');
+            } catch (e) {
+                console.error('IDB Save Error:', e);
+            }
+        }
+
+        async function loadStateFromStorage() {
+            try {
+                const db = await getDB();
+                return new Promise((resolve) => {
+                    const tx = db.transaction(STORE_NAME, 'readonly');
+                    const request = tx.objectStore(STORE_NAME).get('app_state');
+                    
+                    request.onsuccess = () => {
+                        const parsed = request.result;
+                        if (!parsed) {
+                            // Міграція зі старого localStorage, якщо файл оновлено
+                            const rawOld = localStorage.getItem(STORAGE_KEY) || localStorage.getItem('linkbox_android_v2');
+                            if (rawOld) {
+                                try {
+                                    const oldParsed = JSON.parse(rawOld);
+                                    _applyState(oldParsed);
+                                    saveStateToStorage(); // Зберігаємо в нову базу
+                                    return resolve(true);
+                                } catch(e) {}
+                            }
+                            ITEMS = structuredClone(DEFAULT_ITEMS);
+                            resolve(false);
+                            return;
+                        }
+                        _applyState(parsed);
+                        resolve(true);
+                    };
+                    request.onerror = () => {
+                        ITEMS = structuredClone(DEFAULT_ITEMS);
+                        resolve(false);
+                    };
+                });
+            } catch (e) {
+                ITEMS = structuredClone(DEFAULT_ITEMS);
+                return false;
+            }
+        }
+
+        function _applyState(parsed) {
+            if (Array.isArray(parsed.items)) {
+                ITEMS = parsed.items.map(it => {
+                    const normCats = getItemCats(it);
+                    return { ...it, url: cleanRawUrl(it.url), cat: normCats[0], cats: normCats, pinned: Boolean(it.pinned), folderPriority: Boolean(it.folderPriority), pendingOffline: Boolean(it.pendingOffline), lockedOverride: typeof it.lockedOverride === 'boolean' ? it.lockedOverride : null };
+                });
+            } else { ITEMS = structuredClone(DEFAULT_ITEMS); }
+            if (Array.isArray(parsed.lockedFolders)) LOCKED_FOLDERS = new Set(parsed.lockedFolders);
+            if (parsed.themeMode) themeMode = parsed.themeMode;
+            if (parsed.viewMode) viewMode = parsed.viewMode;
+            if (parsed.sortMode) sortMode = parsed.sortMode;
+            if (parsed.fontScale) fontScale = parsed.fontScale;
+        }
 
         // --- НАВІГАЦІЯ ТА ЗАКРИТТЯ МОДАЛЬНИХ ВІКОН ---
         function isAnyModalOpen() {
@@ -711,7 +1118,13 @@
         }
 
         function cleanRawUrl(raw) {
-            let u = (raw || '').trim().replace(/^[,\s"'<>()[\]{};:]+|[,\s"'<>()[\]{}.;:]+$/g, '');
+            let u = (raw || '').trim().replace(/^[,\s"'<>()[\]{};:]+|[,\s"'<>\[\]{}.;:]+$/g, '');
+            while (u.endsWith(')')) {
+                const openCount = (u.match(/\(/g) || []).length;
+                const closeCount = (u.match(/\)/g) || []).length;
+                if (closeCount > openCount) u = u.slice(0, -1).replace(/[,\s"'<>\[\]{}.;:]+$/g, '');
+                else break;
+            }
             if (!u) return ''; if (!/^https?:\/\//i.test(u)) u = 'https://' + u; return u;
         }
 
@@ -734,7 +1147,7 @@
         }
 
         function getSiteFaviconHtml(item, sizeClass = 'w-5 h-5', imgSizeClass = 'w-4 h-4') {
-            const cleanDom = (item.domain || 'example.com').replace(/^www\./i, '');
+            const cleanDom = (item.domain || 'example.com').replace(/^www\./i, '').replace(/[^a-zA-Z0-9.-]/g, '');
             const first = `https://www.google.com/s2/favicons?domain=${encodeURIComponent(cleanDom)}&sz=64`;
             const rest = [`https://${cleanDom}/favicon.ico`, `https://icons.duckduckgo.com/ip3/${cleanDom}.ico`].join('|');
             
@@ -751,30 +1164,6 @@
                     <span class="fallback-icon hidden absolute inset-0 items-center justify-center z-0 p-1 text-[#9CA3AF]">${fallbackSvg}</span>
                 </span>
             `;
-        }
-
-        function saveStateToStorage() {
-            try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ items: ITEMS, lockedFolders: Array.from(LOCKED_FOLDERS), themeMode, viewMode, sortMode, fontScale })); } catch (e) {}
-        }
-
-        function loadStateFromStorage() {
-            try {
-                const raw = localStorage.getItem(STORAGE_KEY) || localStorage.getItem('linkbox_android_v2');
-                if (!raw) { ITEMS = structuredClone(DEFAULT_ITEMS); return false; }
-                const parsed = JSON.parse(raw);
-                if (Array.isArray(parsed.items)) {
-                    ITEMS = parsed.items.map(it => {
-                        const normCats = getItemCats(it);
-                        return { ...it, url: cleanRawUrl(it.url), cat: normCats[0], cats: normCats, pinned: Boolean(it.pinned), folderPriority: Boolean(it.folderPriority), pendingOffline: Boolean(it.pendingOffline), lockedOverride: typeof it.lockedOverride === 'boolean' ? it.lockedOverride : null };
-                    });
-                } else { ITEMS = structuredClone(DEFAULT_ITEMS); }
-                if (Array.isArray(parsed.lockedFolders)) LOCKED_FOLDERS = new Set(parsed.lockedFolders);
-                if (parsed.themeMode) themeMode = parsed.themeMode;
-                if (parsed.viewMode) viewMode = parsed.viewMode;
-                if (parsed.sortMode) sortMode = parsed.sortMode;
-                if (parsed.fontScale) fontScale = parsed.fontScale;
-                return true;
-            } catch (e) { ITEMS = structuredClone(DEFAULT_ITEMS); return false; }
         }
 
         function openExternalUrlInNewTab(rawUrl) {
@@ -912,6 +1301,7 @@
             document.getElementById('btn-cancel-select').title = t('cancelSelect'); document.getElementById('sort-newest-btn').textContent = t('sortNewest');
             document.getElementById('sort-oldest-btn').textContent = t('sortOldest'); document.getElementById('sort-az-btn').textContent = t('sortAZ');
             document.getElementById('tag-sort-popular').textContent = t('tagSortPopular'); document.getElementById('cat-sort-popular').textContent = t('tagSortPopular');
+            const fontLbl = document.getElementById('lbl-font-scale'); if (fontLbl) fontLbl.textContent = t('fontScaleLabel');
         }
 
         function setFontScale(scale) {
@@ -948,7 +1338,7 @@
             const toast = document.getElementById('action-toast'); document.getElementById('toast-message').textContent = msg;
             toast.classList.remove('hidden'); toast.classList.add('flex'); toast.style.transform = 'translateX(0)'; toast.style.opacity = '1';
             if (toastTimeout) clearTimeout(toastTimeout);
-            toastTimeout = setTimeout(() => { hideToast(); }, 10000);
+            toastTimeout = setTimeout(() => { hideToast(); }, 3000);
         }
         function hideToast() {
             const toast = document.getElementById('action-toast'); toast.style.opacity = '0';
@@ -1001,8 +1391,8 @@
             const isAll = selectedFolder === 'ALL' && !selectedTag;
             let html = `<button onclick="selectCategoryFromSheet('ALL')" class="key-press rounded-lg px-3.5 py-2.5 flex items-center justify-between transition ${isAll ? 'bg-accent text-onaccent' : 'theme-input'}"><span class="text-xs sm:text-sm font-bold">${t('allFolders')}</span><span class="text-xs font-mono-code font-bold opacity-80">${ITEMS.length}</span></button>`;
             html += cats.map(c => {
-                const active = selectedFolder === c.cat; const folderLocked = LOCKED_FOLDERS.has(c.cat); const safeCat = c.cat.replace(/'/g, "\\'");
-                return `<div class="rounded-lg flex items-stretch overflow-hidden ${active ? 'text-white' : 'theme-input'}" style="${active ? `background:${c.color};` : ''}"><button onclick="selectCategoryFromSheet('${safeCat}')" class="key-press flex-1 px-3.5 py-2.5 text-left flex items-center justify-between min-w-0"><div class="flex items-center gap-2.5 min-w-0"><span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:${active ? '#fff' : c.color}"></span><span class="text-xs sm:text-sm font-bold truncate">${c.cat}</span></div><span class="text-xs font-mono-code font-bold opacity-75 ml-2">${c.count}</span></button><button onclick="toggleFolderLock('${safeCat}', event)" class="key-press px-3 border-l flex items-center justify-center transition ${folderLocked ? (active ? 'bg-black/25 text-white' : 'bg-accent/15 text-accent') : 'opacity-45 hover:opacity-100'}" style="border-color: var(--border-main)">${folderLocked ? LINE_ICONS.lock : LINE_ICONS.unlock}</button></div>`;
+                const active = selectedFolder === c.cat; const folderLocked = LOCKED_FOLDERS.has(c.cat); const safeCat = escJsAttr(c.cat); const safeColor = esc(c.color);
+                return `<div class="rounded-lg flex items-stretch overflow-hidden ${active ? 'text-white' : 'theme-input'}" style="${active ? `background:${safeColor};` : ''}"><button onclick="selectCategoryFromSheet('${safeCat}')" class="key-press flex-1 px-3.5 py-2.5 text-left flex items-center justify-between min-w-0"><div class="flex items-center gap-2.5 min-w-0"><span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:${active ? '#fff' : safeColor}"></span><span class="text-xs sm:text-sm font-bold truncate">${esc(c.cat)}</span></div><span class="text-xs font-mono-code font-bold opacity-75 ml-2">${c.count}</span></button><button onclick="toggleFolderLock('${safeCat}', event)" class="key-press px-3 border-l flex items-center justify-center transition ${folderLocked ? (active ? 'bg-black/25 text-white' : 'bg-accent/15 text-accent') : 'opacity-45 hover:opacity-100'}" style="border-color: var(--border-main)">${folderLocked ? LINE_ICONS.lock : LINE_ICONS.unlock}</button></div>`;
             }).join('');
             container.innerHTML = html;
         }
@@ -1081,8 +1471,8 @@
             const previewEl = document.getElementById('sidebar-tags-preview'); if (!previewEl) return;
             const topTags = getTagMapSorted('popular').slice(0, 10);
             previewEl.innerHTML = topTags.map(tObj => {
-                const isAct = selectedTag && selectedTag.toLowerCase() === tObj.label.toLowerCase(); const safeTag = tObj.label.replace(/'/g, "\\'");
-                return `<button onclick="selectTagAndClose('${safeTag}')" class="key-press px-2 py-1 rounded-md text-[11px] font-mono-code font-bold flex items-center gap-1 transition ${isAct ? 'bg-accent text-onaccent' : 'theme-input opacity-85 hover:opacity-100'}"><span>${tObj.label}</span><span class="text-[9px] opacity-70">${tObj.count}</span></button>`;
+                const isAct = selectedTag && selectedTag.toLowerCase() === tObj.label.toLowerCase(); const safeTag = escJsAttr(tObj.label);
+                return `<button onclick="selectTagAndClose('${safeTag}')" class="key-press px-2 py-1 rounded-md text-[11px] font-mono-code font-bold flex items-center gap-1 transition ${isAct ? 'bg-accent text-onaccent' : 'theme-input opacity-85 hover:opacity-100'}"><span>${esc(tObj.label)}</span><span class="text-[9px] opacity-70">${tObj.count}</span></button>`;
             }).join('');
         }
 
@@ -1093,7 +1483,7 @@
             let html = `<button onclick="selectTagAndClose(null)" class="key-press px-3.5 py-2 rounded-lg text-xs font-mono-code font-bold flex items-center gap-2 transition ${selectedTag === null ? 'bg-accent text-onaccent' : 'theme-input'}"><span>${t('allFolders')}</span><span class="opacity-75">${ITEMS.length}</span></button>`;
             html += sorted.map(tObj => {
                 const isAct = selectedTag && selectedTag.toLowerCase() === tObj.label.toLowerCase();
-                return `<button onclick="selectTagAndClose('${tObj.label.replace(/'/g, "\\'")}')" class="key-press px-3.5 py-2 rounded-lg text-xs font-mono-code font-bold flex items-center gap-1.5 transition ${isAct ? 'bg-accent text-onaccent' : 'theme-input'}"><span>${tObj.label}</span><span class="text-[10px] opacity-70 px-1.5 py-0.2 rounded bg-black/10">${tObj.count}</span></button>`;
+                return `<button onclick="selectTagAndClose('${escJsAttr(tObj.label)}')" class="key-press px-3.5 py-2 rounded-lg text-xs font-mono-code font-bold flex items-center gap-1.5 transition ${isAct ? 'bg-accent text-onaccent' : 'theme-input'}"><span>${esc(tObj.label)}</span><span class="text-[10px] opacity-70 px-1.5 py-0.2 rounded bg-black/10">${tObj.count}</span></button>`;
             }).join('');
             container.innerHTML = html;
         }
@@ -1120,8 +1510,8 @@
 
             const limitedCats = cats.slice(0, 7);
             html += limitedCats.map(c => {
-                const active = selectedFolder === c.cat; const folderLocked = LOCKED_FOLDERS.has(c.cat); const safeCat = c.cat.replace(/'/g, "\\'");
-                return `<div class="rounded-lg flex items-stretch overflow-hidden ${active ? 'text-white' : 'theme-input'}" style="${active ? `background:${c.color};` : ''}"><button onclick="selectFolderAndClose('${safeCat}')" class="key-press flex-1 px-3 py-2 text-left flex items-center justify-between min-w-0"><div class="flex items-center gap-2 min-w-0"><span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:${active ? '#fff' : c.color}"></span><span class="text-xs sm:text-sm font-bold truncate">${c.cat}</span></div><span class="text-xs font-mono-code font-bold opacity-75 ml-1">${c.count}</span></button><button onclick="toggleFolderLock('${safeCat}', event)" class="key-press px-2.5 border-l flex items-center justify-center transition ${folderLocked ? (active ? 'bg-black/25 text-white' : 'bg-accent/15 text-accent') : 'opacity-45 hover:opacity-100'}" style="border-color: var(--border-main)">${folderLocked ? LINE_ICONS.lock : LINE_ICONS.unlock}</button></div>`;
+                const active = selectedFolder === c.cat; const folderLocked = LOCKED_FOLDERS.has(c.cat); const safeCat = escJsAttr(c.cat); const safeColor = esc(c.color);
+                return `<div class="rounded-lg flex items-stretch overflow-hidden ${active ? 'text-white' : 'theme-input'}" style="${active ? `background:${safeColor};` : ''}"><button onclick="selectFolderAndClose('${safeCat}')" class="key-press flex-1 px-3 py-2 text-left flex items-center justify-between min-w-0"><div class="flex items-center gap-2 min-w-0"><span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:${active ? '#fff' : safeColor}"></span><span class="text-xs sm:text-sm font-bold truncate">${esc(c.cat)}</span></div><span class="text-xs font-mono-code font-bold opacity-75 ml-1">${c.count}</span></button><button onclick="toggleFolderLock('${safeCat}', event)" class="key-press px-2.5 border-l flex items-center justify-center transition ${folderLocked ? (active ? 'bg-black/25 text-white' : 'bg-accent/15 text-accent') : 'opacity-45 hover:opacity-100'}" style="border-color: var(--border-main)">${folderLocked ? LINE_ICONS.lock : LINE_ICONS.unlock}</button></div>`;
             }).join('');
             grid.innerHTML = html;
         }
@@ -1130,7 +1520,24 @@
 
         function copyItemUrl(url, e) {
             if (e) e.stopPropagation();
-            const clean = cleanRawUrl(url); const temp = document.createElement('textarea'); temp.value = clean; document.body.appendChild(temp); temp.select(); document.execCommand('copy'); document.body.removeChild(temp); showToast(t('copied') + clean);
+            const clean = cleanRawUrl(url);
+            if (!clean) return;
+            const fallbackCopy = () => {
+                const temp = document.createElement('textarea');
+                temp.value = clean;
+                temp.style.position = 'fixed';
+                temp.style.opacity = '0';
+                document.body.appendChild(temp);
+                temp.select();
+                try { document.execCommand('copy'); } catch (err) {}
+                document.body.removeChild(temp);
+                showToast(t('copied') + clean);
+            };
+            if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+                navigator.clipboard.writeText(clean).then(() => showToast(t('copied') + clean)).catch(fallbackCopy);
+            } else {
+                fallbackCopy();
+            }
         }
 
         function openItemById(id, e) {
@@ -1157,8 +1564,8 @@
             const nowUnix = Math.floor(Date.now() / 1000);
             let html = `<!DOCTYPE NETSCAPE-Bookmark-file-1><META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8"><TITLE>LinkBox Bookmarks</TITLE><H1>LinkBox</H1><DL><p>\n`;
             Object.keys(foldersMap).forEach(cat => {
-                html += `    <DT><H3 ADD_DATE="${nowUnix}">${cat}</H3>\n    <DL><p>\n`;
-                foldersMap[cat].forEach(item => { html += `        <DT><A HREF="${cleanRawUrl(item.url)}" ADD_DATE="${nowUnix}">${item.name} — ${item.title}</A>\n<DD>${item.note}\n`; });
+                html += `    <DT><H3 ADD_DATE="${nowUnix}">${esc(cat)}</H3>\n    <DL><p>\n`;
+                foldersMap[cat].forEach(item => { html += `        <DT><A HREF="${esc(cleanRawUrl(item.url))}" ADD_DATE="${nowUnix}">${esc(item.name)} — ${esc(item.title)}</A>\n<DD>${esc(item.note)}\n`; });
                 html += `    </DL><p>\n`;
             });
             html += `</DL><p>\n`;
@@ -1179,7 +1586,7 @@
             bar.classList.remove('hidden'); bar.classList.add('flex');
             bar.innerHTML = pinnedItems.map(p => {
                 const locked = isItemLocked(p); const faviconBadge = getSiteFaviconHtml(p, 'w-6 h-6');
-                return `<div class="theme-card border rounded-lg p-1 flex items-center gap-1.5 shrink-0 shadow-2xs hover:border-accent transition"><button onclick="openItemById(${p.id}, event)" title="${p.title} (${p.domain})" class="key-press flex items-center gap-1.5 pl-0.5 pr-1.5 py-0.5 rounded-md min-w-0">${faviconBadge}<span class="text-xs font-extrabold truncate max-w-[105px] sm:max-w-[140px]">${p.name}</span>${locked ? `<span class="opacity-65">${LINE_ICONS.lock}</span>` : ''}</button><button onclick="openEditSheet(${p.id})" title="Налаштування" class="key-press w-6 h-6 rounded-md theme-input flex items-center justify-center text-[10px] opacity-70 hover:opacity-100 shrink-0">•••</button></div>`;
+                return `<div class="theme-card border rounded-lg p-1 flex items-center gap-1.5 shrink-0 shadow-2xs hover:border-accent transition"><button onclick="openItemById(${p.id}, event)" title="${esc(p.title)} (${esc(p.domain)})" class="key-press flex items-center gap-1.5 pl-0.5 pr-1.5 py-0.5 rounded-md min-w-0">${faviconBadge}<span class="text-xs font-extrabold truncate max-w-[105px] sm:max-w-[140px]">${esc(p.name)}</span>${locked ? `<span class="opacity-65">${LINE_ICONS.lock}</span>` : ''}</button><button onclick="openEditSheet(${p.id})" title="Налаштування" class="key-press w-6 h-6 rounded-md theme-input flex items-center justify-center text-[10px] opacity-70 hover:opacity-100 shrink-0">•••</button></div>`;
             }).join('');
         }
 
@@ -1205,8 +1612,8 @@
             function renderCatBadges(item) {
                 const allCats = getItemCats(item);
                 const badges = allCats.map((cName, idx) => {
-                    const safeCat = cName.replace(/'/g, "\\'");
-                    return `<button type="button" onclick="filterByCategoryFromCard('${safeCat}', event)" title="Перейти у категорію «${cName}»" class="key-press text-[11px] font-bold px-2 py-0.5 rounded-md hover:opacity-85 transition cursor-pointer ${idx === 0 ? 'text-white' : 'theme-input opacity-85'}" style="${idx === 0 ? `background:${item.color}` : ''}">${cName}</button>`;
+                    const safeCat = escJsAttr(cName);
+                    return `<button type="button" onclick="filterByCategoryFromCard('${safeCat}', event)" title="Перейти у категорію «${esc(cName)}»" class="key-press text-[11px] font-bold px-2 py-0.5 rounded-md hover:opacity-85 transition cursor-pointer ${idx === 0 ? 'text-white' : 'theme-input opacity-85'}" style="${idx === 0 ? `background:${esc(item.color)}` : ''}">${esc(cName)}</button>`;
                 }).join('');
                 const offBadge = item.pendingOffline ? `<span class="text-[10px] font-mono-code font-bold px-1.5 py-0.5 rounded-md bg-amber-500/20 text-amber-600 border border-amber-500/40">${t('offlineBadge')}</span>` : '';
                 return `${offBadge}${badges}`;
@@ -1219,26 +1626,45 @@
                 cardsEl.innerHTML = filtered.map(s => {
                     const locked = isItemLocked(s); const isDup = highlightedDuplicateId === s.id; const isSelected = selectedIds.has(s.id);
                     const clickAction = isSelectMode ? `toggleCardSelect(${s.id}, event)` : `openEditSheet(${s.id})`;
-                    return `<div id="card-${s.id}" onclick="${clickAction}" class="rounded-xl p-4 theme-card border flex flex-col justify-between cursor-pointer hover:border-accent transition ${isDup || isSelected ? 'ring-2 ring-accent border-accent' : ''}"><div><div class="flex items-center justify-between gap-2"><div class="flex items-center gap-2.5 min-w-0">${isSelectMode ? `<span class="w-6 h-6 rounded-md border flex items-center justify-center shrink-0 ${isSelected ? 'bg-accent border-accent text-white' : 'theme-input'}">${isSelected ? '✓' : ''}</span>` : ''}${getSiteFaviconHtml(s, 'w-8 h-8', 'w-5 h-5')}<div class="min-w-0"><div class="font-black text-base leading-tight truncate">${s.name}</div><div class="text-xs font-mono-code theme-muted truncate">${s.domain}</div></div></div><div class="flex items-center flex-wrap justify-end gap-1 shrink-0"><button onclick="toggleItemPinQuick(${s.id}, event)" title="${t('pinBtn')}" class="key-press w-6 h-6 rounded-md flex items-center justify-center transition ${s.pinned ? 'text-accent bg-accent/15' : 'theme-input opacity-55 hover:opacity-100'}">${s.pinned ? LINE_ICONS.pinFilled : LINE_ICONS.pin}</button>${renderPrioStar(s, 'w-6 h-6')}${locked ? `<span class="w-6 h-6 rounded-md theme-input flex items-center justify-center opacity-75" title="Прямий перехід заблоковано">${LINE_ICONS.lock}</span>` : ''}</div></div><div class="flex items-center flex-wrap gap-1 mt-2.5">${renderCatBadges(s)}</div><div class="text-sm sm:text-base font-bold mt-3 line-clamp-1">${s.title}</div><p class="mt-1.5 text-sm theme-muted leading-snug line-clamp-2">${s.note}</p></div><div class="flex items-stretch gap-2 mt-4 pt-3 border-t" style="border-color: var(--border-main)"><button onclick="openItemById(${s.id}, event)" ${locked ? 'disabled' : ''} class="flex-1 py-2.5 px-3 rounded-lg font-extrabold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition ${locked ? 'theme-input opacity-45 cursor-not-allowed' : 'key-press bg-accent text-onaccent'}"><span>${t('openMain')}</span>${locked ? LINE_ICONS.lock : LINE_ICONS.extArrow}</button><button onclick="copyItemUrl('${s.url.replace(/'/g, "\\'")}', event)" title="Копіювати URL" class="key-press w-11 rounded-lg theme-input flex items-center justify-center shrink-0"><svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="1"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div></div>`;
+                    return `<div id="card-${s.id}" onclick="${clickAction}" class="rounded-xl p-4 theme-card border flex flex-col justify-between cursor-pointer hover:border-accent transition ${isDup || isSelected ? 'ring-2 ring-accent border-accent' : ''}"><div><div class="flex items-center justify-between gap-2"><div class="flex items-center gap-2.5 min-w-0">${isSelectMode ? `<span class="w-6 h-6 rounded-md border flex items-center justify-center shrink-0 ${isSelected ? 'bg-accent border-accent text-white' : 'theme-input'}">${isSelected ? '✓' : ''}</span>` : ''}${getSiteFaviconHtml(s, 'w-8 h-8', 'w-5 h-5')}<div class="min-w-0"><div class="font-black text-base leading-tight truncate">${esc(s.name)}</div><div class="text-xs font-mono-code theme-muted truncate">${esc(s.domain)}</div></div></div><div class="flex items-center flex-wrap justify-end gap-1 shrink-0"><button onclick="toggleItemPinQuick(${s.id}, event)" title="${t('pinBtn')}" class="key-press w-6 h-6 rounded-md flex items-center justify-center transition ${s.pinned ? 'text-accent bg-accent/15' : 'theme-input opacity-55 hover:opacity-100'}">${s.pinned ? LINE_ICONS.pinFilled : LINE_ICONS.pin}</button>${renderPrioStar(s, 'w-6 h-6')}${locked ? `<span class="w-6 h-6 rounded-md theme-input flex items-center justify-center opacity-75" title="Прямий перехід заблоковано">${LINE_ICONS.lock}</span>` : ''}</div></div><div class="flex items-center flex-wrap gap-1 mt-2.5">${renderCatBadges(s)}</div><div class="text-sm sm:text-base font-bold mt-3 line-clamp-1">${esc(s.title)}</div><p class="mt-1.5 text-sm theme-muted leading-snug line-clamp-2">${esc(s.note)}</p></div><div class="flex items-stretch gap-2 mt-4 pt-3 border-t" style="border-color: var(--border-main)"><button onclick="openItemById(${s.id}, event)" ${locked ? 'disabled' : ''} class="flex-1 py-2.5 px-3 rounded-lg font-extrabold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition ${locked ? 'theme-input opacity-45 cursor-not-allowed' : 'key-press bg-accent text-onaccent'}"><span>${t('openMain')}</span>${locked ? LINE_ICONS.lock : LINE_ICONS.extArrow}</button><button onclick="copyItemUrl('${escJsAttr(s.url)}', event)" title="Копіювати URL" class="key-press w-11 rounded-lg theme-input flex items-center justify-center shrink-0"><svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="1"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div></div>`;
                 }).join('');
             } else if (viewMode === 'large') {
                 cardsEl.className = 'space-y-3';
                 cardsEl.innerHTML = filtered.map(s => {
                     const locked = isItemLocked(s); const isDup = highlightedDuplicateId === s.id; const isSelected = selectedIds.has(s.id);
                     const clickAction = isSelectMode ? `toggleCardSelect(${s.id}, event)` : `openEditSheet(${s.id})`;
-                    return `<div id="card-${s.id}" onclick="${clickAction}" class="rounded-xl p-4 sm:p-5 theme-card border grid grid-cols-1 md:grid-cols-12 gap-4 items-center cursor-pointer hover:border-accent transition ${isDup || isSelected ? 'ring-2 ring-accent border-accent' : ''}"><div class="md:col-span-5 flex flex-col justify-between space-y-3"><div class="flex items-center justify-between gap-2"><div class="flex items-center gap-2.5 min-w-0">${isSelectMode ? `<span class="w-6 h-6 rounded-md border flex items-center justify-center shrink-0 ${isSelected ? 'bg-accent border-accent text-white' : 'theme-input'}">${isSelected ? '✓' : ''}</span>` : ''}${getSiteFaviconHtml(s, 'w-9 h-9', 'w-5 h-5')}<div class="min-w-0"><div class="font-black text-base truncate">${s.name}</div><div class="text-xs font-mono-code theme-muted truncate">${s.domain}</div></div></div><div class="flex items-center flex-wrap justify-end gap-1 shrink-0"><button onclick="toggleItemPinQuick(${s.id}, event)" title="${t('pinBtn')}" class="key-press w-7 h-7 rounded-md flex items-center justify-center transition ${s.pinned ? 'text-accent bg-accent/15' : 'theme-input opacity-55 hover:opacity-100'}">${s.pinned ? LINE_ICONS.pinFilled : LINE_ICONS.pin}</button>${renderPrioStar(s, 'w-7 h-7')}</div></div><div class="flex items-center flex-wrap gap-1">${renderCatBadges(s)}</div><div class="flex items-stretch gap-2"><button onclick="openItemById(${s.id}, event)" ${locked ? 'disabled' : ''} class="flex-1 py-2.5 px-3 rounded-lg font-extrabold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition ${locked ? 'theme-input opacity-45 cursor-not-allowed' : 'key-press bg-accent text-onaccent'}"><span>${t('openMain')}</span>${locked ? LINE_ICONS.lock : LINE_ICONS.extArrow}</button><button onclick="copyItemUrl('${s.url.replace(/'/g, "\\'")}', event)" class="key-press w-11 rounded-lg theme-input flex items-center justify-center shrink-0"><svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="1"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div></div><div class="md:col-span-7 md:border-l md:pl-4 space-y-1.5" style="border-color: var(--border-main)"><div class="text-base font-bold">${s.title}</div><p class="text-sm theme-muted leading-relaxed">${s.note}</p><div class="flex flex-wrap gap-1.5 pt-1">${(s.tags || []).map(tg => `<button type="button" onclick="filterByTagFromCard('${tg.replace(/'/g, "\\'")}', event)" class="text-[11px] font-mono-code theme-muted hover:text-accent transition">${tg}</button>`).join('')}</div></div></div>`;
+                    return `<div id="card-${s.id}" onclick="${clickAction}" class="rounded-xl p-4 sm:p-5 theme-card border grid grid-cols-1 md:grid-cols-12 gap-4 items-center cursor-pointer hover:border-accent transition ${isDup || isSelected ? 'ring-2 ring-accent border-accent' : ''}"><div class="md:col-span-5 flex flex-col justify-between space-y-3"><div class="flex items-center justify-between gap-2"><div class="flex items-center gap-2.5 min-w-0">${isSelectMode ? `<span class="w-6 h-6 rounded-md border flex items-center justify-center shrink-0 ${isSelected ? 'bg-accent border-accent text-white' : 'theme-input'}">${isSelected ? '✓' : ''}</span>` : ''}${getSiteFaviconHtml(s, 'w-9 h-9', 'w-5 h-5')}<div class="min-w-0"><div class="font-black text-base truncate">${esc(s.name)}</div><div class="text-xs font-mono-code theme-muted truncate">${esc(s.domain)}</div></div></div><div class="flex items-center flex-wrap justify-end gap-1 shrink-0"><button onclick="toggleItemPinQuick(${s.id}, event)" title="${t('pinBtn')}" class="key-press w-7 h-7 rounded-md flex items-center justify-center transition ${s.pinned ? 'text-accent bg-accent/15' : 'theme-input opacity-55 hover:opacity-100'}">${s.pinned ? LINE_ICONS.pinFilled : LINE_ICONS.pin}</button>${renderPrioStar(s, 'w-7 h-7')}</div></div><div class="flex items-center flex-wrap gap-1">${renderCatBadges(s)}</div><div class="flex items-stretch gap-2"><button onclick="openItemById(${s.id}, event)" ${locked ? 'disabled' : ''} class="flex-1 py-2.5 px-3 rounded-lg font-extrabold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition ${locked ? 'theme-input opacity-45 cursor-not-allowed' : 'key-press bg-accent text-onaccent'}"><span>${t('openMain')}</span>${locked ? LINE_ICONS.lock : LINE_ICONS.extArrow}</button><button onclick="copyItemUrl('${escJsAttr(s.url)}', event)" class="key-press w-11 rounded-lg theme-input flex items-center justify-center shrink-0"><svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="1"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div></div><div class="md:col-span-7 md:border-l md:pl-4 space-y-1.5" style="border-color: var(--border-main)"><div class="text-base font-bold">${esc(s.title)}</div><p class="text-sm theme-muted leading-relaxed">${esc(s.note)}</p><div class="flex flex-wrap gap-1.5 pt-1">${(s.tags || []).map(tg => `<button type="button" onclick="filterByTagFromCard('${escJsAttr(tg)}', event)" class="text-[11px] font-mono-code theme-muted hover:text-accent transition">${esc(tg)}</button>`).join('')}</div></div></div>`;
                 }).join('');
             } else {
                 cardsEl.className = 'space-y-2';
                 cardsEl.innerHTML = filtered.map(s => {
                     const locked = isItemLocked(s); const isDup = highlightedDuplicateId === s.id; const isSelected = selectedIds.has(s.id);
                     const clickAction = isSelectMode ? `toggleCardSelect(${s.id}, event)` : `openEditSheet(${s.id})`;
-                    return `<div id="card-${s.id}" onclick="${clickAction}" class="rounded-xl p-3 theme-card border flex items-center justify-between gap-3 cursor-pointer hover:border-accent transition ${isDup || isSelected ? 'ring-2 ring-accent border-accent' : ''}"><div class="flex items-center gap-2.5 min-w-0 flex-1">${isSelectMode ? `<span class="w-6 h-6 rounded-md border flex items-center justify-center shrink-0 ${isSelected ? 'bg-accent border-accent text-white' : 'theme-input'}">${isSelected ? '✓' : ''}</span>` : ''}${getSiteFaviconHtml(s, 'w-8 h-8', 'w-5 h-5')}<div class="min-w-0 flex-1"><div class="font-bold text-sm truncate">${s.title}</div><div class="flex items-center flex-wrap gap-1 mt-1">${renderCatBadges(s)}</div><div class="text-xs theme-muted truncate">${s.note}</div></div></div><div class="flex items-center gap-1.5 shrink-0"><button onclick="toggleItemPinQuick(${s.id}, event)" title="${t('pinBtn')}" class="key-press w-8 h-8 rounded-lg flex items-center justify-center transition ${s.pinned ? 'text-accent bg-accent/15' : 'theme-input opacity-55 hover:opacity-100'}">${s.pinned ? LINE_ICONS.pinFilled : LINE_ICONS.pin}</button>${renderPrioStar(s, 'w-8 h-8')}<button onclick="openItemById(${s.id}, event)" ${locked ? 'disabled' : ''} class="w-9 h-9 rounded-lg flex items-center justify-center transition ${locked ? 'theme-input opacity-45 cursor-not-allowed' : 'key-press bg-accent text-onaccent'}">${locked ? LINE_ICONS.lock : LINE_ICONS.extArrow}</button><button onclick="copyItemUrl('${s.url.replace(/'/g, "\\'")}', event)" class="key-press w-9 h-9 rounded-lg theme-input flex items-center justify-center"><svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="1"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div></div>`;
+                    return `<div id="card-${s.id}" onclick="${clickAction}" class="rounded-xl p-3 theme-card border flex items-center justify-between gap-3 cursor-pointer hover:border-accent transition ${isDup || isSelected ? 'ring-2 ring-accent border-accent' : ''}"><div class="flex items-center gap-2.5 min-w-0 flex-1">${isSelectMode ? `<span class="w-6 h-6 rounded-md border flex items-center justify-center shrink-0 ${isSelected ? 'bg-accent border-accent text-white' : 'theme-input'}">${isSelected ? '✓' : ''}</span>` : ''}${getSiteFaviconHtml(s, 'w-8 h-8', 'w-5 h-5')}<div class="min-w-0 flex-1"><div class="font-bold text-sm truncate">${esc(s.title)}</div><div class="flex items-center flex-wrap gap-1 mt-1">${renderCatBadges(s)}</div><div class="text-xs theme-muted truncate">${esc(s.note)}</div></div></div><div class="flex items-center gap-1.5 shrink-0"><button onclick="toggleItemPinQuick(${s.id}, event)" title="${t('pinBtn')}" class="key-press w-8 h-8 rounded-lg flex items-center justify-center transition ${s.pinned ? 'text-accent bg-accent/15' : 'theme-input opacity-55 hover:opacity-100'}">${s.pinned ? LINE_ICONS.pinFilled : LINE_ICONS.pin}</button>${renderPrioStar(s, 'w-8 h-8')}<button onclick="openItemById(${s.id}, event)" ${locked ? 'disabled' : ''} class="w-9 h-9 rounded-lg flex items-center justify-center transition ${locked ? 'theme-input opacity-45 cursor-not-allowed' : 'key-press bg-accent text-onaccent'}">${locked ? LINE_ICONS.lock : LINE_ICONS.extArrow}</button><button onclick="copyItemUrl('${escJsAttr(s.url)}', event)" class="key-press w-9 h-9 rounded-lg theme-input flex items-center justify-center"><svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="1"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div></div>`;
                 }).join('');
             }
         }
 
-        function normalizeUrlForCompare(raw) { return cleanRawUrl(raw).replace(/^https?:\/\//i, '').replace(/^www\./i, '').replace(/\/+$/, '').toLowerCase(); }
+        function normalizeUrlForCompare(raw) {
+            const cleaned = cleanRawUrl(raw);
+            if (!cleaned) return '';
+            try {
+                const u = new URL(cleaned);
+                let host = u.hostname.toLowerCase().replace(/^(?:www|m|mobile)\./, '');
+                if (host === 'youtu.be') {
+                    const vid = u.pathname.replace(/^\/+/, '').split('/')[0];
+                    if (vid) return `youtube.com/watch?v=${vid.toLowerCase()}`;
+                }
+                const dropParams = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'fbclid', 'gclid', 'igshid', 'si', 'feature'];
+                dropParams.forEach(p => u.searchParams.delete(p));
+                u.searchParams.sort();
+                const path = u.pathname.replace(/\/+$/, '');
+                const search = u.searchParams.toString();
+                return `${host}${path}${search ? '?' + search : ''}`.toLowerCase();
+            } catch (e) {
+                return cleaned.replace(/^https?:\/\//i, '').replace(/^(?:www|m|mobile)\./i, '').replace(/#.*$/, '').replace(/\/+$/, '').toLowerCase();
+            }
+        }
         function findDuplicateItem(rawUrl) { const target = normalizeUrlForCompare(rawUrl); if (!target) return null; return ITEMS.find(item => normalizeUrlForCompare(item.url) === target) || null; }
 
         function extractCleanBrandName(domain) {
@@ -1267,7 +1693,7 @@
             if (/[ыъэё]/i.test(combinedText)) return 'ru';
             if (/[а-я]/i.test(combinedText)) {
                 if (/\b(лучших|лучшие|самые|самых|века|романов|чтение|воскресное|смешные|заголовки|каналы|выбор|редакции|недорогой|купить|обзор|новости|технологии)\b/i.test(combinedText)) return 'ru';
-                if (/\b(найкращі|століття|недільне|читання|смішні|канали|вибір|редакції|недорогий|купити|огляд|новини|технології|посилання)\b/i.test(combinedText)) return 'uk';
+                if (/\b(найкращі|століття|недільне|читання|смішні|канали|вибір|редакції|недорогий|купити|огляд|новини|технологиї|посилання)\b/i.test(combinedText)) return 'uk';
                 if (/\.(ru|su|by|рф)$/i.test(domain)) return 'ru';
                 return 'uk';
             }
@@ -1522,8 +1948,8 @@
                 return (aiSuggested.has(b) ? 1 : 0) - (aiSuggested.has(a) ? 1 : 0);
             });
             container.innerHTML = sorted.map(catName => {
-                const isSelected = activeCats.some(c => c.toLowerCase() === catName.toLowerCase()); const isAiRecommended = aiSuggested.has(catName); const safeCat = catName.replace(/'/g, "\\'");
-                return `<button type="button" onclick="toggleSuggestedCategory('${safeCat}')" class="key-press px-2.5 py-1 rounded-md text-xs font-mono-code font-bold flex items-center gap-1 transition border ${isSelected ? 'bg-accent/15 text-accent border-accent/40' : 'theme-input theme-muted border-transparent opacity-75 hover:opacity-100'}"><span>${isSelected ? '✓' : '+'}</span><span>${catName}</span>${isAiRecommended && !isSelected ? '<span class="text-[9px] uppercase opacity-70 ml-0.5">AI</span>' : ''}</button>`;
+                const isSelected = activeCats.some(c => c.toLowerCase() === catName.toLowerCase()); const isAiRecommended = aiSuggested.has(catName); const safeCat = escJsAttr(catName);
+                return `<button type="button" onclick="toggleSuggestedCategory('${safeCat}')" class="key-press px-2.5 py-1 rounded-md text-xs font-mono-code font-bold flex items-center gap-1 transition border ${isSelected ? 'bg-accent/15 text-accent border-accent/40' : 'theme-input theme-muted border-transparent opacity-75 hover:opacity-100'}"><span>${isSelected ? '✓' : '+'}</span><span>${esc(catName)}</span>${isAiRecommended && !isSelected ? '<span class="text-[9px] uppercase opacity-70 ml-0.5">AI</span>' : ''}</button>`;
             }).join('');
         }
 
@@ -1591,7 +2017,7 @@
             const parsedCats = document.getElementById('sheet-cat').value.split(',').map(c => c.trim()).filter(Boolean);
             if (parsedCats.length > 0) { item.cats = Array.from(new Set(parsedCats)); item.cat = item.cats[0]; }
             const rawTags = document.getElementById('sheet-tags').value.trim();
-            if (rawTags) item.tags = rawTags.split(/\s+/).map(tg => tg.startsWith('#' ) ? tg : `#${tg}`);
+            item.tags = rawTags ? rawTags.split(/\s+/).filter(Boolean).map(tg => tg.startsWith('#') ? tg : `#${tg}`) : [];
             item.lockedOverride = sheetTempLocked; item.folderPriority = sheetTempFolderPriority;
             saveStateToStorage(); closeEditSheet(); renderApp(); showToast(t('saved'));
         }
@@ -1599,18 +2025,44 @@
         function attachSheetDrag(handleId, panelId, closeFn) {
             const handle = document.getElementById(handleId); const panel = document.getElementById(panelId); if (!handle || !panel) return;
             let startY = 0, currentY = 0, dragging = false;
-            function onStart(e) { dragging = true; startY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY; panel.style.transition = 'none'; }
-            function onMove(e) { if (!dragging) return; currentY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY; const diff = currentY - startY; if (diff > 0) panel.style.transform = `translateY(${diff}px)`; }
-            function onEnd() {
-                if (!dragging) return; dragging = false; panel.style.transition = 'transform 0.34s cubic-bezier(0.16, 1, 0.3, 1)';
-                if (currentY - startY > 90) closeFn(); else panel.style.transform = 'translateY(0)'; startY = 0; currentY = 0;
+            function onMove(e) {
+                if (!dragging) return;
+                currentY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
+                const diff = currentY - startY;
+                if (diff > 0) panel.style.transform = `translateY(${diff}px)`;
             }
-            handle.addEventListener('mousedown', onStart); window.addEventListener('mousemove', onMove); window.addEventListener('mouseup', onEnd);
-            handle.addEventListener('touchstart', onStart, { passive: true }); window.addEventListener('touchmove', onMove, { passive: true }); window.addEventListener('touchend', onEnd);
+            function onEnd() {
+                if (!dragging) return;
+                dragging = false;
+                window.removeEventListener('mousemove', onMove);
+                window.removeEventListener('mouseup', onEnd);
+                window.removeEventListener('touchmove', onMove);
+                window.removeEventListener('touchend', onEnd);
+                window.removeEventListener('touchcancel', onEnd);
+                panel.style.transition = 'transform 0.34s cubic-bezier(0.16, 1, 0.3, 1)';
+                if (currentY - startY > 90) closeFn(); else panel.style.transform = 'translateY(0)';
+                startY = 0; currentY = 0;
+            }
+            function onStart(e) {
+                dragging = true;
+                startY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
+                currentY = startY;
+                panel.style.transition = 'none';
+                if (e.type.includes('mouse')) {
+                    window.addEventListener('mousemove', onMove);
+                    window.addEventListener('mouseup', onEnd);
+                } else {
+                    window.addEventListener('touchmove', onMove, { passive: true });
+                    window.addEventListener('touchend', onEnd);
+                    window.addEventListener('touchcancel', onEnd);
+                }
+            }
+            handle.addEventListener('mousedown', onStart);
+            handle.addEventListener('touchstart', onStart, { passive: true });
         }
 
-        window.onload = () => {
-            const hadSaved = loadStateFromStorage();
+        window.onload = async () => {
+            const hadSaved = await loadStateFromStorage();
             updateStaticTexts();
             setThemeMode(themeMode || 'light');
             setFontScale(fontScale || 'md');
@@ -1623,6 +2075,7 @@
             attachSheetDrag('edit-drag-handle', 'edit-sheet-panel', closeEditSheet);
             initToastSwipe(); 
             if (navigator.onLine) { processOfflineQueue(false); }
+            renderApp();
         };
     </script>
 </body>
