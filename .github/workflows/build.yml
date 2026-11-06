@@ -36,6 +36,8 @@ jobs:
           npm i @capacitor/core @capacitor/cli @capacitor/android
           npx cap init LinkBox com.shans.linkbox2 --web-dir=www
           npx cap add android
+          sed -i "s/versionCode 1/versionCode ${{ github.run_number }}/" android/app/build.gradle
+          sed -i 's/versionName "1.0"/versionName "1.${{ github.run_number }}"/' android/app/build.gradle
           mkdir -p assets
           cp icon.jpg assets/icon-only.jpg
           cp icon.jpg assets/icon-foreground.jpg
