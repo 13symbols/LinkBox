@@ -18,7 +18,8 @@ jobs:
           java-version: 21
       - name: Signing key
         run: |
-          if [ ! -f debug.keystore ]; then
+          if [ ! -s debug.keystore ]; then
+            rm -f debug.keystore
             keytool -genkeypair -keystore debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
             git config user.name "build"
             git config user.email "build@example.com"
@@ -26,6 +27,7 @@ jobs:
             git commit -m "Add signing key"
             git push
           fi
+          ls -l debug.keystore
           mkdir -p ~/.android
           cp debug.keystore ~/.android/debug.keystore
       - name: Prepare
