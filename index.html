@@ -431,6 +431,27 @@
         ::-webkit-scrollbar { width: 5px; height: 5px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: rgba(150, 145, 135, 0.35); border-radius: 4px; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    
+        /* Calendar Dynamic Classes */
+        .grid-cols-7 { grid-template-columns: repeat(7, minmax(0, 1fr)); }
+        .gap-x-1 { column-gap: 0.25rem; }
+        .gap-y-2 { row-gap: 0.5rem; }
+        .border-2 { border-width: 2px; }
+        .bg-accent\/10 { background-color: rgb(var(--accent-rgb) / 0.1); }
+        .bg-accent\/20 { background-color: rgb(var(--accent-rgb) / 0.2); }
+        .border-accent\/40 { border-color: rgb(var(--accent-rgb) / 0.4) !important; }
+        .text-rose-500\/80 { color: rgba(244, 63, 94, 0.8); }
+        .opacity-60 { opacity: 0.6; }
+        .opacity-75 { opacity: 0.75; }
+        .w-10 { width: 2.5rem; }
+        .h-10 { height: 2.5rem; }
+        .hover\:opacity-80:hover { opacity: 0.8; }
+
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
@@ -518,6 +539,15 @@
                         <button onclick="setSortMode('oldest')" id="sort-oldest-btn" class="key-press py-1.5 rounded-md text-xs font-bold transition">↑ Старі</button>
                         <button onclick="setSortMode('az')" id="sort-az-btn" class="key-press py-1.5 rounded-md text-xs font-bold transition">А–Я</button>
                     </div>
+                    <button type="button" onclick="openCalendarSheet()" title="Календар активності" class="key-press w-[46px] rounded-lg theme-input flex items-center justify-center text-accent hover:bg-accent/15 transition shrink-0">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                            <path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01" stroke-width="3" stroke-linecap="round"/>
+                        </svg>
+                    </button>
                     <button onclick="cycleFontScale()" id="font-cycle-btn" class="key-press w-[46px] rounded-lg theme-input flex items-center justify-center font-mono-code font-black text-[13px] transition shrink-0" title="Розмір тексту">A</button>
                 </div>
             </div>
@@ -640,6 +670,50 @@
     </div>
 
     <!-- ШТОРКИ (КАТЕГОРІЇ, ТЕГИ, ПРО ДОДАТОК, РЕДАГУВАННЯ) -->
+    <!-- КАЛЕНДАР АКТИВНОСТІ -->
+    <div id="calendar-sheet-modal" onclick="if(event.target===this) closeCalendarSheet()" class="sheet-backdrop fixed inset-0 bg-black/60 z-50 hidden items-end sm:items-center justify-center p-0 sm:p-4">
+        <div id="calendar-sheet-panel" class="sheet-panel theme-surface w-full max-w-md rounded-t-2xl sm:rounded-xl p-5 border-t sm:border space-y-4 max-h-[85vh] overflow-y-auto flex flex-col">
+            <div id="calendar-drag-handle" class="w-12 h-2 bg-stone-400/50 rounded-full mx-auto -mt-1 cursor-grab active:cursor-grabbing touch-none sm:hidden shrink-0"></div>
+            <div class="flex items-center justify-between shrink-0">
+                <div class="flex items-center gap-2">
+                    <span class="w-7 h-7 rounded-lg bg-accent text-onaccent font-mono-code font-black text-xs flex items-center justify-center"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
+                    <span class="font-black text-base uppercase tracking-tight" id="calendar-sheet-title">Історія збережень</span>
+                </div>
+                <button onclick="closeCalendarSheet()" class="key-press w-9 h-9 rounded-lg theme-input flex items-center justify-center"><svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+            </div>
+            
+            <div id="calendar-view" class="flex-1 transition-opacity duration-150 flex flex-col space-y-4 min-h-0">
+                <div class="flex items-center justify-between px-1">
+                    <button onclick="changeCalendarMonth(-1)" class="key-press w-8 h-8 rounded-lg theme-input flex items-center justify-center"><svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+                    <span id="calendar-month-label" class="font-bold text-sm uppercase tracking-wider">Жовтень 2026</span>
+                    <button onclick="changeCalendarMonth(1)" class="key-press w-8 h-8 rounded-lg theme-input flex items-center justify-center"><svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></button>
+                </div>
+                <div class="grid grid-cols-7 gap-1 text-center mb-2">
+                    <div class="text-[10px] font-mono-code font-bold theme-muted uppercase">Пн</div>
+                    <div class="text-[10px] font-mono-code font-bold theme-muted uppercase">Вв</div>
+                    <div class="text-[10px] font-mono-code font-bold theme-muted uppercase">Ср</div>
+                    <div class="text-[10px] font-mono-code font-bold theme-muted uppercase">Чт</div>
+                    <div class="text-[10px] font-mono-code font-bold theme-muted uppercase">Пт</div>
+                    <div class="text-[10px] font-mono-code font-bold text-rose-500/80 uppercase">Сб</div>
+                    <div class="text-[10px] font-mono-code font-bold text-rose-500/80 uppercase">Нд</div>
+                </div>
+                <div id="calendar-grid" class="grid grid-cols-7 gap-y-2 gap-x-1"></div>
+            </div>
+
+            <div id="day-dashboard-view" class="hidden transition-opacity duration-150 opacity-0 flex-col space-y-3 flex-1 min-h-0 h-full">
+                <div class="flex items-center gap-2 px-1">
+                    <button onclick="backToCalendar()" class="key-press w-8 h-8 rounded-lg theme-input flex items-center justify-center shrink-0"><svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+                    <div class="flex-1 text-center font-bold text-sm uppercase tracking-wider" id="dash-date-label">24 Жовтня 2026</div>
+                    <div class="w-8 h-8"></div>
+                </div>
+                <div class="flex items-center justify-between text-xs font-mono-code font-bold theme-muted px-2 border-b pb-2" style="border-color: var(--border-main)">
+                    <span>Збережено посилань:</span>
+                    <span id="dash-count-label" class="text-accent bg-accent/15 px-2 py-0.5 rounded-md">0</span>
+                </div>
+                <div id="dash-items-list" class="flex-1 overflow-y-auto space-y-2 pr-1 pb-2"></div>
+            </div>
+        </div>
+    </div>
     <div id="cats-sheet-modal" onclick="if(event.target===this) closeCategoriesSheet()" class="sheet-backdrop fixed inset-0 bg-black/60 z-50 hidden items-end sm:items-center justify-center p-0 sm:p-4">
         <div id="cats-sheet-panel" class="sheet-panel theme-surface w-full max-w-md rounded-t-2xl sm:rounded-xl p-5 border-t sm:border space-y-4 max-h-[85vh] overflow-y-auto">
             <div id="cats-drag-handle" class="w-12 h-2 bg-stone-400/50 rounded-full mx-auto -mt-1 cursor-grab active:cursor-grabbing touch-none sm:hidden"></div>
@@ -794,6 +868,8 @@
 
     <script>
         const currentLang = 'uk';
+        let currentCalDate = new Date();
+        const MONTH_NAMES = ['Січень', 'Лютий', 'Березень', 'Квітень', 'Травень', 'Червень', 'Липень', 'Серпень', 'Вересень', 'Жовтень', 'Листопад', 'Грудень'];
         let highlightedDuplicateId = null;
         let isSelectMode = false;
         let selectedIds = new Set();
@@ -2092,6 +2168,148 @@
             handle.addEventListener('touchstart', onStart, { passive: true });
         }
 
+
+        function openCalendarSheet() {
+            _pushModalState(); _hideSidebar();
+            currentCalDate = new Date();
+            renderCalendarMonth();
+            document.getElementById('calendar-view').classList.remove('hidden');
+            document.getElementById('calendar-view').classList.add('flex');
+            document.getElementById('day-dashboard-view').classList.add('hidden');
+            document.getElementById('day-dashboard-view').classList.remove('flex');
+            const modal = document.getElementById('calendar-sheet-modal'); const panel = document.getElementById('calendar-sheet-panel');
+            panel.style.transform = ''; modal.classList.remove('hidden'); modal.style.display = 'flex'; setTimeout(() => modal.classList.add('open'), 10);
+        }
+        function closeCalendarSheet() { safeCloseModal(_hideCalendarSheet); }
+        function _hideCalendarSheet() {
+            const modal = document.getElementById('calendar-sheet-modal'); const panel = document.getElementById('calendar-sheet-panel');
+            modal.classList.remove('open'); setTimeout(() => { modal.classList.add('hidden'); modal.style.display = 'none'; panel.style.transform = ''; }, 340);
+        }
+
+        function changeCalendarMonth(delta) {
+            currentCalDate.setMonth(currentCalDate.getMonth() + delta);
+            renderCalendarMonth();
+        }
+
+        function getDatesMap() {
+            const map = {};
+            ITEMS.forEach(it => {
+                if (!it.date) return;
+                const parts = it.date.split('/');
+                if (parts.length === 3) {
+                    const y = '20' + parts[2];
+                    const k = `${y}-${parts[1]}-${parts[0]}`;
+                    if (!map[k]) map[k] = [];
+                    map[k].push(it);
+                }
+            });
+            return map;
+        }
+
+        function renderCalendarMonth() {
+            const y = currentCalDate.getFullYear();
+            const m = currentCalDate.getMonth();
+            document.getElementById('calendar-month-label').textContent = `${MONTH_NAMES[m]} ${y}`;
+            
+            const grid = document.getElementById('calendar-grid');
+            grid.innerHTML = '';
+            
+            const firstDay = new Date(y, m, 1);
+            let startDay = firstDay.getDay() || 7; 
+            startDay -= 1; // 0 = Mon, 6 = Sun
+            
+            const daysInMonth = new Date(y, m + 1, 0).getDate();
+            const datesMap = getDatesMap();
+            
+            const today = new Date();
+            const isCurrentMonth = today.getFullYear() === y && today.getMonth() === m;
+
+            for (let i = 0; i < startDay; i++) {
+                grid.innerHTML += `<div></div>`;
+            }
+
+            for (let d = 1; d <= daysInMonth; d++) {
+                const dateKey = `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+                const itemsForDay = datesMap[dateKey] || [];
+                const isToday = isCurrentMonth && today.getDate() === d;
+                const count = itemsForDay.length;
+                
+                // Стиль 3: Modern Android (Material You)
+                let btnClass = "w-10 h-10 mx-auto flex items-center justify-center rounded-xl text-sm transition ";
+                
+                if (count >= 5) {
+                    // Висока активність (Solid Fill, squircle-like)
+                    btnClass += "bg-accent text-onaccent font-black shadow-sm key-press cursor-pointer";
+                } else if (count > 0) {
+                    // Низька/Середня активність (Tonal Fill)
+                    btnClass += "bg-accent/20 text-accent font-extrabold key-press cursor-pointer hover:opacity-80";
+                } else if (isToday) {
+                    // Сьогодні порожній
+                    btnClass += "border-2 border-accent/40 text-accent font-extrabold";
+                } else {
+                    // Порожні дні
+                    btnClass += "theme-muted opacity-75 font-medium";
+                }
+
+                if (count > 0) {
+                    grid.innerHTML += `<button onclick="openDayDashboard('${dateKey}')" class="${btnClass}" title="${count} посилань">${d}</button>`;
+                } else {
+                    grid.innerHTML += `<div class="${btnClass}">${d}</div>`;
+                }
+            }
+        }
+
+        function openDayDashboard(dateKey) {
+            const items = getDatesMap()[dateKey] || [];
+            if (items.length === 0) return;
+            
+            const parts = dateKey.split('-');
+            const displayDate = `${parseInt(parts[2])} ${MONTH_NAMES[parseInt(parts[1])-1]} ${parts[0]}`;
+            document.getElementById('dash-date-label').textContent = displayDate;
+            document.getElementById('dash-count-label').textContent = items.length;
+
+            const list = document.getElementById('dash-items-list');
+            list.innerHTML = items.map((s, idx) => {
+                const locked = isItemLocked(s);
+                return `<div class="rounded-xl p-3 theme-card border flex flex-col gap-2.5 hover:border-accent transition opacity-0" style="animation: fadeIn 0.3s ease forwards ${idx * 0.04}s;">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                        <div class="shrink-0">${getSiteFaviconHtml(s, 'w-9 h-9', 'w-5 h-5')}</div>
+                        <div class="min-w-0 flex-1">
+                            <div class="font-bold text-sm truncate">${esc(s.title || s.name)}</div>
+                            <div class="text-[11px] font-mono-code theme-muted truncate mt-0.5">${esc(s.domain)} • ${getItemCats(s)[0]}</div>
+                        </div>
+                    </div>
+                    <div class="flex items-stretch gap-1.5 pt-2.5 border-t" style="border-color: var(--border-main)">
+                        <button onclick="closeCalendarSheet(); setTimeout(()=>openItemById(${s.id}), 100)" ${locked ? 'disabled' : ''} class="flex-1 h-9 rounded-lg flex items-center justify-center gap-1.5 transition ${locked ? 'theme-input opacity-45 cursor-not-allowed' : 'key-press bg-accent/15 text-accent font-extrabold text-xs'}"><span>Відкрити</span>${locked ? LINE_ICONS.lock : LINE_ICONS.extArrow}</button>
+                        <button onclick="copyItemUrl('${escJsAttr(s.url)}', event)" class="key-press w-11 h-9 rounded-lg theme-input flex items-center justify-center shrink-0" title="Копіювати URL"><svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="1"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+                        <button onclick="closeCalendarSheet(); setTimeout(()=>openEditSheet(${s.id}), 100)" class="key-press w-11 h-9 rounded-lg theme-input flex items-center justify-center text-[10px] opacity-70 hover:opacity-100 shrink-0" title="Налаштування">•••</button>
+                    </div>
+                </div>`;
+            }).join('');
+
+            const calView = document.getElementById('calendar-view');
+            const dashView = document.getElementById('day-dashboard-view');
+            
+            calView.style.opacity = '0';
+            setTimeout(() => {
+                calView.classList.add('hidden'); calView.classList.remove('flex');
+                dashView.classList.remove('hidden'); dashView.classList.add('flex');
+                requestAnimationFrame(() => dashView.style.opacity = '1');
+            }, 150);
+        }
+
+        function backToCalendar() {
+            const calView = document.getElementById('calendar-view');
+            const dashView = document.getElementById('day-dashboard-view');
+            
+            dashView.style.opacity = '0';
+            setTimeout(() => {
+                dashView.classList.add('hidden'); dashView.classList.remove('flex');
+                calView.classList.remove('hidden'); calView.classList.add('flex');
+                requestAnimationFrame(() => calView.style.opacity = '1');
+            }, 150);
+        }
+
         window.onload = async () => {
             const hadSaved = await loadStateFromStorage();
             
@@ -2116,6 +2334,7 @@
             attachSheetDrag('tags-drag-handle', 'tags-sheet-panel', closeTagsSheet);
             attachSheetDrag('about-drag-handle', 'about-sheet-panel', closeAboutSheet);
             attachSheetDrag('edit-drag-handle', 'edit-sheet-panel', closeEditSheet);
+            attachSheetDrag('calendar-drag-handle', 'calendar-sheet-panel', closeCalendarSheet);
             initToastSwipe(); 
             if (navigator.onLine) { processOfflineQueue(false); }
             renderApp();
