@@ -28,8 +28,6 @@ jobs:
             git push
           fi
           ls -l debug.keystore
-          mkdir -p ~/.android
-          cp debug.keystore ~/.android/debug.keystore
       - name: Prepare
         run: |
           mkdir -p www
@@ -40,6 +38,18 @@ jobs:
           npx cap add android
           sed -i "s/versionCode 1/versionCode ${{ github.run_number }}/" android/app/build.gradle
           sed -i 's/versionName "1.0"/versionName "1.${{ github.run_number }}"/' android/app/build.gradle
+          cat >> android/app/build.gradle <<'GRADLE'
+          android {
+              signingConfigs {
+                  debug {
+                      storeFile file('../../debug.keystore')
+                      storePassword 'android'
+                      keyAlias 'androiddebugkey'
+                      keyPassword 'android'
+                  }
+              }
+          }
+          GRADLE
           mkdir -p assets
           cp icon.jpg assets/icon-only.jpg
           cp icon.jpg assets/icon-foreground.jpg
@@ -126,6 +136,11 @@ jobs:
           ./gradlew assembleDebug
       - name: Rename APK
         run: mv android/app/build/outputs/apk/debug/app-debug.apk LinkBox.apk
+      - name: Show signature
+        run: |
+          sha256sum debug.keystore
+          keytool -list -keystore debug.keystore -storepass android | tail -3
+          keytool -printcert -jarfile LinkBox.apk | grep -E "SHA256" || echo "no v1 signature info"
       - uses: actions/upload-artifact@v4
         with:
           name: LinkBox
