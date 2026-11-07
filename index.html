@@ -452,6 +452,10 @@
         .h-10 { height: 2.5rem; }
         .hover\:opacity-80:hover { opacity: 0.8; }
 
+    
+        .rounded-2xl { border-radius: 1rem; }
+        .pr-3 { padding-right: 0.75rem; }
+
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
@@ -861,9 +865,11 @@
     </div>
 
     <!-- Тост уведомлений -->
-    <div id="action-toast" class="fixed bottom-4 inset-x-4 max-w-sm mx-auto bg-[#0F1115] text-[#FFFFFF] px-4 py-3 rounded-lg shadow-xl hidden items-center justify-between z-50 text-xs font-mono-code touch-pan-x" style="will-change: transform, opacity;">
-        <span id="toast-message">Скопійовано</span>
-        <span class="text-accent font-bold ml-3">OK</span>
+    <div id="action-toast" class="fixed bottom-4 inset-x-4 max-w-sm mx-auto theme-card border shadow-2xl rounded-2xl p-1.5 hidden items-center gap-3 z-50 touch-pan-x" style="will-change: transform, opacity; border-color: var(--border-main);">
+        <div class="w-10 h-10 rounded-xl bg-accent text-onaccent flex items-center justify-center shrink-0 shadow-sm">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        </div>
+        <span id="toast-message" class="text-sm font-bold truncate pr-3 flex-1">Скопійовано</span>
     </div>
 
     <script>
@@ -1422,7 +1428,7 @@
             const toast = document.getElementById('action-toast'); document.getElementById('toast-message').textContent = msg;
             toast.classList.remove('hidden'); toast.classList.add('flex'); toast.style.transform = 'translateX(0)'; toast.style.opacity = '1';
             if (toastTimeout) clearTimeout(toastTimeout);
-            toastTimeout = setTimeout(() => { hideToast(); }, 3000);
+            toastTimeout = setTimeout(() => { hideToast(); }, 5000);
         }
         function hideToast() {
             const toast = document.getElementById('action-toast'); toast.style.opacity = '0';
