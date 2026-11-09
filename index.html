@@ -452,6 +452,23 @@
         .h-10 { height: 2.5rem; }
         .hover\:opacity-80:hover { opacity: 0.8; }
 
+    
+        .bottom-6 { bottom: 1.5rem; }
+        .z-\[60\] { z-index: 60; }
+        .z-\[70\] { z-index: 70; }
+        .bg-\[\#1A1C20\] { background-color: #1A1C20; }
+        .text-\[\#E5E7EB\] { color: #E5E7EB; }
+        .border-white\/5 { border-color: rgba(255, 255, 255, 0.05) !important; }
+        .hover\:bg-white\/10:hover { background-color: rgba(255, 255, 255, 0.1); }
+        .active\:scale-95:active { transform: scale(0.95); }
+        .tracking-wider { letter-spacing: 0.05em; }
+        .w-\[220px\] { width: 220px; }
+        .h-\[220px\] { height: 220px; }
+        .rounded-2xl { border-radius: 1rem; }
+
+    
+        .animate-spin { animation: spin 1s linear infinite; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
@@ -705,11 +722,28 @@
     </div>
 
     <!-- МОДАЛКА QR КОДУ -->
-    <div id="qr-modal" onclick="if(event.target===this) closeQRModal()" class="sheet-backdrop fixed inset-0 bg-black/60 z-60 hidden items-center justify-center p-4">
-        <div class="theme-surface w-full max-w-xs rounded-xl p-5 border shadow-2xl flex flex-col items-center text-center space-y-4 transition-transform scale-95 duration-200" id="qr-panel">
-            <h3 class="font-black text-base truncate w-full" id="qr-title">domain.com</h3>
-            <div id="qr-container" class="bg-white p-3 rounded-xl shadow-inner border border-black/10 flex items-center justify-center w-[200px] h-[200px]"></div>
-            <button onclick="closeQRModal()" class="key-press w-full py-2.5 rounded-lg theme-input text-sm font-bold">Закрити</button>
+    <div id="qr-modal" onclick="if(event.target===this) closeQRModal()" class="sheet-backdrop fixed inset-0 bg-black/60 hidden items-end sm:items-center justify-center p-0 sm:p-4" style="z-index: 9999;">
+        <div id="qr-panel" class="sheet-panel theme-surface w-full max-w-sm p-6 sm:p-8 flex flex-col items-center text-center shadow-2xl relative" style="border-top-left-radius: 1.5rem; border-top-right-radius: 1.5rem; max-height: 90vh; overflow-y: auto;">
+            <div id="qr-drag-handle" class="absolute top-3 left-1/2 w-12 h-1.5 bg-stone-400/30 rounded-full cursor-grab active:cursor-grabbing touch-none sm:hidden" style="transform: translateX(-50%);"></div>
+            
+            <div class="w-full mt-4 mb-3 space-y-1">
+                <h3 class="font-black text-2xl tracking-tight truncate w-full text-ink" id="qr-title">domain.com</h3>
+                <p class="text-xs font-bold theme-muted truncate w-full px-2" id="qr-subtitle">Page Title</p>
+            </div>
+            
+            <div class="bg-white p-3.5 border border-black/5 flex items-center justify-center shrink-0 mb-6 relative" style="width: 240px; height: 240px; border-radius: 1.5rem; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);">
+                <div id="qr-container" class="w-full h-full relative flex items-center justify-center"></div>
+            </div>
+
+            <div class="w-full space-y-2.5">
+                <button onclick="copyQRUrl()" class="key-press w-full py-4 rounded-xl bg-accent text-onaccent font-black text-base flex items-center justify-center gap-2.5 transition active:scale-95" style="box-shadow: 0 8px 16px -4px rgba(var(--accent-rgb), 0.4);">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                    Копіювати URL
+                </button>
+                <button onclick="closeQRModal()" class="key-press w-full py-3.5 rounded-xl bg-black/5 text-ink font-bold text-sm flex items-center justify-center transition hover:bg-black/10 active:scale-95">
+                    Закрити
+                </button>
+            </div>
         </div>
     </div>
 
@@ -870,11 +904,11 @@
 
             <div class="flex items-stretch gap-2">
                 <button id="sheet-open-btn" onclick="openSheetUrl()" class="key-press flex-1 py-3.5 px-4 rounded-lg bg-accent text-onaccent font-black text-sm sm:text-base flex items-center justify-center gap-2 transition">
-                    <span id="btn-open">Відкрити в браузері</span>
+                    <span id="btn-open">Відкрити</span>
                     <span id="sheet-open-icon" class="w-4 h-4 flex items-center justify-center"></span>
                 </button>
                 <button onclick="copySheetUrl()" title="Копіювати посилання" class="key-press w-12 rounded-lg theme-input flex items-center justify-center shrink-0"><svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="1"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
-                <button type="button" onclick="showQRCode()" title="QR-код" class="key-press w-12 rounded-lg theme-input flex items-center justify-center shrink-0 text-accent hover:bg-accent/15 transition">${LINE_ICONS.qr}</button>
+                <button type="button" onclick="showQRCode()" title="QR-код" class="key-press w-12 rounded-lg theme-input flex items-center justify-center shrink-0 text-accent hover:bg-accent/15 transition"><svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M7 7h.01M18 7h.01M18 18h.01M7 18h.01"/></svg></button>
             </div>
 
             <button type="button" onclick="toggleSheetItemLock()" id="sheet-lock-toggle" class="key-press w-full py-2.5 px-3.5 rounded-lg theme-input flex items-center justify-between text-xs font-bold transition">
@@ -925,25 +959,13 @@
     </div>
 
     <!-- Тост уведомлений -->
-    <div id="action-toast" class="fixed bottom-4 inset-x-4 max-w-sm mx-auto bg-[#0F1115] text-[#FFFFFF] px-4 py-3 rounded-lg shadow-xl hidden items-center justify-between z-50 text-xs font-mono-code touch-pan-x" style="will-change: transform, opacity;">
-        <span id="toast-message">Скопійовано</span>
-        <span class="text-accent font-bold ml-3">OK</span>
+    <div id="action-toast" class="fixed bottom-6 inset-x-4 max-w-sm mx-auto bg-[#1A1C20] text-white px-4 py-3.5 rounded-xl shadow-2xl hidden items-center justify-between z-[70] text-sm font-medium touch-pan-x gap-3 border border-white/5" style="will-change: transform, opacity;">
+        <span id="toast-message" class="truncate flex-1 text-[#E5E7EB]">Скопійовано</span>
+        <button onclick="hideToast()" class="text-accent font-black shrink-0 uppercase text-[11px] tracking-wider px-2 py-1 rounded-md hover:bg-white/10 transition active:scale-95">OK</button>
     </div>
 
     <script>
         
-// Tiny QR Code Generator for offline usage
-var QRCode = function(options) {
-    var str = String(options.content);
-    // Simple mock QR generation just for sandbox preview if offline, 
-    // but in real app we'd load full qrious or similar.
-    // For pure offline without huge code, we'll draw a simulated QR payload, 
-    // or use a robust base64 image generator for Google Chart API.
-    // Let's implement a real QR library in JS if possible.
-    this.svg = function() {
-        return `<img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(str)}&color=0F1115&bgcolor=ffffff" alt="QR" class="w-full h-full object-contain">`;
-    }
-};
 
         const currentLang = 'uk';
         let currentCalDate = new Date();
@@ -974,7 +996,7 @@ var QRCode = function(options) {
                 urlPlaceholder: 'Вставте посилання або список посилань...',
                 allFolders: 'Усі посилання', importAi: 'Імпорт', exportHtml: 'Експорт',
                 expHtmlSub: 'Для браузера', expJsonSub: 'Повний бекап',
-                openMain: 'Відкрити', openBrowser: 'Відкрити в браузері',
+                openMain: 'Відкрити', openBrowser: 'Відкрити',
                 titleLabel: 'Назва', noteLabel: 'Нотатка', regenBtn: 'Переписати ІІ',
                 folderLabel: 'Папки (через кому)', aiCatHint: 'Сірі підказки ІІ — тапніть, щоб додати',
                 tagsLabel: '#Теги', deleteBtn: 'Видалити', saveBtn: 'Зберегти',
@@ -1131,11 +1153,16 @@ var QRCode = function(options) {
         }
 
         window.addEventListener('popstate', () => {
-            if (isAnyModalOpen()) {
-                _forceCloseAllUI();
-            } else if (isSelectMode) {
-                toggleSelectMode();
-            }
+            if (document.getElementById('confirm-modal')?.classList.contains('open')) { _hideConfirmModal(); }
+            else if (document.getElementById('qr-modal')?.classList.contains('open')) { _hideQRModal(); }
+            else if (document.getElementById('bulk-edit-sheet-modal')?.classList.contains('open')) { _hideBulkEditSheet(); }
+            else if (document.getElementById('edit-sheet-modal')?.classList.contains('open')) { _hideEditSheet(); }
+            else if (document.getElementById('calendar-sheet-modal')?.classList.contains('open')) { _hideCalendarSheet(); }
+            else if (document.getElementById('cats-sheet-modal')?.classList.contains('open')) { _hideCatsSheet(); }
+            else if (document.getElementById('tags-sheet-modal')?.classList.contains('open')) { _hideTagsSheet(); }
+            else if (document.getElementById('about-sheet-modal')?.classList.contains('open')) { _hideAboutSheet(); }
+            else if (isMobileSidebarOpen) { _hideSidebar(); }
+            else if (isSelectMode) { toggleSelectMode(); }
         });
 
         function _pushModalState() {
@@ -1153,7 +1180,7 @@ var QRCode = function(options) {
         }
 
         function _forceCloseAllUI() {
-            _hideSidebar(); _hideCatsSheet(); _hideTagsSheet(); _hideAboutSheet(); _hideEditSheet(); _hideConfirmModal();
+            _hideSidebar(); _hideCatsSheet(); _hideTagsSheet(); _hideAboutSheet(); _hideCalendarSheet(); _hideEditSheet(); _hideBulkEditSheet(); _hideQRModal(); _hideConfirmModal();
         }
 
         function openMobileSidebar() {
@@ -1531,7 +1558,7 @@ var QRCode = function(options) {
         function closeCategoriesSheet() { safeCloseModal(_hideCatsSheet); }
         function _hideCatsSheet() {
             const modal = document.getElementById('cats-sheet-modal'); const panel = document.getElementById('cats-sheet-panel');
-            modal.classList.remove('open'); setTimeout(() => { modal.classList.add('hidden'); modal.style.display = 'none'; panel.style.transform = ''; }, 340);
+            panel.style.transform = ''; modal.classList.remove('open'); setTimeout(() => { modal.classList.add('hidden'); modal.style.display = 'none'; }, 340);
         }
         function setCatsSortMode(mode) {
             catsSortMode = mode;
@@ -1574,7 +1601,7 @@ var QRCode = function(options) {
         function closeTagsSheet() { safeCloseModal(_hideTagsSheet); }
         function _hideTagsSheet() {
             const modal = document.getElementById('tags-sheet-modal'); const panel = document.getElementById('tags-sheet-panel');
-            modal.classList.remove('open'); setTimeout(() => { modal.classList.add('hidden'); modal.style.display = 'none'; panel.style.transform = ''; }, 340);
+            panel.style.transform = ''; modal.classList.remove('open'); setTimeout(() => { modal.classList.add('hidden'); modal.style.display = 'none'; }, 340);
         }
         function setTagsSortMode(mode) {
             tagsSortMode = mode;
@@ -1593,7 +1620,7 @@ var QRCode = function(options) {
         function closeAboutSheet() { safeCloseModal(_hideAboutSheet); }
         function _hideAboutSheet() {
             const modal = document.getElementById('about-sheet-modal'); const panel = document.getElementById('about-sheet-panel');
-            modal.classList.remove('open'); setTimeout(() => { modal.classList.add('hidden'); modal.style.display = 'none'; panel.style.transform = ''; }, 340);
+            panel.style.transform = ''; modal.classList.remove('open'); setTimeout(() => { modal.classList.add('hidden'); modal.style.display = 'none'; }, 340);
         }
 
         function renderAboutContent() {
@@ -2172,7 +2199,7 @@ var QRCode = function(options) {
         function closeEditSheet() { safeCloseModal(_hideEditSheet); }
         function _hideEditSheet() {
             const modal = document.getElementById('edit-sheet-modal'); const panel = document.getElementById('edit-sheet-panel');
-            modal.classList.remove('open'); setTimeout(() => { modal.classList.add('hidden'); modal.style.display = 'none'; panel.style.transform = ''; }, 340); editingId = null;
+            panel.style.transform = ''; modal.classList.remove('open'); setTimeout(() => { modal.classList.add('hidden'); modal.style.display = 'none'; }, 340); editingId = null;
         }
 
         function regenerateAINote() {
@@ -2268,7 +2295,7 @@ var QRCode = function(options) {
         function closeCalendarSheet() { safeCloseModal(_hideCalendarSheet); }
         function _hideCalendarSheet() {
             const modal = document.getElementById('calendar-sheet-modal'); const panel = document.getElementById('calendar-sheet-panel');
-            modal.classList.remove('open'); setTimeout(() => { modal.classList.add('hidden'); modal.style.display = 'none'; panel.style.transform = ''; }, 340);
+            panel.style.transform = ''; modal.classList.remove('open'); setTimeout(() => { modal.classList.add('hidden'); modal.style.display = 'none'; }, 340);
         }
 
         function changeCalendarMonth(delta) {
@@ -2367,7 +2394,7 @@ var QRCode = function(options) {
                     <div class="flex items-stretch gap-1.5 pt-2.5 border-t" style="border-color: var(--border-main)">
                         <button onclick="closeCalendarSheet(); setTimeout(()=>openItemById(${s.id}), 100)" ${locked ? 'disabled' : ''} class="flex-1 h-9 rounded-lg flex items-center justify-center gap-1.5 transition ${locked ? 'theme-input opacity-45 cursor-not-allowed' : 'key-press bg-accent/15 text-accent font-extrabold text-xs'}"><span>Відкрити</span>${locked ? LINE_ICONS.lock : LINE_ICONS.extArrow}</button>
                         <button onclick="copyItemUrl('${escJsAttr(s.url)}', event)" class="key-press w-11 h-9 rounded-lg theme-input flex items-center justify-center shrink-0" title="Копіювати URL"><svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="1"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
-                        <button onclick="closeCalendarSheet(); setTimeout(()=>showQRCode(${s.id}), 100)" class="key-press w-11 h-9 rounded-lg theme-input flex items-center justify-center text-accent hover:bg-accent/15 transition shrink-0" title="Показати QR">${LINE_ICONS.qr}</button>
+                        <button onclick="closeCalendarSheet(); setTimeout(()=>showQRCode(${s.id}), 100)" class="key-press w-11 h-9 rounded-lg theme-input flex items-center justify-center text-accent hover:bg-accent/15 transition shrink-0" title="Показати QR"><svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M7 7h.01M18 7h.01M18 18h.01M7 18h.01"/></svg></button>
 <button onclick="closeCalendarSheet(); setTimeout(()=>openEditSheet(${s.id}), 100)" class="key-press w-11 h-9 rounded-lg theme-input flex items-center justify-center text-[10px] opacity-70 hover:opacity-100 shrink-0" title="Налаштування">•••</button>
                     </div>
                 </div>`;
@@ -2459,7 +2486,7 @@ var QRCode = function(options) {
         function closeBulkEditSheet() { safeCloseModal(_hideBulkEditSheet); }
         function _hideBulkEditSheet() {
             const modal = document.getElementById('bulk-edit-sheet-modal'); const panel = document.getElementById('bulk-edit-sheet-panel');
-            modal.classList.remove('open'); setTimeout(() => { modal.classList.add('hidden'); modal.style.display = 'none'; panel.style.transform = ''; }, 340);
+            panel.style.transform = ''; modal.classList.remove('open'); setTimeout(() => { modal.classList.add('hidden'); modal.style.display = 'none'; }, 340);
         }
 
         function applyBulkEdit() {
@@ -2500,29 +2527,38 @@ var QRCode = function(options) {
             if (!item) return;
             
             _pushModalState();
-            document.getElementById('qr-title').textContent = item.name;
+            document.getElementById('qr-title').textContent = item.domain;
+            const subEl = document.getElementById('qr-subtitle');
+            if (subEl) subEl.textContent = item.title;
+            window._currentQRUrl = item.url;
             
             const qrContainer = document.getElementById('qr-container');
-            qrContainer.innerHTML = '';
+            const safeUrl = encodeURIComponent(cleanRawUrl(item.url));
+            const imgUrl = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${safeUrl}&color=0F1115&bgcolor=ffffff&ecc=H&margin=0`;
             
-            try {
-                // Using embedded QRCode lib
-                var qrcode = new QRCode({ content: item.url, padding: 0, width: 200, height: 200, color: "#0F1115", background: "#ffffff", ecl: "L" });
-                qrContainer.innerHTML = qrcode.svg();
-            } catch (e) {
-                qrContainer.innerHTML = `<span class="text-xs text-rose-500 font-bold">Помилка генерації</span>`;
-            }
+            qrContainer.innerHTML = `
+                <div style="position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+                    <div class="absolute w-8 h-8 rounded-full border-4 border-stone-200 border-t-accent animate-spin z-0"></div>
+                    <img src="${imgUrl}" alt="QR" class="w-full h-full object-contain z-10 relative" style="mix-blend-mode: multiply; background-color: transparent;" onload="this.previousElementSibling.style.display='none';">
+                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 44px; height: 44px; background: white; border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 0 4px #fff, 0 4px 10px rgba(0,0,0,0.15);" class="z-20">
+                        <svg viewBox="0 0 2048 2048" class="w-6 h-6 text-[#0F1115] drop-shadow-sm" xmlns="http://www.w3.org/2000/svg"><path fill="currentColor" d="M 820.745 774.484 C 843.943 773.99 873.918 775.257 896.837 776.679 C 976.15 781.6 1061.49 792.356 1128.78 838.041 C 1194.53 882.69 1242.68 950.654 1257.85 1029.03 C 1208.06 1030.81 1114.09 1032.21 1070.34 1012.39 C 1057.54 1006.59 1048.04 997.356 1037.19 988.759 C 1026.23 980.074 1014.43 972.7 1001.26 967.858 C 926.976 940.551 772.06 945.932 690.612 955.345 C 544.138 972.273 403.224 1022 309.048 1140.88 C 237.059 1230.09 204.079 1344.56 217.568 1458.39 C 231.435 1569.88 289.137 1671.25 377.917 1740.09 C 465.695 1809.18 578.939 1849.08 690.998 1834.81 C 903.421 1807.77 1039.63 1638.79 1082.95 1438.5 C 1088.66 1412.8 1092.59 1386.74 1094.72 1360.5 C 1095.11 1355.7 1095.66 1338.72 1097.53 1336.33 L 1102 1335.91 C 1122.33 1336.33 1146.1 1338.33 1167.22 1339.02 C 1201.81 1339.88 1236.42 1340.02 1271.01 1339.43 C 1266.42 1377.03 1265.41 1411.49 1258.02 1450.12 C 1230.46 1594.11 1175.15 1722.01 1073.17 1828.16 C 964.32 1939.53 816.106 2003.75 660.404 2006.98 C 493.262 2010.27 337.212 1952.99 216.275 1837.64 C -28.8002 1603.91 -23.8879 1230.94 211.223 991.613 C 372.412 827.536 598.052 777.654 820.745 774.484 z"/><path fill="#DF6D27" d="M 1396.31 39.4755 C 1512.61 37.6317 1629.32 66.1793 1727.77 129.345 C 1864.71 218.317 1960.59 358.153 1994.23 517.959 C 2028.26 673.494 1996.72 832.794 1909.46 968.647 C 1732.09 1244.52 1388.18 1291.96 1087.03 1264.59 C 1048.66 1261.11 1009.23 1251.21 973.5 1236.71 C 886.848 1201.56 809.795 1113.6 790.003 1021.45 C 832.844 1021.23 946.663 1019.89 981.612 1037.17 C 998.635 1045.58 1010.96 1060.85 1027.08 1070.83 C 1056.87 1089.28 1097.11 1093.28 1131.48 1096.35 C 1235.42 1105.62 1351.69 1098.17 1453.25 1074.63 C 1620.82 1041.23 1770.82 924.626 1816.58 756.08 C 1854.48 616.481 1821.61 459.393 1726.31 349.829 C 1654.8 266.642 1552.75 215.815 1443.27 208.849 C 1329.89 200.394 1217.92 238.271 1132.96 313.824 C 1017.91 415.124 972.93 564.552 963.56 712.937 C 951.318 713.323 939.91 712.409 927.711 712.049 L 856.285 710.134 C 833.991 709.611 807.256 711.231 786.079 709.852 L 786.001 708.387 C 784.917 684.003 793.699 644.934 797.397 620.219 C 844.945 302.493 1060.97 53.5881 1396.31 39.4755 z"/><path fill="#DF6D27" d="M 629.683 1234.44 C 728.899 1227.18 815.058 1302.08 821.686 1401.34 C 828.315 1500.6 752.879 1586.29 653.58 1592.29 C 555.159 1598.24 470.396 1523.62 463.826 1425.24 C 457.257 1326.85 531.345 1241.62 629.683 1234.44 z"/><path fill="currentColor" d="M 1389.32 459.332 C 1486.96 448.395 1574.96 518.749 1585.79 616.408 C 1596.61 714.067 1526.16 801.986 1428.49 812.698 C 1330.98 823.393 1243.23 753.077 1232.42 655.577 C 1221.62 558.078 1291.83 470.252 1389.32 459.332 z"/></svg>
+                    </div>
+                </div>
+            `;
 
             const modal = document.getElementById('qr-modal'); const panel = document.getElementById('qr-panel');
-            modal.classList.remove('hidden'); modal.style.display = 'flex'; 
-            setTimeout(() => { modal.classList.add('open'); panel.classList.remove('scale-95'); panel.classList.add('scale-100'); }, 10);
+            if(panel) panel.style.transform = ''; modal.classList.remove('hidden'); modal.style.display = 'flex'; 
+            setTimeout(() => modal.classList.add('open'), 10);
+        }
+
+        function copyQRUrl() {
+            if (window._currentQRUrl) copyItemUrl(window._currentQRUrl);
         }
 
         function closeQRModal() { safeCloseModal(_hideQRModal); }
         function _hideQRModal() {
             const modal = document.getElementById('qr-modal'); const panel = document.getElementById('qr-panel');
-            panel.classList.remove('scale-100'); panel.classList.add('scale-95');
-            setTimeout(() => { modal.classList.remove('open'); modal.classList.add('hidden'); modal.style.display = 'none'; }, 200);
+            panel.style.transform = ''; modal.classList.remove('open'); setTimeout(() => { modal.classList.add('hidden'); modal.style.display = 'none'; }, 340);
         }
 
         window.onload = async () => {
@@ -2551,6 +2587,7 @@ var QRCode = function(options) {
             attachSheetDrag('edit-drag-handle', 'edit-sheet-panel', closeEditSheet);
             attachSheetDrag('calendar-drag-handle', 'calendar-sheet-panel', closeCalendarSheet);
             attachSheetDrag('bulk-edit-drag-handle', 'bulk-edit-sheet-panel', closeBulkEditSheet);
+            attachSheetDrag('qr-drag-handle', 'qr-panel', closeQRModal);
             initToastSwipe(); 
             if (navigator.onLine) { processOfflineQueue(false); }
             renderApp();
