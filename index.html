@@ -723,25 +723,37 @@
 
     <!-- МОДАЛКА QR КОДУ -->
     <div id="qr-modal" onclick="if(event.target===this) closeQRModal()" class="sheet-backdrop fixed inset-0 bg-black/60 hidden items-end sm:items-center justify-center p-0 sm:p-4" style="z-index: 9999;">
-        <div id="qr-panel" class="sheet-panel theme-surface w-full max-w-sm p-6 sm:p-8 flex flex-col items-center text-center shadow-2xl relative" style="border-top-left-radius: 1.5rem; border-top-right-radius: 1.5rem; max-height: 90vh; overflow-y: auto;">
-            <div id="qr-drag-handle" class="absolute top-3 left-1/2 w-12 h-1.5 bg-stone-400/30 rounded-full cursor-grab active:cursor-grabbing touch-none sm:hidden" style="transform: translateX(-50%);"></div>
+        <div id="qr-panel" class="sheet-panel theme-surface w-full max-w-md rounded-t-2xl sm:rounded-xl p-5 border-t sm:border space-y-4 max-h-[90vh] overflow-y-auto shadow-2xl">
+            <div id="qr-drag-handle" class="w-12 h-2 bg-stone-400/50 rounded-full mx-auto -mt-1 cursor-grab active:cursor-grabbing touch-none sm:hidden"></div>
             
-            <div class="w-full mt-4 mb-3 space-y-1">
-                <h3 class="font-black text-2xl tracking-tight truncate w-full text-ink" id="qr-title">domain.com</h3>
-                <p class="text-xs font-bold theme-muted truncate w-full px-2" id="qr-subtitle">Page Title</p>
-            </div>
-            
-            <div class="bg-white p-3.5 border border-black/5 flex items-center justify-center shrink-0 mb-6 relative" style="width: 240px; height: 240px; border-radius: 1.5rem; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);">
-                <div id="qr-container" class="w-full h-full relative flex items-center justify-center"></div>
+            <div class="flex items-center justify-between gap-2.5">
+                <div class="flex items-center gap-2.5 min-w-0">
+                    <span id="qr-favicon" class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"></span>
+                    <div class="min-w-0 text-left">
+                        <h3 id="qr-title" class="text-sm font-mono-code font-bold truncate">domain.com</h3>
+                        <p id="qr-subtitle" class="text-xs theme-muted font-bold truncate">Page Title</p>
+                    </div>
+                </div>
+                <button onclick="closeQRModal()" class="key-press w-9 h-9 rounded-lg theme-input flex items-center justify-center shrink-0" title="Закрити">
+                    <svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                </button>
             </div>
 
-            <div class="w-full space-y-2.5">
-                <button onclick="copyQRUrl()" class="key-press w-full py-4 rounded-xl bg-accent text-onaccent font-black text-base flex items-center justify-center gap-2.5 transition active:scale-95" style="box-shadow: 0 8px 16px -4px rgba(var(--accent-rgb), 0.4);">
-                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                    Копіювати URL
+            <div class="theme-card border rounded-xl p-5 flex flex-col items-center justify-center space-y-3 shadow-2xs">
+                <div class="bg-white p-3.5 rounded-2xl border border-black/10 shadow-sm flex items-center justify-center relative shrink-0" style="width: 228px; height: 228px;">
+                    <div id="qr-container" class="w-full h-full relative flex items-center justify-center"></div>
+                </div>
+                <div id="qr-url-preview" class="text-[11px] font-mono-code theme-muted truncate w-full text-center px-2">https://example.com</div>
+            </div>
+
+            <div class="flex items-stretch gap-2 pt-0.5">
+                <button onclick="copyQRUrl()" class="key-press flex-1 py-3.5 px-4 rounded-lg bg-accent text-onaccent font-black text-sm sm:text-base flex items-center justify-center gap-2 transition shadow-xs">
+                    <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="1"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                    <span>Копіювати URL</span>
                 </button>
-                <button onclick="closeQRModal()" class="key-press w-full py-3.5 rounded-xl bg-black/5 text-ink font-bold text-sm flex items-center justify-center transition hover:bg-black/10 active:scale-95">
-                    Закрити
+                <button onclick="shareQRUrl()" title="Поділитися посиланням" class="key-press px-4 rounded-lg theme-input font-extrabold text-xs sm:text-sm flex items-center justify-center gap-1.5 shrink-0 hover:text-accent transition">
+                    <svg class="w-4 h-4 mono-icon shrink-0" viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+                    <span>Поділитися</span>
                 </button>
             </div>
         </div>
@@ -2242,42 +2254,62 @@
         }
 
         function attachSheetDrag(handleId, panelId, closeFn) {
-            const handle = document.getElementById(handleId); const panel = document.getElementById(panelId); if (!handle || !panel) return;
+            const handle = document.getElementById(handleId); 
+            const panel = document.getElementById(panelId); 
+            if (!handle || !panel) return;
+            
             let startY = 0, currentY = 0, dragging = false;
+            
             function onMove(e) {
                 if (!dragging) return;
                 currentY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
                 const diff = currentY - startY;
-                if (diff > 0) panel.style.transform = `translateY(${diff}px)`;
+                
+                // Двигаем шторку только если тянем вниз
+                if (diff > 0) {
+                    if (e.cancelable && e.type.includes('touch')) e.preventDefault();
+                    panel.style.transform = `translateY(${diff}px)`;
+                }
             }
+            
             function onEnd() {
                 if (!dragging) return;
                 dragging = false;
                 window.removeEventListener('mousemove', onMove);
                 window.removeEventListener('mouseup', onEnd);
-                window.removeEventListener('touchmove', onMove);
-                window.removeEventListener('touchend', onEnd);
-                window.removeEventListener('touchcancel', onEnd);
+                panel.removeEventListener('touchmove', onMove);
+                panel.removeEventListener('touchend', onEnd);
+                panel.removeEventListener('touchcancel', onEnd);
+                
                 panel.style.transition = 'transform 0.34s cubic-bezier(0.16, 1, 0.3, 1)';
                 if (currentY - startY > 90) closeFn(); else panel.style.transform = 'translateY(0)';
                 startY = 0; currentY = 0;
             }
+            
             function onStart(e) {
+                // Разрешаем тянуть окно вниз только если мы в самом верху списка, 
+                // либо если тапнули чётко по серому ползунку
+                if (panel.scrollTop > 0 && e.target !== handle && !handle.contains(e.target)) return;
+
                 dragging = true;
                 startY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
                 currentY = startY;
                 panel.style.transition = 'none';
+                
                 if (e.type.includes('mouse')) {
                     window.addEventListener('mousemove', onMove);
                     window.addEventListener('mouseup', onEnd);
                 } else {
-                    window.addEventListener('touchmove', onMove, { passive: true });
-                    window.addEventListener('touchend', onEnd);
-                    window.addEventListener('touchcancel', onEnd);
+                    // passive: false обязательно, чтобы работал preventDefault в onMove
+                    panel.addEventListener('touchmove', onMove, { passive: false });
+                    panel.addEventListener('touchend', onEnd);
+                    panel.addEventListener('touchcancel', onEnd);
                 }
             }
+            
+            // Вешаем слушатель на ВСЮ панель, а не только на handle
+            panel.addEventListener('touchstart', onStart, { passive: true });
             handle.addEventListener('mousedown', onStart);
-            handle.addEventListener('touchstart', onStart, { passive: true });
         }
 
 
@@ -2520,6 +2552,289 @@
             showToast('Зміни успішно застосовані');
         }
 
+        // --- ЛОКАЛЬНИЙ ОФЛАЙН ГЕНЕРАТОР QR-КОДІВ (0ms, SVG) ---
+        const _QR_PATTERN_POS = [[], [6, 18], [6, 22], [6, 26], [6, 30], [6, 34], [6, 22, 38], [6, 24, 42], [6, 26, 46], [6, 28, 50], [6, 30, 54], [6, 32, 58], [6, 34, 62], [6, 26, 46, 66], [6, 26, 48, 70], [6, 26, 50, 74], [6, 30, 54, 78], [6, 30, 56, 82], [6, 30, 58, 86], [6, 34, 62, 90], [6, 28, 50, 72, 94], [6, 26, 50, 74, 98], [6, 30, 54, 78, 102], [6, 28, 54, 80, 106], [6, 32, 58, 84, 110], [6, 30, 58, 86, 114], [6, 34, 62, 90, 118], [6, 26, 50, 74, 98, 122], [6, 30, 54, 78, 102, 126], [6, 26, 52, 78, 104, 130], [6, 30, 56, 82, 108, 134], [6, 34, 60, 86, 112, 138], [6, 30, 58, 86, 114, 142], [6, 34, 62, 90, 118, 146], [6, 30, 54, 78, 102, 126, 150], [6, 24, 50, 76, 102, 128, 154], [6, 28, 54, 80, 106, 132, 158], [6, 32, 58, 84, 110, 136, 162], [6, 26, 54, 82, 110, 138, 166], [6, 30, 58, 86, 114, 142, 170]];
+        const _QR_RS_BLOCK_TABLE = [[1, 26, 19], [1, 26, 16], [1, 26, 13], [1, 26, 9], [1, 44, 34], [1, 44, 28], [1, 44, 22], [1, 44, 16], [1, 70, 55], [1, 70, 44], [2, 35, 17], [2, 35, 13], [1, 100, 80], [2, 50, 32], [2, 50, 24], [4, 25, 9], [1, 134, 108], [2, 67, 43], [2, 33, 15, 2, 34, 16], [2, 33, 11, 2, 34, 12], [2, 86, 68], [4, 43, 27], [4, 43, 19], [4, 43, 15], [2, 98, 78], [4, 49, 31], [2, 32, 14, 4, 33, 15], [4, 39, 13, 1, 40, 14], [2, 121, 97], [2, 60, 38, 2, 61, 39], [4, 40, 18, 2, 41, 19], [4, 40, 14, 2, 41, 15], [2, 146, 116], [3, 58, 36, 2, 59, 37], [4, 36, 16, 4, 37, 17], [4, 36, 12, 4, 37, 13], [2, 86, 68, 2, 87, 69], [4, 69, 43, 1, 70, 44], [6, 43, 19, 2, 44, 20], [6, 43, 15, 2, 44, 16], [4, 101, 81], [1, 80, 50, 4, 81, 51], [4, 50, 22, 4, 51, 23], [3, 36, 12, 8, 37, 13], [2, 116, 92, 2, 117, 93], [6, 58, 36, 2, 59, 37], [4, 46, 20, 6, 47, 21], [7, 42, 14, 4, 43, 15], [4, 133, 107], [8, 59, 37, 1, 60, 38], [8, 44, 20, 4, 45, 21], [12, 33, 11, 4, 34, 12], [3, 145, 115, 1, 146, 116], [4, 64, 40, 5, 65, 41], [11, 36, 16, 5, 37, 17], [11, 36, 12, 5, 37, 13], [5, 109, 87, 1, 110, 88], [5, 65, 41, 5, 66, 42], [5, 54, 24, 7, 55, 25], [11, 36, 12], [5, 122, 98, 1, 123, 99], [7, 73, 45, 3, 74, 46], [15, 43, 19, 2, 44, 20], [3, 45, 15, 13, 46, 16], [1, 135, 107, 5, 136, 108], [10, 74, 46, 1, 75, 47], [1, 50, 22, 15, 51, 23], [2, 42, 14, 17, 43, 15], [5, 150, 120, 1, 151, 121], [9, 69, 43, 4, 70, 44], [17, 50, 22, 1, 51, 23], [2, 42, 14, 19, 43, 15], [3, 141, 113, 4, 142, 114], [3, 70, 44, 11, 71, 45], [17, 47, 21, 4, 48, 22], [9, 39, 13, 16, 40, 14], [3, 135, 107, 5, 136, 108], [3, 67, 41, 13, 68, 42], [15, 54, 24, 5, 55, 25], [15, 43, 15, 10, 44, 16], [4, 144, 116, 4, 145, 117], [17, 68, 42], [17, 50, 22, 6, 51, 23], [19, 46, 16, 6, 47, 17], [2, 139, 111, 7, 140, 112], [17, 74, 46], [7, 54, 24, 16, 55, 25], [34, 37, 13], [4, 151, 121, 5, 152, 122], [4, 75, 47, 14, 76, 48], [11, 54, 24, 14, 55, 25], [16, 45, 15, 14, 46, 16], [6, 147, 117, 4, 148, 118], [6, 73, 45, 14, 74, 46], [11, 54, 24, 16, 55, 25], [30, 46, 16, 2, 47, 17], [8, 132, 106, 4, 133, 107], [8, 75, 47, 13, 76, 48], [7, 54, 24, 22, 55, 25], [22, 45, 15, 13, 46, 16], [10, 142, 114, 2, 143, 115], [19, 74, 46, 4, 75, 47], [28, 50, 22, 6, 51, 23], [33, 46, 16, 4, 47, 17], [8, 152, 122, 4, 153, 123], [22, 73, 45, 3, 74, 46], [8, 53, 23, 26, 54, 24], [12, 45, 15, 28, 46, 16], [3, 147, 117, 10, 148, 118], [3, 73, 45, 23, 74, 46], [4, 54, 24, 31, 55, 25], [11, 45, 15, 31, 46, 16], [7, 146, 116, 7, 147, 117], [21, 73, 45, 7, 74, 46], [1, 53, 23, 37, 54, 24], [19, 45, 15, 26, 46, 16], [5, 145, 115, 10, 146, 116], [19, 75, 47, 10, 76, 48], [15, 54, 24, 25, 55, 25], [23, 45, 15, 25, 46, 16], [13, 145, 115, 3, 146, 116], [2, 74, 46, 29, 75, 47], [42, 54, 24, 1, 55, 25], [23, 45, 15, 28, 46, 16], [17, 145, 115], [10, 74, 46, 23, 75, 47], [10, 54, 24, 35, 55, 25], [19, 45, 15, 35, 46, 16], [17, 145, 115, 1, 146, 116], [14, 74, 46, 21, 75, 47], [29, 54, 24, 19, 55, 25], [11, 45, 15, 46, 46, 16], [13, 145, 115, 6, 146, 116], [14, 74, 46, 23, 75, 47], [44, 54, 24, 7, 55, 25], [59, 46, 16, 1, 47, 17], [12, 151, 121, 7, 152, 122], [12, 75, 47, 26, 76, 48], [39, 54, 24, 14, 55, 25], [22, 45, 15, 41, 46, 16], [6, 151, 121, 14, 152, 122], [6, 75, 47, 34, 76, 48], [46, 54, 24, 10, 55, 25], [2, 45, 15, 64, 46, 16], [17, 152, 122, 4, 153, 123], [29, 74, 46, 14, 75, 47], [49, 54, 24, 10, 55, 25], [24, 45, 15, 46, 46, 16], [4, 152, 122, 18, 153, 123], [13, 74, 46, 32, 75, 47], [48, 54, 24, 14, 55, 25], [42, 45, 15, 32, 46, 16], [20, 147, 117, 4, 148, 118], [40, 75, 47, 7, 76, 48], [43, 54, 24, 22, 55, 25], [10, 45, 15, 67, 46, 16], [19, 148, 118, 6, 149, 119], [18, 75, 47, 31, 76, 48], [34, 54, 24, 34, 55, 25], [20, 45, 15, 61, 46, 16]];
+        const _QR_EXP = new Array(256);
+        const _QR_LOG = new Array(256);
+        for (let i = 0; i < 8; i++) _QR_EXP[i] = 1 << i;
+        for (let i = 8; i < 256; i++) _QR_EXP[i] = _QR_EXP[i - 4] ^ _QR_EXP[i - 5] ^ _QR_EXP[i - 6] ^ _QR_EXP[i - 8];
+        for (let i = 0; i < 255; i++) _QR_LOG[_QR_EXP[i]] = i;
+        function _qrGlog(n) { return _QR_LOG[n]; }
+        function _qrGexp(n) { while (n < 0) n += 255; while (n >= 256) n -= 255; return _QR_EXP[n]; }
+
+        function _qrPolyMul(p1, p2) {
+            const num = new Array(p1.length + p2.length - 1).fill(0);
+            for (let i = 0; i < p1.length; i++) {
+                if (p1[i] === 0) continue;
+                for (let j = 0; j < p2.length; j++) {
+                    if (p2[j] === 0) continue;
+                    num[i + j] ^= _qrGexp(_qrGlog(p1[i]) + _qrGlog(p2[j]));
+                }
+            }
+            let off = 0; while (off < num.length && num[off] === 0) off++;
+            return num.slice(off);
+        }
+
+        function _qrPolyMod(p1, p2) {
+            let num = p1.slice();
+            while (true) {
+                let off = 0; while (off < num.length && num[off] === 0) off++;
+                num = num.slice(off);
+                if (num.length < p2.length) return num;
+                const ratio = _qrGlog(num[0]) - _qrGlog(p2[0]);
+                for (let i = 0; i < p2.length; i++) {
+                    if (p2[i] !== 0) num[i] ^= _qrGexp(_qrGlog(p2[i]) + ratio);
+                }
+            }
+        }
+
+        function _qrGetErrorPoly(ecLen) {
+            let a = [1];
+            for (let i = 0; i < ecLen; i++) a = _qrPolyMul(a, [1, _qrGexp(i)]);
+            return a;
+        }
+
+        function _qrBCHDigit(d) { let digit = 0; while (d !== 0) { digit++; d >>>= 1; } return digit; }
+        function _qrBCHTypeInfo(data) {
+            const G15 = (1 << 10) | (1 << 8) | (1 << 5) | (1 << 4) | (1 << 2) | (1 << 1) | 1;
+            const G15_MASK = (1 << 14) | (1 << 12) | (1 << 10) | (1 << 4) | (1 << 1);
+            let d = data << 10;
+            while (_qrBCHDigit(d) - _qrBCHDigit(G15) >= 0) d ^= (G15 << (_qrBCHDigit(d) - _qrBCHDigit(G15)));
+            return ((data << 10) | d) ^ G15_MASK;
+        }
+        function _qrBCHTypeNumber(data) {
+            const G18 = (1 << 12) | (1 << 11) | (1 << 10) | (1 << 9) | (1 << 8) | (1 << 5) | (1 << 2) | 1;
+            let d = data << 12;
+            while (_qrBCHDigit(d) - _qrBCHDigit(G18) >= 0) d ^= (G18 << (_qrBCHDigit(d) - _qrBCHDigit(G18)));
+            return (data << 12) | d;
+        }
+        function _qrMask(p, i, j) {
+            switch (p) {
+                case 0: return (i + j) % 2 === 0;
+                case 1: return i % 2 === 0;
+                case 2: return j % 3 === 0;
+                case 3: return (i + j) % 3 === 0;
+                case 4: return (Math.floor(i / 2) + Math.floor(j / 3)) % 2 === 0;
+                case 5: return (i * j) % 2 + (i * j) % 3 === 0;
+                case 6: return ((i * j) % 2 + (i * j) % 3) % 2 === 0;
+                case 7: return ((i * j) % 3 + (i + j) % 2) % 2 === 0;
+            }
+            return false;
+        }
+
+        function buildOfflineQRSvg(text) {
+            const bytes = Array.from(new TextEncoder().encode(text));
+            let ecLevel = 2; // H (30% recovery - ideal for center logo)
+            let ecOffset = 3;
+            let version = 1;
+            let rsBlocks = [];
+
+            function getBlocks(ver, off) {
+                const row = _QR_RS_BLOCK_TABLE[(ver - 1) * 4 + off];
+                const list = [];
+                for (let i = 0; i < row.length; i += 3) {
+                    for (let j = 0; j < row[i]; j++) list.push({ totalCount: row[i + 1], dataCount: row[i + 2] });
+                }
+                return list;
+            }
+
+            let found = false;
+            for (let v = 1; v <= 40; v++) {
+                const b = getBlocks(v, ecOffset);
+                const totalData = b.reduce((s, x) => s + x.dataCount, 0);
+                const lenBits = v < 10 ? 8 : 16;
+                if (4 + lenBits + bytes.length * 8 <= totalData * 8) {
+                    version = v; rsBlocks = b; found = true; break;
+                }
+            }
+            if (!found) {
+                ecLevel = 0; ecOffset = 1; // Fallback to M if URL is huge
+                for (let v = 1; v <= 40; v++) {
+                    const b = getBlocks(v, ecOffset);
+                    const totalData = b.reduce((s, x) => s + x.dataCount, 0);
+                    const lenBits = v < 10 ? 8 : 16;
+                    if (4 + lenBits + bytes.length * 8 <= totalData * 8) {
+                        version = v; rsBlocks = b; found = true; break;
+                    }
+                }
+            }
+
+            const buf = []; let bitLen = 0;
+            function putBit(bit) {
+                const idx = bitLen >>> 3;
+                if (buf.length <= idx) buf.push(0);
+                if (bit) buf[idx] |= (0x80 >>> (bitLen % 8));
+                bitLen++;
+            }
+            function putBits(num, length) {
+                for (let i = 0; i < length; i++) putBit(((num >>> (length - i - 1)) & 1) === 1);
+            }
+
+            putBits(4, 4);
+            putBits(bytes.length, version < 10 ? 8 : 16);
+            for (let i = 0; i < bytes.length; i++) putBits(bytes[i], 8);
+
+            const totalDataCount = rsBlocks.reduce((s, x) => s + x.dataCount, 0);
+            if (bitLen + 4 <= totalDataCount * 8) putBits(0, 4);
+            while (bitLen % 8 !== 0) putBit(false);
+            while (bitLen < totalDataCount * 8) {
+                putBits(0xEC, 8);
+                if (bitLen >= totalDataCount * 8) break;
+                putBits(0x11, 8);
+            }
+
+            let offset = 0, maxDc = 0, maxEc = 0;
+            const dcdata = [], ecdata = [];
+            for (let r = 0; r < rsBlocks.length; r++) {
+                const dcCount = rsBlocks[r].dataCount;
+                const ecCount = rsBlocks[r].totalCount - dcCount;
+                maxDc = Math.max(maxDc, dcCount);
+                maxEc = Math.max(maxEc, ecCount);
+                const dc = buf.slice(offset, offset + dcCount);
+                dcdata.push(dc);
+                offset += dcCount;
+
+                const rsPoly = _qrGetErrorPoly(ecCount);
+                let rawPoly = dc.concat(new Array(ecCount).fill(0));
+                const modPoly = _qrPolyMod(rawPoly, rsPoly);
+                const ec = new Array(ecCount).fill(0);
+                for (let i = 0; i < ecCount; i++) {
+                    const modIdx = i + modPoly.length - ecCount;
+                    ec[i] = modIdx >= 0 ? modPoly[modIdx] : 0;
+                }
+                ecdata.push(ec);
+            }
+
+            const dataCache = [];
+            for (let i = 0; i < maxDc; i++) {
+                for (let r = 0; r < rsBlocks.length; r++) if (i < dcdata[r].length) dataCache.push(dcdata[r][i]);
+            }
+            for (let i = 0; i < maxEc; i++) {
+                for (let r = 0; r < rsBlocks.length; r++) if (i < ecdata[r].length) dataCache.push(ecdata[r][i]);
+            }
+
+            const moduleCount = version * 4 + 17;
+            function buildMatrix(isTest, maskPattern) {
+                const modules = Array.from({ length: moduleCount }, () => new Array(moduleCount).fill(null));
+                function setupProbe(row, col) {
+                    for (let r = -1; r <= 7; r++) {
+                        if (row + r <= -1 || moduleCount <= row + r) continue;
+                        for (let c = -1; c <= 7; c++) {
+                            if (col + c <= -1 || moduleCount <= col + c) continue;
+                            if ((0 <= r && r <= 6 && (c === 0 || c === 6)) || (0 <= c && c <= 6 && (r === 0 || r === 6)) || (2 <= r && r <= 4 && 2 <= c && c <= 4)) {
+                                modules[row + r][col + c] = true;
+                            } else {
+                                modules[row + r][col + c] = false;
+                            }
+                        }
+                    }
+                }
+                setupProbe(0, 0);
+                setupProbe(moduleCount - 7, 0);
+                setupProbe(0, moduleCount - 7);
+
+                const pos = _QR_PATTERN_POS[version - 1];
+                for (let i = 0; i < pos.length; i++) {
+                    for (let j = 0; j < pos.length; j++) {
+                        const row = pos[i], col = pos[j];
+                        if (modules[row][col] !== null) continue;
+                        for (let r = -2; r <= 2; r++) {
+                            for (let c = -2; c <= 2; c++) {
+                                modules[row + r][col + c] = (r === -2 || r === 2 || c === -2 || c === 2 || (r === 0 && c === 0));
+                            }
+                        }
+                    }
+                }
+
+                for (let r = 8; r < moduleCount - 8; r++) if (modules[r][6] === null) modules[r][6] = (r % 2 === 0);
+                for (let c = 8; c < moduleCount - 8; c++) if (modules[6][c] === null) modules[6][c] = (c % 2 === 0);
+
+                const typeBits = _qrBCHTypeInfo((ecLevel << 3) | maskPattern);
+                for (let i = 0; i < 15; i++) {
+                    const mod = (!isTest && ((typeBits >> i) & 1) === 1);
+                    if (i < 6) modules[i][8] = mod;
+                    else if (i < 8) modules[i + 1][8] = mod;
+                    else modules[moduleCount - 15 + i][8] = mod;
+
+                    if (i < 8) modules[8][moduleCount - i - 1] = mod;
+                    else if (i < 9) modules[8][15 - i - 1 + 1] = mod;
+                    else modules[8][15 - i - 1] = mod;
+                }
+                modules[moduleCount - 8][8] = !isTest;
+
+                if (version >= 7) {
+                    const vBits = _qrBCHTypeNumber(version);
+                    for (let i = 0; i < 18; i++) {
+                        const mod = (!isTest && ((vBits >> i) & 1) === 1);
+                        modules[Math.floor(i / 3)][i % 3 + moduleCount - 11] = mod;
+                        modules[i % 3 + moduleCount - 11][Math.floor(i / 3)] = mod;
+                    }
+                }
+
+                let inc = -1, row = moduleCount - 1, bitIdx = 7, byteIdx = 0;
+                for (let col = moduleCount - 1; col > 0; col -= 2) {
+                    if (col === 6) col--;
+                    while (true) {
+                        for (let c = 0; c < 2; c++) {
+                            if (modules[row][col - c] === null) {
+                                let dark = false;
+                                if (byteIdx < dataCache.length) dark = (((dataCache[byteIdx] >>> bitIdx) & 1) === 1);
+                                if (_qrMask(maskPattern, row, col - c)) dark = !dark;
+                                modules[row][col - c] = dark;
+                                bitIdx--;
+                                if (bitIdx === -1) { byteIdx++; bitIdx = 7; }
+                            }
+                        }
+                        row += inc;
+                        if (row < 0 || moduleCount <= row) { row -= inc; inc = -inc; break; }
+                    }
+                }
+                return modules;
+            }
+
+            function calcPenalty(m) {
+                let lost = 0;
+                for (let r = 0; r < moduleCount; r++) {
+                    for (let c = 0; c < moduleCount; c++) {
+                        let same = 0; const dark = m[r][c];
+                        for (let dr = -1; dr <= 1; dr++) {
+                            if (r + dr < 0 || moduleCount <= r + dr) continue;
+                            for (let dc = -1; dc <= 1; dc++) {
+                                if (c + dc < 0 || moduleCount <= c + dc || (dr === 0 && dc === 0)) continue;
+                                if (dark === m[r + dr][c + dc]) same++;
+                            }
+                        }
+                        if (same > 5) lost += (3 + same - 5);
+                    }
+                }
+                return lost;
+            }
+
+            let bestMask = 0, minPenalty = Infinity;
+            for (let i = 0; i < 8; i++) {
+                const m = buildMatrix(true, i);
+                const p = calcPenalty(m);
+                if (p < minPenalty) { minPenalty = p; bestMask = i; }
+            }
+
+            const finalMatrix = buildMatrix(false, bestMask);
+            let path = '';
+            for (let r = 0; r < moduleCount; r++) {
+                let c = 0;
+                while (c < moduleCount) {
+                    if (finalMatrix[r][c]) {
+                        let run = 1;
+                        while (c + run < moduleCount && finalMatrix[r][c + run]) run++;
+                        path += `M${c},${r}h${run}v1h-${run}z`;
+                        c += run;
+                    } else c++;
+                }
+            }
+
+            return `<svg viewBox="0 0 ${moduleCount} ${moduleCount}" class="w-full h-full block" shape-rendering="crispEdges" xmlns="http://www.w3.org/2000/svg"><path fill="#0F1115" d="${path}"/></svg>`;
+        }
+
         // QR Code Logic
         function showQRCode(forceId = null) {
             const id = forceId || editingId;
@@ -2527,21 +2842,29 @@
             if (!item) return;
             
             _pushModalState();
+            const favEl = document.getElementById('qr-favicon');
+            if (favEl) favEl.innerHTML = getSiteFaviconHtml(item, 'w-9 h-9', 'w-5 h-5');
             document.getElementById('qr-title').textContent = item.domain;
             const subEl = document.getElementById('qr-subtitle');
-            if (subEl) subEl.textContent = item.title;
-            window._currentQRUrl = item.url;
+            if (subEl) subEl.textContent = item.title || item.name;
+            const cleanUrl = cleanRawUrl(item.url);
+            window._currentQRUrl = cleanUrl;
+            const urlPrev = document.getElementById('qr-url-preview');
+            if (urlPrev) urlPrev.textContent = cleanUrl;
             
             const qrContainer = document.getElementById('qr-container');
-            const safeUrl = encodeURIComponent(cleanRawUrl(item.url));
-            const imgUrl = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${safeUrl}&color=0F1115&bgcolor=ffffff&ecc=H&margin=0`;
+            const svgMarkup = buildOfflineQRSvg(cleanUrl);
             
             qrContainer.innerHTML = `
-                <div style="position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
-                    <div class="absolute w-8 h-8 rounded-full border-4 border-stone-200 border-t-accent animate-spin z-0"></div>
-                    <img src="${imgUrl}" alt="QR" class="w-full h-full object-contain z-10 relative" style="mix-blend-mode: multiply; background-color: transparent;" onload="this.previousElementSibling.style.display='none';">
-                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 44px; height: 44px; background: white; border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 0 4px #fff, 0 4px 10px rgba(0,0,0,0.15);" class="z-20">
-                        <svg viewBox="0 0 2048 2048" class="w-6 h-6 text-[#0F1115] drop-shadow-sm" xmlns="http://www.w3.org/2000/svg"><path fill="currentColor" d="M 820.745 774.484 C 843.943 773.99 873.918 775.257 896.837 776.679 C 976.15 781.6 1061.49 792.356 1128.78 838.041 C 1194.53 882.69 1242.68 950.654 1257.85 1029.03 C 1208.06 1030.81 1114.09 1032.21 1070.34 1012.39 C 1057.54 1006.59 1048.04 997.356 1037.19 988.759 C 1026.23 980.074 1014.43 972.7 1001.26 967.858 C 926.976 940.551 772.06 945.932 690.612 955.345 C 544.138 972.273 403.224 1022 309.048 1140.88 C 237.059 1230.09 204.079 1344.56 217.568 1458.39 C 231.435 1569.88 289.137 1671.25 377.917 1740.09 C 465.695 1809.18 578.939 1849.08 690.998 1834.81 C 903.421 1807.77 1039.63 1638.79 1082.95 1438.5 C 1088.66 1412.8 1092.59 1386.74 1094.72 1360.5 C 1095.11 1355.7 1095.66 1338.72 1097.53 1336.33 L 1102 1335.91 C 1122.33 1336.33 1146.1 1338.33 1167.22 1339.02 C 1201.81 1339.88 1236.42 1340.02 1271.01 1339.43 C 1266.42 1377.03 1265.41 1411.49 1258.02 1450.12 C 1230.46 1594.11 1175.15 1722.01 1073.17 1828.16 C 964.32 1939.53 816.106 2003.75 660.404 2006.98 C 493.262 2010.27 337.212 1952.99 216.275 1837.64 C -28.8002 1603.91 -23.8879 1230.94 211.223 991.613 C 372.412 827.536 598.052 777.654 820.745 774.484 z"/><path fill="#DF6D27" d="M 1396.31 39.4755 C 1512.61 37.6317 1629.32 66.1793 1727.77 129.345 C 1864.71 218.317 1960.59 358.153 1994.23 517.959 C 2028.26 673.494 1996.72 832.794 1909.46 968.647 C 1732.09 1244.52 1388.18 1291.96 1087.03 1264.59 C 1048.66 1261.11 1009.23 1251.21 973.5 1236.71 C 886.848 1201.56 809.795 1113.6 790.003 1021.45 C 832.844 1021.23 946.663 1019.89 981.612 1037.17 C 998.635 1045.58 1010.96 1060.85 1027.08 1070.83 C 1056.87 1089.28 1097.11 1093.28 1131.48 1096.35 C 1235.42 1105.62 1351.69 1098.17 1453.25 1074.63 C 1620.82 1041.23 1770.82 924.626 1816.58 756.08 C 1854.48 616.481 1821.61 459.393 1726.31 349.829 C 1654.8 266.642 1552.75 215.815 1443.27 208.849 C 1329.89 200.394 1217.92 238.271 1132.96 313.824 C 1017.91 415.124 972.93 564.552 963.56 712.937 C 951.318 713.323 939.91 712.409 927.711 712.049 L 856.285 710.134 C 833.991 709.611 807.256 711.231 786.079 709.852 L 786.001 708.387 C 784.917 684.003 793.699 644.934 797.397 620.219 C 844.945 302.493 1060.97 53.5881 1396.31 39.4755 z"/><path fill="#DF6D27" d="M 629.683 1234.44 C 728.899 1227.18 815.058 1302.08 821.686 1401.34 C 828.315 1500.6 752.879 1586.29 653.58 1592.29 C 555.159 1598.24 470.396 1523.62 463.826 1425.24 C 457.257 1326.85 531.345 1241.62 629.683 1234.44 z"/><path fill="currentColor" d="M 1389.32 459.332 C 1486.96 448.395 1574.96 518.749 1585.79 616.408 C 1596.61 714.067 1526.16 801.986 1428.49 812.698 C 1330.98 823.393 1243.23 753.077 1232.42 655.577 C 1221.62 558.078 1291.83 470.252 1389.32 459.332 z"/></svg>
+                <div class="relative w-full h-full flex items-center justify-center">
+                    ${svgMarkup}
+                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 46px; height: 46px; background: #FFFFFF; border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 0 3px #FFFFFF, 0 4px 12px rgba(15,17,21,0.18);">
+                        <svg viewBox="0 0 2048 2048" class="w-7 h-7" xmlns="http://www.w3.org/2000/svg">
+                            <path fill="#1F1D1E" d="M 820.745 774.484 C 843.943 773.99 873.918 775.257 896.837 776.679 C 976.15 781.6 1061.49 792.356 1128.78 838.041 C 1194.53 882.69 1242.68 950.654 1257.85 1029.03 C 1208.06 1030.81 1114.09 1032.21 1070.34 1012.39 C 1057.54 1006.59 1048.04 997.356 1037.19 988.759 C 1026.23 980.074 1014.43 972.7 1001.26 967.858 C 926.976 940.551 772.06 945.932 690.612 955.345 C 544.138 972.273 403.224 1022 309.048 1140.88 C 237.059 1230.09 204.079 1344.56 217.568 1458.39 C 231.435 1569.88 289.137 1671.25 377.917 1740.09 C 465.695 1809.18 578.939 1849.08 690.998 1834.81 C 903.421 1807.77 1039.63 1638.79 1082.95 1438.5 C 1088.66 1412.8 1092.59 1386.74 1094.72 1360.5 C 1095.11 1355.7 1095.66 1338.72 1097.53 1336.33 L 1102 1335.91 C 1122.33 1336.33 1146.1 1338.33 1167.22 1339.02 C 1201.81 1339.88 1236.42 1340.02 1271.01 1339.43 C 1266.42 1377.03 1265.41 1411.49 1258.02 1450.12 C 1230.46 1594.11 1175.15 1722.01 1073.17 1828.16 C 964.32 1939.53 816.106 2003.75 660.404 2006.98 C 493.262 2010.27 337.212 1952.99 216.275 1837.64 C -28.8002 1603.91 -23.8879 1230.94 211.223 991.613 C 372.412 827.536 598.052 777.654 820.745 774.484 z"/>
+                            <path fill="#DF6D27" d="M 1396.31 39.4755 C 1512.61 37.6317 1629.32 66.1793 1727.77 129.345 C 1864.71 218.317 1960.59 358.153 1994.23 517.959 C 2028.26 673.494 1996.72 832.794 1909.46 968.647 C 1732.09 1244.52 1388.18 1291.96 1087.03 1264.59 C 1048.66 1261.11 1009.23 1251.21 973.5 1236.71 C 886.848 1201.56 809.795 1113.6 790.003 1021.45 C 832.844 1021.23 946.663 1019.89 981.612 1037.17 C 998.635 1045.58 1010.96 1060.85 1027.08 1070.83 C 1056.87 1089.28 1097.11 1093.28 1131.48 1096.35 C 1235.42 1105.62 1351.69 1098.17 1453.25 1074.63 C 1620.82 1041.23 1770.82 924.626 1816.58 756.08 C 1854.48 616.481 1821.61 459.393 1726.31 349.829 C 1654.8 266.642 1552.75 215.815 1443.27 208.849 C 1329.89 200.394 1217.92 238.271 1132.96 313.824 C 1017.91 415.124 972.93 564.552 963.56 712.937 C 951.318 713.323 939.91 712.409 927.711 712.049 L 856.285 710.134 C 833.991 709.611 807.256 711.231 786.079 709.852 L 786.001 708.387 C 784.917 684.003 793.699 644.934 797.397 620.219 C 844.945 302.493 1060.97 53.5881 1396.31 39.4755 z"/>
+                            <path fill="#DF6D27" d="M 629.683 1234.44 C 728.899 1227.18 815.058 1302.08 821.686 1401.34 C 828.315 1500.6 752.879 1586.29 653.58 1592.29 C 555.159 1598.24 470.396 1523.62 463.826 1425.24 C 457.257 1326.85 531.345 1241.62 629.683 1234.44 z"/>
+                            <path fill="#1F1D1E" d="M 1389.32 459.332 C 1486.96 448.395 1574.96 518.749 1585.79 616.408 C 1596.61 714.067 1526.16 801.986 1428.49 812.698 C 1330.98 823.393 1243.23 753.077 1232.42 655.577 C 1221.62 558.078 1291.83 470.252 1389.32 459.332 z"/>
+                        </svg>
                     </div>
                 </div>
             `;
@@ -2553,6 +2876,17 @@
 
         function copyQRUrl() {
             if (window._currentQRUrl) copyItemUrl(window._currentQRUrl);
+        }
+
+        function shareQRUrl() {
+            const url = window._currentQRUrl;
+            if (!url) return;
+            const title = document.getElementById('qr-subtitle')?.textContent || 'LinkBox';
+            if (navigator.share) {
+                navigator.share({ title, url }).catch(() => {});
+            } else {
+                copyItemUrl(url);
+            }
         }
 
         function closeQRModal() { safeCloseModal(_hideQRModal); }
