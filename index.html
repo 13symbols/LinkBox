@@ -469,6 +469,12 @@
     
         .animate-spin { animation: spin 1s linear infinite; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        .unread-card {
+            position: relative;
+            border-left: 4px solid rgb(var(--accent-rgb)) !important;
+        }
+
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
@@ -1166,22 +1172,101 @@
             if (parsed.fontScale) fontScale = parsed.fontScale;
         }
 
-        // --- НАВІГАЦІЯ ТА ЗАКРИТТЯ МОДАЛЬНИХ ВІКОН ---
+        // --- НАВІГАЦІЯ, ЖЕСТИ ВІД КРАЮ ЕКРАНА ТА ПОДВІЙНИЙ СВАЙП ДЛЯ ВИХОДУ ---
+        let _lastBackTapTime = 0;
+
         function isAnyModalOpen() {
             return isMobileSidebarOpen || Boolean(document.querySelector('.sheet-backdrop.open'));
         }
 
+        function _ensureBaseHistoryGuard() {
+            if (!history.state || (!history.state.appBase && history.state.id !== 'modal')) {
+                history.replaceState({ appBase: true }, '');
+                history.pushState({ appGuard: true }, '');
+            }
+        }
+
+        function closeTopMostActiveModal(viaHistory = false) {
+            if (document.getElementById('confirm-modal')?.classList.contains('open')) {
+                viaHistory ? _hideConfirmModal() : closeConfirmModal();
+                return true;
+            }
+            if (document.getElementById('qr-modal')?.classList.contains('open')) {
+                viaHistory ? _hideQRModal() : closeQRModal();
+                return true;
+            }
+            if (document.getElementById('bulk-edit-sheet-modal')?.classList.contains('open')) {
+                viaHistory ? _hideBulkEditSheet() : closeBulkEditSheet();
+                return true;
+            }
+            if (document.getElementById('edit-sheet-modal')?.classList.contains('open')) {
+                viaHistory ? _hideEditSheet() : closeEditSheet();
+                return true;
+            }
+            if (document.getElementById('calendar-sheet-modal')?.classList.contains('open')) {
+                const dashView = document.getElementById('day-dashboard-view');
+                if (dashView && !dashView.classList.contains('hidden')) {
+                    backToCalendar();
+                    if (viaHistory) _pushModalState();
+                    return true;
+                }
+                viaHistory ? _hideCalendarSheet() : closeCalendarSheet();
+                return true;
+            }
+            if (document.getElementById('cats-sheet-modal')?.classList.contains('open')) {
+                viaHistory ? _hideCatsSheet() : closeCategoriesSheet();
+                return true;
+            }
+            if (document.getElementById('tags-sheet-modal')?.classList.contains('open')) {
+                viaHistory ? _hideTagsSheet() : closeTagsSheet();
+                return true;
+            }
+            if (document.getElementById('about-sheet-modal')?.classList.contains('open')) {
+                viaHistory ? _hideAboutSheet() : closeAboutSheet();
+                return true;
+            }
+            if (isMobileSidebarOpen) {
+                viaHistory ? _hideSidebar() : closeMobileSidebar();
+                return true;
+            }
+            if (isSelectMode) {
+                toggleSelectMode();
+                if (viaHistory) history.pushState({ appGuard: true }, '');
+                return true;
+            }
+            if (selectedFolder !== 'ALL' || selectedTag !== null || (document.getElementById('search-input')?.value || '').trim() !== '') {
+                resetToAllLinks();
+                if (viaHistory) history.pushState({ appGuard: true }, '');
+                return true;
+            }
+            return false;
+        }
+
+        function triggerDoubleBackExit(fromPopstate = false) {
+            const now = Date.now();
+            if (now - _lastBackTapTime < 2200) {
+                try { if (window. navigator && navigator.app && navigator.app.exitApp) navigator.app.exitApp(); } catch (e) {}
+                try { if (window.Android && typeof window.Android.closeApp === 'function') window.Android.closeApp(); } catch (e) {}
+                try { window.close(); } catch (e) {}
+                if (fromPopstate) {
+                    history.back();
+                } else {
+                    history.go(-2);
+                }
+            } else {
+                _lastBackTapTime = now;
+                showToast('Змахніть ще раз для виходу');
+                if (fromPopstate) {
+                    history.pushState({ appGuard: true }, '');
+                }
+            }
+        }
+
         window.addEventListener('popstate', () => {
-            if (document.getElementById('confirm-modal')?.classList.contains('open')) { _hideConfirmModal(); }
-            else if (document.getElementById('qr-modal')?.classList.contains('open')) { _hideQRModal(); }
-            else if (document.getElementById('bulk-edit-sheet-modal')?.classList.contains('open')) { _hideBulkEditSheet(); }
-            else if (document.getElementById('edit-sheet-modal')?.classList.contains('open')) { _hideEditSheet(); }
-            else if (document.getElementById('calendar-sheet-modal')?.classList.contains('open')) { _hideCalendarSheet(); }
-            else if (document.getElementById('cats-sheet-modal')?.classList.contains('open')) { _hideCatsSheet(); }
-            else if (document.getElementById('tags-sheet-modal')?.classList.contains('open')) { _hideTagsSheet(); }
-            else if (document.getElementById('about-sheet-modal')?.classList.contains('open')) { _hideAboutSheet(); }
-            else if (isMobileSidebarOpen) { _hideSidebar(); }
-            else if (isSelectMode) { toggleSelectMode(); }
+            if (closeTopMostActiveModal(true)) {
+                return;
+            }
+            triggerDoubleBackExit(true);
         });
 
         function _pushModalState() {
@@ -1196,6 +1281,48 @@
             } else {
                 hideFn();
             }
+        }
+
+        function attachEdgeBackGesture() {
+            let startX = 0, startY = 0, edgeSide = null, tracking = false;
+            document.addEventListener('touchstart', (e) => {
+                if (e.touches.length !== 1) { tracking = false; return; }
+                const x = e.touches[0].clientX;
+                const y = e.touches[0].clientY;
+                const w = window.innerWidth || document.documentElement.clientWidth;
+                const isRightEdge = x >= w - 34;
+                const isLeftEdge = x <= 34;
+                // Якщо ми на головному екрані без модалок, лівий край відкриває меню, а правий край працює як жест Назад/Вихід.
+                // Якщо відкрита будь-яка шторка/вікно — жест від будь-якого краю (лівого чи правого) закриває активне вікно!
+                if (isAnyModalOpen()) {
+                    if (isLeftEdge || isRightEdge) {
+                        startX = x; startY = y; edgeSide = isLeftEdge ? 'left' : 'right'; tracking = true;
+                    } else { tracking = false; }
+                } else {
+                    if (isRightEdge) {
+                        startX = x; startY = y; edgeSide = 'right'; tracking = true;
+                    } else { tracking = false; }
+                }
+            }, { passive: true });
+
+            document.addEventListener('touchend', (e) => {
+                if (!tracking || !e.changedTouches || e.changedTouches.length === 0) return;
+                tracking = false;
+                const endX = e.changedTouches[0].clientX;
+                const endY = e.changedTouches[0].clientY;
+                const dx = endX - startX;
+                const dy = endY - startY;
+                if (Math.abs(dx) > 48 && Math.abs(dx) > Math.abs(dy) * 1.4) {
+                    if ((edgeSide === 'left' && dx > 48) || (edgeSide === 'right' && dx < -48)) {
+                        if (!closeTopMostActiveModal(false)) {
+                            triggerDoubleBackExit(false);
+                        }
+                    }
+                }
+                edgeSide = null;
+            }, { passive: true });
+
+            document.addEventListener('touchcancel', () => { tracking = false; edgeSide = null; }, { passive: true });
         }
 
         function _forceCloseAllUI() {
@@ -1664,8 +1791,14 @@
                     <div class="theme-card border rounded-xl p-3.5 space-y-1"><div class="font-bold">9. Розумна фільтрація NSFW (Полуничка 18+)</div><p class="theme-muted">ШІ автоматично розпізнає контент для дорослих, поміщає його в окрему категорію <b>«Полуничка 18+»</b>, додає тег <code>#nsfw</code> та <b>відразу блокує прямий перехід</b> (вмикає замок Сейфу). Це гарантує відсутність випадкових відкриттів таких посилань у публічних місцях.</p></div>
                 </div>
                 <div class="theme-card border border-accent/40 rounded-xl p-4 text-center space-y-2 mt-3">
-                    <div class="font-black text-sm sm:text-base tracking-tight">Зробив Shans</div>
-                    <div class="flex items-center justify-center gap-2 font-extrabold text-sm"><span>Слава Україні!</span><span class="inline-flex flex-col w-6 h-4 rounded-xs overflow-hidden shadow-2xs shrink-0" title="Україна"><span class="w-full h-1/2 bg-[#0057B7]"></span><span class="w-full h-1/2 bg-[#FFD700]"></span></span></div>
+                    <div class="font-black text-sm sm:text-base tracking-tight">Shans</div>
+                    <div class="flex items-center justify-center gap-2 font-extrabold text-sm">
+                        <span>Слава Україні!</span>
+                        <svg viewBox="0 0 24 16" class="w-6 h-4 rounded-xs shadow-2xs shrink-0" style="border: 1px solid rgba(0,0,0,0.08);" title="Україна" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="24" height="8" y="0" fill="#0057B7"/>
+                            <rect width="24" height="8" y="8" fill="#FFD700"/>
+                        </svg>
+                    </div>
                 </div>
             `;
         }
@@ -1805,7 +1938,7 @@
         }
 
         function renderUnreadDot(item) {
-            return item.isRead === false ? `<span class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-accent border-2 border-white shadow-sm z-10" title="Нове (не прочитано)"></span>` : '';
+            return '';
         }
 
         function renderApp() {
@@ -1846,21 +1979,21 @@
                 cardsEl.innerHTML = filtered.map(s => {
                     const locked = isItemLocked(s); const isDup = highlightedDuplicateId === s.id; const isSelected = selectedIds.has(s.id);
                     const clickActionAttr = isSelectMode ? `data-action="toggle-card-select" data-id="${s.id}"` : `data-action="open-edit" data-id="${s.id}"`;
-                    return `<div id="card-${s.id}" ${clickActionAttr} class="rounded-xl p-4 theme-card border flex flex-col justify-between cursor-pointer hover:border-accent transition ${isDup || isSelected ? 'ring-2 ring-accent border-accent' : ''}"><div><div class="flex items-center justify-between gap-2"><div class="flex items-center gap-2.5 min-w-0">${isSelectMode ? `<span class="w-6 h-6 rounded-md border flex items-center justify-center shrink-0 ${isSelected ? 'bg-accent border-accent text-white' : 'theme-input'}">${isSelected ? '✓' : ''}</span>` : ''}<div class="relative">${getSiteFaviconHtml(s, 'w-8 h-8', 'w-5 h-5')}${renderUnreadDot(s)}</div><div class="min-w-0"><div class="font-black text-base leading-tight truncate">${esc(s.name)}</div><div class="text-xs font-mono-code theme-muted truncate">${esc(s.domain)}</div></div></div><div class="flex items-center flex-wrap justify-end gap-1 shrink-0"><button data-action="toggle-pin" data-id="${s.id}" data-stop="1" title="${t('pinBtn')}" class="key-press w-6 h-6 rounded-md flex items-center justify-center transition ${s.pinned ? 'text-accent bg-accent/15' : 'theme-input opacity-55 hover:opacity-100'}">${s.pinned ? LINE_ICONS.pinFilled : LINE_ICONS.pin}</button>${renderPrioStar(s, 'w-6 h-6')}${locked ? `<span class="w-6 h-6 rounded-md theme-input flex items-center justify-center opacity-75" title="Прямий перехід заблоковано">${LINE_ICONS.lock}</span>` : ''}</div></div><div class="flex items-center flex-wrap gap-1 mt-2.5">${renderCatBadges(s)}</div><div class="text-sm sm:text-base font-bold mt-3 line-clamp-1">${esc(s.title)}</div><p class="mt-1.5 text-sm theme-muted leading-snug line-clamp-2">${esc(s.note)}</p></div><div class="flex items-stretch gap-2 mt-4 pt-3 border-t" style="border-color: var(--border-main)"><button data-action="open-item" data-id="${s.id}" data-stop="1" ${locked ? 'disabled' : ''} class="flex-1 py-2.5 px-3 rounded-lg font-extrabold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition ${locked ? 'theme-input opacity-45 cursor-not-allowed' : 'key-press bg-accent text-onaccent'}"><span>${t('openMain')}</span>${locked ? LINE_ICONS.lock : LINE_ICONS.extArrow}</button><button data-action="copy-url" data-url="${esc(s.url)}" data-stop="1" title="Копіювати URL" class="key-press w-11 rounded-lg theme-input flex items-center justify-center shrink-0"><svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="1"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div></div>`;
+                    return `<div id="card-${s.id}" ${clickActionAttr} class="rounded-xl p-4 theme-card border flex flex-col justify-between cursor-pointer hover:border-accent transition ${s.isRead === false ? 'unread-card' : ''} ${isDup || isSelected ? 'ring-2 ring-accent border-accent' : ''}"><div><div class="flex items-center justify-between gap-2"><div class="flex items-center gap-2.5 min-w-0">${isSelectMode ? `<span class="w-6 h-6 rounded-md border flex items-center justify-center shrink-0 ${isSelected ? 'bg-accent border-accent text-white' : 'theme-input'}">${isSelected ? '✓' : ''}</span>` : ''}<div class="relative">${getSiteFaviconHtml(s, 'w-8 h-8', 'w-5 h-5')}</div><div class="min-w-0"><div class="font-black text-base leading-tight truncate">${esc(s.name)}</div><div class="text-xs font-mono-code theme-muted truncate">${esc(s.domain)}</div></div></div><div class="flex items-center flex-wrap justify-end gap-1 shrink-0"><button data-action="toggle-pin" data-id="${s.id}" data-stop="1" title="${t('pinBtn')}" class="key-press w-6 h-6 rounded-md flex items-center justify-center transition ${s.pinned ? 'text-accent bg-accent/15' : 'theme-input opacity-55 hover:opacity-100'}">${s.pinned ? LINE_ICONS.pinFilled : LINE_ICONS.pin}</button>${renderPrioStar(s, 'w-6 h-6')}${locked ? `<span class="w-6 h-6 rounded-md theme-input flex items-center justify-center opacity-75" title="Прямий перехід заблоковано">${LINE_ICONS.lock}</span>` : ''}</div></div><div class="flex items-center justify-end flex-wrap gap-1 mt-2.5">${renderCatBadges(s)}</div><div class="text-sm sm:text-base font-bold mt-3 line-clamp-1">${esc(s.title)}</div><p class="mt-1.5 text-sm theme-muted leading-snug line-clamp-2">${esc(s.note)}</p></div><div class="flex items-stretch gap-2 mt-4 pt-3 border-t" style="border-color: var(--border-main)"><button data-action="open-item" data-id="${s.id}" data-stop="1" ${locked ? 'disabled' : ''} class="flex-1 py-2.5 px-3 rounded-lg font-extrabold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition ${locked ? 'theme-input opacity-45 cursor-not-allowed' : 'key-press bg-accent text-onaccent'}"><span>${t('openMain')}</span>${locked ? LINE_ICONS.lock : LINE_ICONS.extArrow}</button><button data-action="copy-url" data-url="${esc(s.url)}" data-stop="1" title="Копіювати URL" class="key-press w-11 rounded-lg theme-input flex items-center justify-center shrink-0"><svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="1"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div></div>`;
                 }).join('');
             } else if (viewMode === 'large') {
                 cardsEl.className = 'space-y-3';
                 cardsEl.innerHTML = filtered.map(s => {
                     const locked = isItemLocked(s); const isDup = highlightedDuplicateId === s.id; const isSelected = selectedIds.has(s.id);
                     const clickActionAttr = isSelectMode ? `data-action="toggle-card-select" data-id="${s.id}"` : `data-action="open-edit" data-id="${s.id}"`;
-                    return `<div id="card-${s.id}" ${clickActionAttr} class="rounded-xl p-4 sm:p-5 theme-card border grid grid-cols-1 md:grid-cols-12 gap-4 items-center cursor-pointer hover:border-accent transition ${isDup || isSelected ? 'ring-2 ring-accent border-accent' : ''}"><div class="md:col-span-5 flex flex-col justify-between space-y-3"><div class="flex items-center justify-between gap-2"><div class="flex items-center gap-2.5 min-w-0">${isSelectMode ? `<span class="w-6 h-6 rounded-md border flex items-center justify-center shrink-0 ${isSelected ? 'bg-accent border-accent text-white' : 'theme-input'}">${isSelected ? '✓' : ''}</span>` : ''}<div class="relative">${getSiteFaviconHtml(s, 'w-9 h-9', 'w-5 h-5')}${renderUnreadDot(s)}</div><div class="min-w-0"><div class="font-black text-base truncate">${esc(s.name)}</div><div class="text-xs font-mono-code theme-muted truncate">${esc(s.domain)}</div></div></div><div class="flex items-center flex-wrap justify-end gap-1 shrink-0"><button data-action="toggle-pin" data-id="${s.id}" data-stop="1" title="${t('pinBtn')}" class="key-press w-7 h-7 rounded-md flex items-center justify-center transition ${s.pinned ? 'text-accent bg-accent/15' : 'theme-input opacity-55 hover:opacity-100'}">${s.pinned ? LINE_ICONS.pinFilled : LINE_ICONS.pin}</button>${renderPrioStar(s, 'w-7 h-7')}</div></div><div class="flex items-center flex-wrap gap-1">${renderCatBadges(s)}</div><div class="flex items-stretch gap-2"><button data-action="open-item" data-id="${s.id}" data-stop="1" ${locked ? 'disabled' : ''} class="flex-1 py-2.5 px-3 rounded-lg font-extrabold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition ${locked ? 'theme-input opacity-45 cursor-not-allowed' : 'key-press bg-accent text-onaccent'}"><span>${t('openMain')}</span>${locked ? LINE_ICONS.lock : LINE_ICONS.extArrow}</button><button data-action="copy-url" data-url="${esc(s.url)}" data-stop="1" class="key-press w-11 rounded-lg theme-input flex items-center justify-center shrink-0"><svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="1"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div></div><div class="md:col-span-7 md:border-l md:pl-4 space-y-1.5" style="border-color: var(--border-main)"><div class="text-base font-bold">${esc(s.title)}</div><p class="text-sm theme-muted leading-relaxed">${esc(s.note)}</p><div class="flex flex-wrap gap-1.5 pt-1">${(s.tags || []).map(tg => `<button type="button" data-action="filter-tag-card" data-tag="${esc(tg)}" data-stop="1" class="text-[11px] font-mono-code theme-muted hover:text-accent transition">${esc(tg)}</button>`).join('')}</div></div></div>`;
+                    return `<div id="card-${s.id}" ${clickActionAttr} class="rounded-xl p-4 sm:p-5 theme-card border grid grid-cols-1 md:grid-cols-12 gap-4 items-center cursor-pointer hover:border-accent transition ${s.isRead === false ? 'unread-card' : ''} ${isDup || isSelected ? 'ring-2 ring-accent border-accent' : ''}"><div class="md:col-span-5 flex flex-col justify-between space-y-3"><div class="flex items-center justify-between gap-2"><div class="flex items-center gap-2.5 min-w-0">${isSelectMode ? `<span class="w-6 h-6 rounded-md border flex items-center justify-center shrink-0 ${isSelected ? 'bg-accent border-accent text-white' : 'theme-input'}">${isSelected ? '✓' : ''}</span>` : ''}<div class="relative">${getSiteFaviconHtml(s, 'w-9 h-9', 'w-5 h-5')}</div><div class="min-w-0"><div class="font-black text-base truncate">${esc(s.name)}</div><div class="text-xs font-mono-code theme-muted truncate">${esc(s.domain)}</div></div></div><div class="flex items-center flex-wrap justify-end gap-1 shrink-0"><button data-action="toggle-pin" data-id="${s.id}" data-stop="1" title="${t('pinBtn')}" class="key-press w-7 h-7 rounded-md flex items-center justify-center transition ${s.pinned ? 'text-accent bg-accent/15' : 'theme-input opacity-55 hover:opacity-100'}">${s.pinned ? LINE_ICONS.pinFilled : LINE_ICONS.pin}</button>${renderPrioStar(s, 'w-7 h-7')}</div></div><div class="flex items-center justify-end flex-wrap gap-1">${renderCatBadges(s)}</div><div class="flex items-stretch gap-2"><button data-action="open-item" data-id="${s.id}" data-stop="1" ${locked ? 'disabled' : ''} class="flex-1 py-2.5 px-3 rounded-lg font-extrabold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition ${locked ? 'theme-input opacity-45 cursor-not-allowed' : 'key-press bg-accent text-onaccent'}"><span>${t('openMain')}</span>${locked ? LINE_ICONS.lock : LINE_ICONS.extArrow}</button><button data-action="copy-url" data-url="${esc(s.url)}" data-stop="1" class="key-press w-11 rounded-lg theme-input flex items-center justify-center shrink-0"><svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="1"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div></div><div class="md:col-span-7 md:border-l md:pl-4 space-y-1.5" style="border-color: var(--border-main)"><div class="text-base font-bold">${esc(s.title)}</div><p class="text-sm theme-muted leading-relaxed">${esc(s.note)}</p><div class="flex flex-wrap gap-1.5 pt-1">${(s.tags || []).map(tg => `<button type="button" data-action="filter-tag-card" data-tag="${esc(tg)}" data-stop="1" class="text-[11px] font-mono-code theme-muted hover:text-accent transition">${esc(tg)}</button>`).join('')}</div></div></div>`;
                 }).join('');
             } else {
                 cardsEl.className = 'space-y-2';
                 cardsEl.innerHTML = filtered.map(s => {
                     const locked = isItemLocked(s); const isDup = highlightedDuplicateId === s.id; const isSelected = selectedIds.has(s.id);
                     const clickActionAttr = isSelectMode ? `data-action="toggle-card-select" data-id="${s.id}"` : `data-action="open-edit" data-id="${s.id}"`;
-                    return `<div id="card-${s.id}" ${clickActionAttr} class="rounded-xl p-3 theme-card border flex items-center justify-between gap-3 cursor-pointer hover:border-accent transition ${isDup || isSelected ? 'ring-2 ring-accent border-accent' : ''}"><div class="flex items-center gap-2.5 min-w-0 flex-1">${isSelectMode ? `<span class="w-6 h-6 rounded-md border flex items-center justify-center shrink-0 ${isSelected ? 'bg-accent border-accent text-white' : 'theme-input'}">${isSelected ? '✓' : ''}</span>` : ''}<div class="relative">${getSiteFaviconHtml(s, 'w-8 h-8', 'w-5 h-5')}${renderUnreadDot(s)}</div><div class="min-w-0 flex-1"><div class="font-bold text-sm truncate">${esc(s.title)}</div><div class="flex items-center flex-wrap gap-1 mt-1">${renderCatBadges(s)}</div><div class="text-xs theme-muted truncate">${esc(s.note)}</div></div></div><div class="flex items-center gap-1.5 shrink-0"><button data-action="toggle-pin" data-id="${s.id}" data-stop="1" title="${t('pinBtn')}" class="key-press w-8 h-8 rounded-lg flex items-center justify-center transition ${s.pinned ? 'text-accent bg-accent/15' : 'theme-input opacity-55 hover:opacity-100'}">${s.pinned ? LINE_ICONS.pinFilled : LINE_ICONS.pin}</button>${renderPrioStar(s, 'w-8 h-8')}<button data-action="open-item" data-id="${s.id}" data-stop="1" ${locked ? 'disabled' : ''} class="w-9 h-9 rounded-lg flex items-center justify-center transition ${locked ? 'theme-input opacity-45 cursor-not-allowed' : 'key-press bg-accent text-onaccent'}">${locked ? LINE_ICONS.lock : LINE_ICONS.extArrow}</button><button data-action="copy-url" data-url="${esc(s.url)}" data-stop="1" class="key-press w-9 h-9 rounded-lg theme-input flex items-center justify-center"><svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="1"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div></div>`;
+                    return `<div id="card-${s.id}" ${clickActionAttr} class="rounded-xl p-3 theme-card border flex items-center justify-between gap-3 cursor-pointer hover:border-accent transition ${s.isRead === false ? 'unread-card' : ''} ${isDup || isSelected ? 'ring-2 ring-accent border-accent' : ''}"><div class="flex items-center gap-2.5 min-w-0 flex-1">${isSelectMode ? `<span class="w-6 h-6 rounded-md border flex items-center justify-center shrink-0 ${isSelected ? 'bg-accent border-accent text-white' : 'theme-input'}">${isSelected ? '✓' : ''}</span>` : ''}<div class="relative">${getSiteFaviconHtml(s, 'w-8 h-8', 'w-5 h-5')}</div><div class="min-w-0 flex-1"><div class="font-bold text-sm truncate">${esc(s.title)}</div><div class="flex items-center justify-end flex-wrap gap-1 mt-1">${renderCatBadges(s)}</div><div class="text-xs theme-muted truncate">${esc(s.note)}</div></div></div><div class="flex items-center gap-1.5 shrink-0"><button data-action="toggle-pin" data-id="${s.id}" data-stop="1" title="${t('pinBtn')}" class="key-press w-8 h-8 rounded-lg flex items-center justify-center transition ${s.pinned ? 'text-accent bg-accent/15' : 'theme-input opacity-55 hover:opacity-100'}">${s.pinned ? LINE_ICONS.pinFilled : LINE_ICONS.pin}</button>${renderPrioStar(s, 'w-8 h-8')}<button data-action="open-item" data-id="${s.id}" data-stop="1" ${locked ? 'disabled' : ''} class="w-9 h-9 rounded-lg flex items-center justify-center transition ${locked ? 'theme-input opacity-45 cursor-not-allowed' : 'key-press bg-accent text-onaccent'}">${locked ? LINE_ICONS.lock : LINE_ICONS.extArrow}</button><button data-action="copy-url" data-url="${esc(s.url)}" data-stop="1" class="key-press w-9 h-9 rounded-lg theme-input flex items-center justify-center"><svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="1"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div></div>`;
                 }).join('');
             }
         }
@@ -2427,7 +2560,7 @@
             const list = document.getElementById('dash-items-list');
             list.innerHTML = items.map((s, idx) => {
                 const locked = isItemLocked(s);
-                return `<div class="rounded-xl p-3 theme-card border flex flex-col gap-2.5 hover:border-accent transition opacity-0" style="animation: fadeIn 0.3s ease forwards ${idx * 0.04}s;">
+                return `<div class="rounded-xl p-3 theme-card border flex flex-col gap-2.5 hover:border-accent transition opacity-0 ${s.isRead === false ? 'unread-card' : ''}" style="animation: fadeIn 0.3s ease forwards ${idx * 0.04}s;">
                     <div class="flex items-center gap-2.5 min-w-0">
                         <div class="shrink-0"><div class="relative">${getSiteFaviconHtml(s, 'w-9 h-9', 'w-5 h-5')}${renderUnreadDot(s)}</div></div>
                         <div class="min-w-0 flex-1">
@@ -3066,7 +3199,9 @@
             attachSheetDrag('calendar-drag-handle', 'calendar-sheet-panel', closeCalendarSheet);
             attachSheetDrag('bulk-edit-drag-handle', 'bulk-edit-sheet-panel', closeBulkEditSheet);
             attachSheetDrag('qr-drag-handle', 'qr-panel', closeQRModal);
-            initToastSwipe(); 
+            initToastSwipe();
+            _ensureBaseHistoryGuard();
+            attachEdgeBackGesture();
             if (navigator.onLine) { processOfflineQueue(false); }
             renderApp();
         });
