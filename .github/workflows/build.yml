@@ -51,11 +51,11 @@ jobs:
           window.addEventListener("load", function () { setTimeout(function () { window.__shareReady = true; }, 800); });
           window.receiveShared = function (t) {
             try {
-              if (!window.__shareReady || typeof addLinkByAI !== "function") return false;
+              if (!window.__shareReady || typeof window.addLinkByAI !== "function") return false;
               var i = document.getElementById("url-input");
               if (!i) return false;
               i.value = t;
-              addLinkByAI();
+              window.addLinkByAI();
               return true;
             } catch (e) { return false; }
           };
@@ -74,6 +74,7 @@ jobs:
           import android.os.Bundle;
           import android.os.Handler;
           import android.os.Looper;
+          import androidx.activity.OnBackPressedCallback;
           import com.getcapacitor.BridgeActivity;
           import org.json.JSONObject;
           public class MainActivity extends BridgeActivity {
@@ -81,6 +82,26 @@ jobs:
             protected void onCreate(Bundle savedInstanceState) {
               super.onCreate(savedInstanceState);
               handleShare(getIntent());
+              getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+                @Override
+                public void handleOnBackPressed() {
+                  if (getBridge() != null && getBridge().getWebView() != null) {
+                    getBridge().getWebView().evaluateJavascript(
+                      "(function(){ return window.onBackPressed ? window.onBackPressed() : 'exit'; })()",
+                      new android.webkit.ValueCallback<String>() {
+                        @Override
+                        public void onReceiveValue(String value) {
+                          if ("\"exit\"".equals(value) || "null".equals(value)) {
+                            finish();
+                          }
+                        }
+                      }
+                    );
+                  } else {
+                    finish();
+                  }
+                }
+              });
             }
             @Override
             protected void onNewIntent(Intent intent) {
