@@ -1172,136 +1172,237 @@
             if (parsed.fontScale) fontScale = parsed.fontScale;
         }
 
-        // --- НАВІГАЦІЯ, ЖЕСТИ ВІД КРАЮ ЕКРАНА ТА ПОДВІЙНИЙ СВАЙП ДЛЯ ВИХОДУ ---
+        // --- НАВІГАЦІЯ, APK-СУМІСНИЙ СТЕК #HASH, ЖЕСТИ ВІД КРАЮ ТА ПОДВІЙНИЙ СВАЙП ДЛЯ ВИХОДУ ---
         let _lastBackTapTime = 0;
+        let _ignoreNextNavEvent = false;
+        let _historyTrapArmed = false;
 
         function isAnyModalOpen() {
             return isMobileSidebarOpen || Boolean(document.querySelector('.sheet-backdrop.open'));
         }
 
         function _ensureBaseHistoryGuard() {
-            if (!history.state || (!history.state.appBase && history.state.id !== 'modal')) {
-                history.replaceState({ appBase: true }, '');
-                history.pushState({ appGuard: true }, '');
+            try {
+                if (!location.hash || location.hash === '#exit') {
+                    history.replaceState({ appBase: true }, '', '#root');
+                    history.pushState({ appGuard: true }, '', '#home');
+                    _historyTrapArmed = true;
+                } else if (location.hash === '#root') {
+                    history.pushState({ appGuard: true }, '', '#home');
+                    _historyTrapArmed = true;
+                }
+            } catch (e) {}
+        }
+
+        function _armHistoryTrapOnInteraction() {
+            if (!_historyTrapArmed || location.hash === '' || location.hash === '#root') {
+                _ensureBaseHistoryGuard();
+            }
+        }
+
+        function _restoreGuardHash() {
+            try {
+                _ignoreNextNavEvent = true;
+                if (isAnyModalOpen()) {
+                    if (location.hash !== '#modal') history.pushState({ id: 'modal' }, '', '#modal');
+                } else {
+                    if (location.hash !== '#home') history.pushState({ appGuard: true }, '', '#home');
+                }
+                setTimeout(() => { _ignoreNextNavEvent = false; }, 60);
+            } catch (e) {
+                _ignoreNextNavEvent = false;
             }
         }
 
         function closeTopMostActiveModal(viaHistory = false) {
             if (document.getElementById('confirm-modal')?.classList.contains('open')) {
                 viaHistory ? _hideConfirmModal() : closeConfirmModal();
+                if (viaHistory) _restoreGuardHash();
                 return true;
             }
             if (document.getElementById('qr-modal')?.classList.contains('open')) {
                 viaHistory ? _hideQRModal() : closeQRModal();
+                if (viaHistory) _restoreGuardHash();
                 return true;
             }
             if (document.getElementById('bulk-edit-sheet-modal')?.classList.contains('open')) {
                 viaHistory ? _hideBulkEditSheet() : closeBulkEditSheet();
+                if (viaHistory) _restoreGuardHash();
                 return true;
             }
             if (document.getElementById('edit-sheet-modal')?.classList.contains('open')) {
                 viaHistory ? _hideEditSheet() : closeEditSheet();
+                if (viaHistory) _restoreGuardHash();
                 return true;
             }
             if (document.getElementById('calendar-sheet-modal')?.classList.contains('open')) {
                 const dashView = document.getElementById('day-dashboard-view');
                 if (dashView && !dashView.classList.contains('hidden')) {
                     backToCalendar();
-                    if (viaHistory) _pushModalState();
+                    if (viaHistory) _restoreGuardHash();
                     return true;
                 }
                 viaHistory ? _hideCalendarSheet() : closeCalendarSheet();
+                if (viaHistory) _restoreGuardHash();
                 return true;
             }
             if (document.getElementById('cats-sheet-modal')?.classList.contains('open')) {
                 viaHistory ? _hideCatsSheet() : closeCategoriesSheet();
+                if (viaHistory) _restoreGuardHash();
                 return true;
             }
             if (document.getElementById('tags-sheet-modal')?.classList.contains('open')) {
                 viaHistory ? _hideTagsSheet() : closeTagsSheet();
+                if (viaHistory) _restoreGuardHash();
                 return true;
             }
             if (document.getElementById('about-sheet-modal')?.classList.contains('open')) {
                 viaHistory ? _hideAboutSheet() : closeAboutSheet();
+                if (viaHistory) _restoreGuardHash();
                 return true;
             }
             if (isMobileSidebarOpen) {
                 viaHistory ? _hideSidebar() : closeMobileSidebar();
+                if (viaHistory) _restoreGuardHash();
                 return true;
             }
             if (isSelectMode) {
                 toggleSelectMode();
-                if (viaHistory) history.pushState({ appGuard: true }, '');
+                if (viaHistory) _restoreGuardHash();
                 return true;
             }
             if (selectedFolder !== 'ALL' || selectedTag !== null || (document.getElementById('search-input')?.value || '').trim() !== '') {
                 resetToAllLinks();
-                if (viaHistory) history.pushState({ appGuard: true }, '');
+                if (viaHistory) _restoreGuardHash();
                 return true;
             }
             return false;
         }
 
-        function triggerDoubleBackExit(fromPopstate = false) {
+        function triggerDoubleBackExit(fromSystemBack = false) {
             const now = Date.now();
             if (now - _lastBackTapTime < 2200) {
-                try { if (window. navigator && navigator.app && navigator.app.exitApp) navigator.app.exitApp(); } catch (e) {}
-                try { if (window.Android && typeof window.Android.closeApp === 'function') window.Android.closeApp(); } catch (e) {}
+                _ignoreNextNavEvent = true;
+                try { if (window.navigator && navigator.app && typeof navigator.app.exitApp === 'function') { navigator.app.exitApp(); return; } } catch (e) {}
+                try { if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App) { window.Capacitor.Plugins.App.exitApp(); return; } } catch (e) {}
+                try { if (window.Android && typeof window.Android.closeApp === 'function') { window.Android.closeApp(); return; } } catch (e) {}
+                try { if (window.Android && typeof window.Android.exitApp === 'function') { window.Android.exitApp(); return; } } catch (e) {}
                 try { window.close(); } catch (e) {}
-                if (fromPopstate) {
-                    history.back();
-                } else {
-                    history.go(-2);
-                }
+                try {
+                    const stepsBack = history.length > 1 ? -(history.length - 1) : -1;
+                    history.go(stepsBack);
+                    setTimeout(() => { try { history.back(); } catch(err) {} }, 80);
+                } catch (e) {}
             } else {
                 _lastBackTapTime = now;
                 showToast('Змахніть ще раз для виходу');
-                if (fromPopstate) {
-                    history.pushState({ appGuard: true }, '');
+                if (fromSystemBack) {
+                    _restoreGuardHash();
                 }
             }
         }
 
-        window.addEventListener('popstate', () => {
+        let _lastNavHandledAt = 0;
+        function _onSystemBackTriggered() {
+            if (_ignoreNextNavEvent) return;
+            const now = Date.now();
+            if (now - _lastNavHandledAt < 120) return;
+            _lastNavHandledAt = now;
+
             if (closeTopMostActiveModal(true)) {
                 return;
             }
             triggerDoubleBackExit(true);
+        }
+
+        window.addEventListener('popstate', () => {
+            _onSystemBackTriggered();
         });
 
+        window.addEventListener('hashchange', () => {
+            if (location.hash === '#root' || location.hash === '' || location.hash === '#home') {
+                _onSystemBackTriggered();
+            }
+        });
+
+        // Нативні хуки для APK-обгорток (Cordova / Capacitor / Android WebView GitHub templates)
+        document.addEventListener('backbutton', (e) => {
+            if (e && typeof e.preventDefault === 'function') e.preventDefault();
+            _onSystemBackTriggered();
+        }, false);
+
+        window.onBackPressed = function() {
+            if (closeTopMostActiveModal(false)) return true;
+            triggerDoubleBackExit(false);
+            return true;
+        };
+        window.handleBackButton = window.onBackPressed;
+
         function _pushModalState() {
-            if (!history.state || history.state.id !== 'modal') {
-                history.pushState({ id: 'modal' }, '');
+            try {
+                _armHistoryTrapOnInteraction();
+                if (location.hash !== '#modal') {
+                    _ignoreNextNavEvent = true;
+                    history.pushState({ id: 'modal' }, '', '#modal');
+                    setTimeout(() => { _ignoreNextNavEvent = false; }, 50);
+                }
+            } catch (e) {
+                _ignoreNextNavEvent = false;
             }
         }
 
         function safeCloseModal(hideFn) {
-            if (history.state && history.state.id === 'modal') {
-                history.back();
-            } else {
-                hideFn();
+            hideFn();
+            try {
+                if (!isAnyModalOpen() && location.hash === '#modal') {
+                    _ignoreNextNavEvent = true;
+                    history.back();
+                    setTimeout(() => { _ignoreNextNavEvent = false; }, 80);
+                }
+            } catch (e) {
+                _ignoreNextNavEvent = false;
             }
         }
 
         function attachEdgeBackGesture() {
-            let startX = 0, startY = 0, edgeSide = null, tracking = false;
+            let startX = 0, startY = 0, gestureMode = null, tracking = false;
+
+            // Озброюємо історію при першому ж дотику в APK
+            document.addEventListener('touchstart', () => {
+                _armHistoryTrapOnInteraction();
+            }, { passive: true, once: true });
+
             document.addEventListener('touchstart', (e) => {
                 if (e.touches.length !== 1) { tracking = false; return; }
+                const target = e.target;
+                if (target instanceof HTMLElement && /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName)) {
+                    tracking = false;
+                    return;
+                }
                 const x = e.touches[0].clientX;
                 const y = e.touches[0].clientY;
                 const w = window.innerWidth || document.documentElement.clientWidth;
-                const isRightEdge = x >= w - 34;
-                const isLeftEdge = x <= 34;
-                // Якщо ми на головному екрані без модалок, лівий край відкриває меню, а правий край працює як жест Назад/Вихід.
-                // Якщо відкрита будь-яка шторка/вікно — жест від будь-якого краю (лівого чи правого) закриває активне вікно!
+
+                // В APK системний жест Android забирає перші 24px біля рамки екрана.
+                // Тому розширюємо зону початку свайпу до 75px від краю,
+                // а всередині відкритих модальних вікон дозволяємо горизонтальний свайп закриття по всій площі вікна!
+                const isRightZone = x >= w - 75;
+                const isLeftZone = x <= 75;
+
                 if (isAnyModalOpen()) {
-                    if (isLeftEdge || isRightEdge) {
-                        startX = x; startY = y; edgeSide = isLeftEdge ? 'left' : 'right'; tracking = true;
-                    } else { tracking = false; }
+                    startX = x;
+                    startY = y;
+                    gestureMode = 'modal-any';
+                    tracking = true;
                 } else {
-                    if (isRightEdge) {
-                        startX = x; startY = y; edgeSide = 'right'; tracking = true;
-                    } else { tracking = false; }
+                    if (isRightZone) {
+                        startX = x;
+                        startY = y;
+                        gestureMode = 'home-right';
+                        tracking = true;
+                    } else {
+                        tracking = false;
+                    }
                 }
             }, { passive: true });
 
@@ -1312,17 +1413,25 @@
                 const endY = e.changedTouches[0].clientY;
                 const dx = endX - startX;
                 const dy = endY - startY;
-                if (Math.abs(dx) > 48 && Math.abs(dx) > Math.abs(dy) * 1.4) {
-                    if ((edgeSide === 'left' && dx > 48) || (edgeSide === 'right' && dx < -48)) {
+
+                if (Math.abs(dx) > 46 && Math.abs(dx) > Math.abs(dy) * 1.45) {
+                    if (gestureMode === 'modal-any') {
+                        // У відкритій шторці свайп вліво або вправо закриває вікно
+                        if (isMobileSidebarOpen) {
+                            if (dx < -46) closeTopMostActiveModal(false);
+                        } else {
+                            closeTopMostActiveModal(false);
+                        }
+                    } else if (gestureMode === 'home-right' && dx < -46) {
                         if (!closeTopMostActiveModal(false)) {
                             triggerDoubleBackExit(false);
                         }
                     }
                 }
-                edgeSide = null;
+                gestureMode = null;
             }, { passive: true });
 
-            document.addEventListener('touchcancel', () => { tracking = false; edgeSide = null; }, { passive: true });
+            document.addEventListener('touchcancel', () => { tracking = false; gestureMode = null; }, { passive: true });
         }
 
         function _forceCloseAllUI() {
@@ -3183,7 +3292,7 @@
                     document.getElementById('url-input').value = urlMatches.join(' ');
                     setTimeout(() => addLinkByAI(), 400);
                 }
-                window.history.replaceState(null, '', window.location.pathname);
+                window.history.replaceState({ appBase: true }, '', window.location.pathname + '#home');
             }
             
             updateStaticTexts();
