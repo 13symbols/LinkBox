@@ -1331,10 +1331,17 @@
             _onSystemBackTriggered();
         }, false);
 
+        window.addLinkByAI = addLinkByAI;
+
         window.onBackPressed = function() {
-            if (closeTopMostActiveModal(false)) return true;
-            triggerDoubleBackExit(false);
-            return true;
+            if (closeTopMostActiveModal(false)) return 'handled';
+            const now = Date.now();
+            if (now - _lastBackTapTime < 2200) {
+                return 'exit';
+            }
+            _lastBackTapTime = now;
+            showToast('Змахніть ще раз для виходу');
+            return 'toast';
         };
         window.handleBackButton = window.onBackPressed;
 
