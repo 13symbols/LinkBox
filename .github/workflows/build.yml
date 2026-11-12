@@ -79,17 +79,28 @@ jobs:
           import android.os.Handler;
           import android.os.Looper;
           import android.provider.MediaStore;
+          import android.text.Html;
           import android.webkit.JavascriptInterface;
           import androidx.activity.OnBackPressedCallback;
           import androidx.core.content.FileProvider;
           import com.getcapacitor.BridgeActivity;
+          import java.io.ByteArrayOutputStream;
           import java.io.File;
           import java.io.FileOutputStream;
+          import java.io.InputStream;
           import java.io.OutputStream;
+          import java.net.HttpURLConnection;
+          import java.net.URL;
           import java.nio.charset.StandardCharsets;
+          import java.util.concurrent.ExecutorService;
+          import java.util.concurrent.Executors;
+          import java.util.regex.Matcher;
+          import java.util.regex.Pattern;
           import org.json.JSONObject;
 
           public class MainActivity extends BridgeActivity {
+            private final ExecutorService netPool = Executors.newFixedThreadPool(4);
+
             @Override
             protected void onCreate(Bundle savedInstanceState) {
               super.onCreate(savedInstanceState);
@@ -124,13 +135,12 @@ jobs:
               public String exportFile(String filename, String content, String mimeType) {
                 try {
                   byte[] bytes = content.getBytes(StandardCharsets.UTF_8);
-                  Uri savedUri = null;
                   if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                     ContentValues values = new ContentValues();
                     values.put(MediaStore.Downloads.DISPLAY_NAME, filename);
                     values.put(MediaStore.Downloads.MIME_TYPE, mimeType);
                     values.put(MediaStore.Downloads.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS);
-                    savedUri = getContentResolver().insert(MediaStore.Downloads.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY), values);
+                    Uri savedUri = getContentResolver().insert(MediaStore.Downloads.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY), values);
                     if (savedUri != null) {
                       try (OutputStream os = getContentResolver().openOutputStream(savedUri)) {
                         if (os != null) os.write(bytes);
@@ -139,8 +149,7 @@ jobs:
                   } else {
                     File dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
                     if (!dir.exists()) dir.mkdirs();
-                    File outFile = new File(dir, filename);
-                    try (FileOutputStream fos = new FileOutputStream(outFile)) {
+                    try (FileOutputStream fos = new FileOutputStream(new File(dir, filename))) {
                       fos.write(bytes);
                     }
                   }
@@ -159,6 +168,100 @@ jobs:
                 } catch (Exception e) {
                   return "";
                 }
+              }
+
+              @JavascriptInterface
+              public void fetchPageMeta(final String reqId, final String targetUrl) {
+                netPool.execute(new Runnable() {
+                  @Override
+                  public void run() {
+                    String title = "";
+                    String desc = "";
+                    HttpURLConnection conn = null;
+                    try {
+                      String currentUrl = targetUrl;
+                      for (int redirects = 0; redirects < 4; redirects++) {
+                        URL url = new URL(currentUrl);
+                        conn = (HttpURLConnection) url.openConnection();
+                        conn.setInstanceFollowRedirects(false);
+                        conn.setConnectTimeout(6500);
+                        conn.setReadTimeout(6500);
+                        conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Mobile Safari/537.36");
+                        conn.setRequestProperty("Accept", "text/html,application/xhtml+xml");
+                        conn.setRequestProperty("Accept-Language", "uk-UA,uk;q=0.9,en;q=0.8");
+                        int code = conn.getResponseCode();
+                        if (code >= 300 && code < 400) {
+                          String loc = conn.getHeaderField("Location");
+                          conn.disconnect();
+                          if (loc == null || loc.isEmpty()) break;
+                          currentUrl = new URL(url, loc).toString();
+                          continue;
+                        }
+                        break;
+                      }
+
+                      if (conn != null && conn.getResponseCode() >= 200 && conn.getResponseCode() < 300) {
+                        String cType = conn.getContentType();
+                        String charset = "UTF-8";
+                        if (cType != null) {
+                          Matcher cm = Pattern.compile("charset=([^;\\s]+)", Pattern.CASE_INSENSITIVE).matcher(cType);
+                          if (cm.find()) charset = cm.group(1).replace("\"", "").trim();
+                        }
+                        InputStream is = conn.getInputStream();
+                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                        byte[] buf = new byte[4096];
+                        int n, total = 0;
+                        while ((n = is.read(buf)) != -1 && total < 163840) {
+                          baos.write(buf, 0, n);
+                          total += n;
+                        }
+                        is.close();
+                        String html = baos.toString(charset);
+
+                        title = extractMeta(html, "(?:property|name)\\s*=\\s*[\"'](?:og:title|twitter:title)[\"']");
+                        if (title.isEmpty()) {
+                          Matcher tm = Pattern.compile("<title[^>]*>(.*?)</title>", Pattern.CASE_INSENSITIVE | Pattern.DOTALL).matcher(html);
+                          if (tm.find()) title = cleanHtmlText(tm.group(1));
+                        }
+
+                        desc = extractMeta(html, "(?:name|property)\\s*=\\s*[\"'](?:description|og:description|twitter:description)[\"']");
+                      }
+                    } catch (Exception ignored) {
+                    } finally {
+                      if (conn != null) conn.disconnect();
+                    }
+
+                    final String jsCall = "window.__onNativePageMeta && window.__onNativePageMeta("
+                      + JSONObject.quote(reqId) + ","
+                      + JSONObject.quote(title) + ","
+                      + JSONObject.quote(desc) + ");";
+                    runOnUiThread(new Runnable() {
+                      @Override
+                      public void run() {
+                        if (getBridge() != null && getBridge().getWebView() != null) {
+                          getBridge().getWebView().evaluateJavascript(jsCall, null);
+                        }
+                      }
+                    });
+                  }
+                });
+              }
+
+              private String extractMeta(String html, String attrPattern) {
+                Pattern p1 = Pattern.compile("<meta[^>]*?" + attrPattern + "[^>]*?content\\s*=\\s*[\"'](.*?)[\"'][^>]*?>", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+                Matcher m1 = p1.matcher(html);
+                if (m1.find()) return cleanHtmlText(m1.group(1));
+                Pattern p2 = Pattern.compile("<meta[^>]*?content\\s*=\\s*[\"'](.*?)[\"'][^>]*?" + attrPattern + "[^>]*?>", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+                Matcher m2 = p2.matcher(html);
+                if (m2.find()) return cleanHtmlText(m2.group(1));
+                return "";
+              }
+
+              private String cleanHtmlText(String raw) {
+                if (raw == null) return "";
+                String stripped = raw.replaceAll("<[^>]+>", " ");
+                String decoded = Html.fromHtml(stripped, Html.FROM_HTML_MODE_LEGACY).toString();
+                return decoded.replaceAll("\\s+", " ").trim();
               }
             }
 
