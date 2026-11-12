@@ -960,7 +960,7 @@
                 <div>
                     <div class="flex items-center justify-between">
                         <label class="text-[11px] font-mono-code font-bold uppercase theme-muted" id="lbl-note">Нотатка</label>
-                        <button data-action="regen-ai-note" class="text-[11px] font-mono-code font-bold text-accent hover:underline" id="btn-regen">Переписати ІІ</button>
+                        <button data-action="regen-ai-note" class="text-[11px] font-mono-code font-bold text-accent hover:underline" id="btn-regen">Переписати</button>
                     </div>
                     <textarea id="sheet-note" rows="3" class="w-full mt-1 theme-input rounded-lg px-3.5 py-2.5 text-sm sm:text-base outline-none resize-none"></textarea>
                 </div>
@@ -968,7 +968,7 @@
                     <div>
                         <div class="flex items-center justify-between">
                             <label class="text-[11px] font-mono-code font-bold uppercase theme-muted" id="lbl-folder">Папки (через кому)</label>
-                            <span class="text-[10px] font-mono-code theme-muted" id="lbl-ai-cat-hint">Сірі підказки ІІ — тапніть, щоб додати</span>
+                            <span class="text-[10px] font-mono-code theme-muted" id="lbl-ai-cat-hint">Сірі підказки — тапніть, щоб додати</span>
                         </div>
                         <input id="sheet-cat" type="text" placeholder="Дизайн, Код та Технології..." class="w-full mt-1 theme-input rounded-lg px-3.5 py-2.5 text-sm font-bold outline-none">
                         <div id="sheet-cat-suggestions" class="flex flex-wrap gap-1.5 mt-2"></div>
@@ -1029,8 +1029,8 @@
                 allFolders: 'Усі посилання', importAi: 'Імпорт', exportHtml: 'Експорт',
                 expHtmlSub: 'Для браузера', expJsonSub: 'Повний бекап',
                 openMain: 'Відкрити', openBrowser: 'Відкрити',
-                titleLabel: 'Назва', noteLabel: 'Нотатка', regenBtn: 'Переписати ІІ',
-                folderLabel: 'Папки (через кому)', aiCatHint: 'Сірі підказки ІІ — тапніть, щоб додати',
+                titleLabel: 'Назва', noteLabel: 'Нотатка', regenBtn: 'Переписати',
+                folderLabel: 'Папки (через кому)', aiCatHint: 'Сірі підказки — тапніть, щоб додати',
                 tagsLabel: '#Теги', deleteBtn: 'Видалити', saveBtn: 'Зберегти',
                 copied: 'Скопійовано: ', exported: 'Експортовано у .HTML',
                 exportedJson: 'Повний бекап збережено у .JSON', restoredJson: 'Бекап відновлено: ',
@@ -1045,8 +1045,8 @@
                 aboutSheetTitle: 'Як усе влаштовано', pinBtn: 'На головну у Pin-бар',
                 pinnedToast: 'Закріплено у швидкій панелі на головній', unpinnedToast: 'Відкріплено зі швидкої панелі',
                 priorityBtn: 'Пріоритет у папці', priorityActiveBtn: 'У топі папки ★',
-                offlineFolderName: '⏳ Очікують мережі', offlineBadge: '⏳ Очікує ІІ',
-                offlineSyncedToast: 'Мережа з’явилась! ІІ розібрав посилань: ', offlineStillNoNet: 'Немає з’єднання. Посилання чекають на інтернет ⏳',
+                offlineFolderName: '⏳ Очікують мережі', offlineBadge: '⏳ Очікує мережі',
+                offlineSyncedToast: 'Мережа з’явилась! Оброблено посилань: ', offlineStillNoNet: 'Немає з’єднання. Посилання чекають на інтернет ⏳',
                 sortNewest: '↓ Нові', sortOldest: '↑ Старі', sortAZ: 'А–Я', tagSortPopular: 'Популярні',
                 fontScaleLabel: 'Розмір тексту'
             }
@@ -1091,12 +1091,12 @@
 
         let LOCKED_FOLDERS = new Set();
         const DEFAULT_ITEMS = [
-            { id: 1, name: 'Spotify', domain: 'spotify.com', url: 'https://open.spotify.com/playlist/synthwave2026', title: 'Evening Synthwave 2026', cat: 'Музика', cats: ['Музика'], date: '24/10/26', color: '#2F8F6B', note: 'Instrumental synthwave playlist on Spotify for deep night focus and coding.', tags: ['#music', '#focus'], svg: LINE_ICONS.music, lockedOverride: null, pinned: true, folderPriority: false, pendingOffline: false, isRead: true },
-            { id: 2, name: 'Behance', domain: 'behance.net', url: 'https://www.behance.net/gallery/fintech-light-ui', title: 'Fintech UI — Light Themes', cat: 'Дизайн', cats: ['Дизайн'], date: '23/10/26', color: '#D98E2B', note: 'Mobile banking UI case study on Behance featuring clean typography and a warm pastel palette.', tags: ['#design', '#ui'], svg: LINE_ICONS.design, lockedOverride: null, pinned: false, folderPriority: true, pendingOffline: false },
-            { id: 3, name: 'Airbnb', domain: 'airbnb.com', url: 'https://www.airbnb.com/rooms/carpathians-aframe', title: 'Carpathians A-Frame Cabin', cat: 'Поїздки', cats: ['Поїздки'], date: '21/10/26', color: '#D2546A', note: 'Forest A-frame cabin listing on Airbnb with panoramic views, hot tub, and Starlink.', tags: ['#travel', '#cabin'], svg: LINE_ICONS.travel, lockedOverride: null, pinned: false, folderPriority: false, pendingOffline: false },
-            { id: 4, name: 'GitHub', domain: 'github.com', url: 'https://github.com/awesome-selfhosted/awesome-selfhosted', title: 'Awesome Self-Hosted 2026', cat: 'Код та Технології', cats: ['Код та Технології'], date: '19/10/26', color: '#6E6A63', note: 'Curated directory of open-source software and self-hosted server solutions on GitHub.', tags: ['#code', '#selfhosted'], svg: LINE_ICONS.code, lockedOverride: null, pinned: true, folderPriority: false, pendingOffline: false, isRead: true },
-            { id: 5, name: 'Rozetka', domain: 'rozetka.com.ua', url: 'https://rozetka.com.ua/ecoflow-river-2/p364589/', title: 'Зарядна станція EcoFlow River', cat: 'Покупки', cats: ['Покупки', 'Код та Технології'], date: '16/10/26', color: '#6A9A3A', note: 'Портативна станція з LiFePO4 акумулятором та швидкою зарядкою за 60 хвилин на Rozetka.', tags: ['#техніка', '#дім'], svg: LINE_ICONS.shop, lockedOverride: null, pinned: false, folderPriority: false, pendingOffline: false },
-            { id: 6, name: 'Netflix', domain: 'netflix.com', url: 'https://www.netflix.com/title/81024821', title: '3 Body Problem', cat: 'Кіно та Серіали', cats: ['Кіно та Серіали'], date: '14/10/26', color: '#C8553D', note: 'Sci-fi drama series on Netflix about humanity preparing for contact with an alien civilization.', tags: ['#movies', '#scifi'], svg: LINE_ICONS.video, lockedOverride: null, pinned: false, folderPriority: false, pendingOffline: false }
+            { id: 1, name: 'Spotify', domain: 'spotify.com', url: 'https://open.spotify.com/playlist/synthwave2026', title: 'Вечірній Synthwave 2026', cat: 'Музика', cats: ['Музика'], date: '24/10/26', color: '#2F8F6B', note: 'Інструментальний плейлист на Spotify для глибокої концентрації та роботи.', tags: ['#музика', '#фокус'], svg: LINE_ICONS.music, lockedOverride: null, pinned: true, folderPriority: false, pendingOffline: false, isRead: true },
+            { id: 2, name: 'Behance', domain: 'behance.net', url: 'https://www.behance.net/gallery/fintech-light-ui', title: 'Fintech UI — Світлі теми', cat: 'Дизайн', cats: ['Дизайн'], date: '23/10/26', color: '#D98E2B', note: 'Кейс мобільного банкінгу на Behance із чистою типографікою та теплими акцентами.', tags: ['#дизайн', '#інтерфейс'], svg: LINE_ICONS.design, lockedOverride: null, pinned: false, folderPriority: true, pendingOffline: false, isRead: true },
+            { id: 3, name: 'Airbnb', domain: 'airbnb.com', url: 'https://www.airbnb.com/rooms/carpathians-aframe', title: 'Будиночок A-Frame у Карпатах', cat: 'Поїздки', cats: ['Поїздки'], date: '21/10/26', color: '#D2546A', note: 'Затишний будинок у лісі на Airbnb з панорамним краєвидом, чаном та Starlink.', tags: ['#поїздки', '#карпати'], svg: LINE_ICONS.travel, lockedOverride: null, pinned: false, folderPriority: false, pendingOffline: false, isRead: true },
+            { id: 4, name: 'GitHub', domain: 'github.com', url: 'https://github.com/awesome-selfhosted/awesome-selfhosted', title: 'Добірка Self-Hosted 2026', cat: 'Код та Технології', cats: ['Код та Технології'], date: '19/10/26', color: '#6E6A63', note: 'Каталог відкритого програмного забезпечення та серверних рішень на GitHub.', tags: ['#код', '#сервери'], svg: LINE_ICONS.code, lockedOverride: null, pinned: true, folderPriority: false, pendingOffline: false, isRead: true },
+            { id: 5, name: 'Rozetka', domain: 'rozetka.com.ua', url: 'https://rozetka.com.ua/ecoflow-river-2/p364589/', title: 'Зарядна станція EcoFlow River', cat: 'Покупки', cats: ['Покупки', 'Код та Технології'], date: '16/10/26', color: '#6A9A3A', note: 'Портативна станція з LiFePO4 акумулятором та швидкою зарядкою за 60 хвилин на Rozetka.', tags: ['#техніка', '#дім'], svg: LINE_ICONS.shop, lockedOverride: null, pinned: false, folderPriority: false, pendingOffline: false, isRead: true },
+            { id: 6, name: 'Netflix', domain: 'netflix.com', url: 'https://www.netflix.com/title/81024821', title: 'Проблема 3 тіл', cat: 'Кіно та Серіали', cats: ['Кіно та Серіали'], date: '14/10/26', color: '#C8553D', note: 'Науково-фантастичний серіал на Netflix про підготовку людства до контакту з іншою цивілізацією.', tags: ['#кіно', '#фантастика'], svg: LINE_ICONS.video, lockedOverride: null, pinned: false, folderPriority: false, pendingOffline: false, isRead: true }
         ];
         let ITEMS = structuredClone(DEFAULT_ITEMS);
         const STORAGE_KEY = 'linkbox_android_v3';
@@ -1750,6 +1750,7 @@
             const unlockedItems = ITEMS.filter(item => !isItemLocked(item));
             if (!unlockedItems.length) { showToast(t('allLockedRandom')); return; }
             const rand = unlockedItems[Math.floor(Math.random() * unlockedItems.length)];
+            markAsRead(rand.id);
             closeMobileSidebar(); showToast(t('randomOpened') + rand.name); openExternalUrlInNewTab(rand.url);
         }
 
@@ -1910,7 +1911,7 @@
                     <div class="theme-card border rounded-xl p-3.5 space-y-1"><div class="font-bold">1. Верхня шапка та миттєвий скид фільтрів</div><p class="theme-muted">Ліворуч розташований логотип <b>LinkBox</b> із лічильником усіх збережених посилань та індикатором активного фільтра. Натискання на логотип у будь-який момент скидає вибрану папку, хештег або пошуковий запит і повертає до повного списку.</p></div>
                     <div class="theme-card border rounded-xl p-3.5 space-y-1"><div class="font-bold">2. Розумне додавання, мова сайту та захист від дублікатів</div><p class="theme-muted">У рядок введення можна вставити як одне посилання, так і цілий список адрес. Кнопка <b>«+ Додати»</b> автоматично очищує URL від зайвих ком чи дужок, перевіряє базу на дублікати (підсвічуючи наявну картку) і визначає <b>мову самого сайту</b> (українська, англійська, італійська, російська тощо), генеруючи заголовок та нотатку мовою оригіналу.</p></div>
                     <div class="theme-card border rounded-xl p-3.5 space-y-1"><div class="font-bold">3. Скріпка (Pin-бар) vs «Пріоритет у папці»</div><p class="theme-muted">У додатку чітко розділено два види закріплення:</p><ul class="list-disc list-inside space-y-1 theme-muted pt-1"><li><b>Скріпка на картці (головний екран):</b> закріплює сайт у верхній горизонтальній панелі швидкого доступу (Pin-барі) з <b>реальними фавіконами сайтів</b> над усіма папками.</li><li><b>Кнопка «Пріоритет у папці» (всередині редагування):</b> позначає посилання зірочкою ★ і завжди піднімає його на самий верх усередині своїх категорій, не займаючи місце у глобальному Pin-барі.</li></ul></div>
-                    <div class="theme-card border rounded-xl p-3.5 space-y-1"><div class="font-bold">4. Мульти-категорії та сірі ІІ-підказки</div><p class="theme-muted">Одне посилання може одночасно належати до кількох папок (через кому, наприклад: <i>«Дизайн, Код та Технології»</i>). Кольорові плашки категорій на картках клікабельні для миттєвого переходу. Під час редагування ІІ показує <b>сірим кольором розумні підказки суміжних категорій</b>.</p></div>
+                    <div class="theme-card border rounded-xl p-3.5 space-y-1"><div class="font-bold">4. Мульти-категорії та сірі підказки</div><p class="theme-muted">Одне посилання може одночасно належати до кількох папок (через кому, наприклад: <i>«Дизайн, Код та Технології»</i>). Кольорові плашки категорій на картках клікабельні для миттєвого переходу. Під час редагування система показує <b>сірим кольором розумні підказки суміжних категорій</b>.</p></div>
                     <div class="theme-card border rounded-xl p-3.5 space-y-1"><div class="font-bold">5. Робота офлайн та черга «⏳ Очікують мережі»</div><p class="theme-muted">Якщо додати посилання без інтернету, LinkBox дбайливо збереже його у тимчасову папку <b>«⏳ Очікують мережі»</b>. Як тільки з'явиться зв'язок, додаток автоматично дообробить чергу, підтягне точні заголовки з мережі та розкладе картки по цільових папках.</p></div>
                     <div class="theme-card border rounded-xl p-3.5 space-y-1"><div class="font-bold">6. Масовий вибір та видалення з підтвердженням</div><p class="theme-muted">У верхній шапці розташована кнопка режиму вибору (іконка з галочкою). Вона відкриває плаваючу панель групових дій, де можна відмітити потрібні картки, обрати всі видимі на екрані посилання кнопкою <b>«Вибрати всі»</b> та видалити їх із обов'язковим вікном підтвердження.</p></div>
                     <div class="theme-card border rounded-xl p-3.5 space-y-1"><div class="font-bold">7. Режим «Сейф» та пріоритет замків</div><p class="theme-muted">Для особистих або чутливих посилань передбачено блокування прямого переходу. Замок можна увімкнути для цілої папки у боковому меню або індивідуально для окремої картки. Коли замок активний, кнопка відкриття у браузері блокується від випадкових натискань, але адресу завжди можна скопіювати кнопкою поруч.</p></div>
@@ -2018,12 +2019,14 @@
             if (e) e.stopPropagation();
             const item = ITEMS.find(x => x.id === id); if (!item) return;
             if (isItemLocked(item)) { showToast(t('lockedToast')); return; }
+            markAsRead(id);
             openExternalUrlInNewTab(item.url);
         }
 
         function copySheetUrl() { const val = cleanRawUrl(document.getElementById('sheet-url').value); if (!val) return; copyItemUrl(val); }
         function openSheetUrl() {
             if (sheetTempLocked) { showToast(t('lockedToast')); return; }
+            if (editingId) markAsRead(editingId);
             const val = cleanRawUrl(document.getElementById('sheet-url').value); if (!val) return; openExternalUrlInNewTab(val);
         }
 
@@ -2195,32 +2198,7 @@
             return mainBrand;
         }
 
-        function detectSiteLanguage(finalUrl, domain, humanTitle, slugTopic) {
-            const lowerUrl = finalUrl.toLowerCase(); const combinedText = `${humanTitle} ${slugTopic}`.trim();
-            if (/\/(it|it-it|italiano)(\/|$)/i.test(lowerUrl)) return 'it';
-            if (/\/(uk|ua|uk-ua)(\/|$)/i.test(lowerUrl)) return 'uk';
-            if (/\/(ru|ru-ru)(\/|$)/i.test(lowerUrl)) return 'ru';
-            if (/\/(de|de-de)(\/|$)/i.test(lowerUrl)) return 'de';
-            if (/\/(fr|fr-fr)(\/|$)/i.test(lowerUrl)) return 'fr';
-            if (/\/(es|es-es)(\/|$)/i.test(lowerUrl)) return 'es';
-            if (/\/(pl|pl-pl)(\/|$)/i.test(lowerUrl)) return 'pl';
-            if (/\/(en|en-us|en-gb)(\/|$)/i.test(lowerUrl)) return 'en';
-
-            if (/[іїєґ]/i.test(combinedText)) return 'uk';
-            if (/[ыъэё]/i.test(combinedText)) return 'ru';
-            if (/[а-я]/i.test(combinedText)) {
-                if (/\b(лучших|лучшие|самые|самых|века|романов|чтение|воскресное|смешные|заголовки|каналы|выбор|редакции|недорогой|купить|обзор|новости|технологии)\b/i.test(combinedText)) return 'ru';
-                if (/\b(найкращі|століття|недільне|читання|смішні|канали|вибір|редакції|недорогий|купити|огляд|новини|технологиї|посилання)\b/i.test(combinedText)) return 'uk';
-                if (/\.(ru|su|by|рф)$/i.test(domain)) return 'ru';
-                return 'uk';
-            }
-
-            if (/\.(it|sm|va)$/i.test(domain) || /(repubblica|corriere|gazzetta|ansa|subito|raiplay|ilpost|fanpage|giallozafferano|trovaprezzi|aranzulla)\./i.test(domain)) return 'it';
-            if (/\.(ru|su|рф)$/i.test(domain) || /(habr|kinopoisk|yandex|dzen|vc\.ru|rbc\.ru|lenta\.ru|ozon|wildberries|avito|4pda)\./i.test(domain)) return 'ru';
-            if (/\.(ua|укр)$/i.test(domain) || /(rozetka|pravda\.com\.ua|nv\.ua|unian|tsn\.ua|dou\.ua|itc\.ua|ain\.ua|prom\.ua|monobank|privatbank|sinoptik|liga\.net|censor\.net|babel\.ua|hromadske|internetua)\b/i.test(domain)) return 'uk';
-            if (/\b(della|delle|degli|nella|nelle|sulla|sono|anche|questo|questa|migliori|notizie|ricette|comprare|prezzo|storia|italia|italiano|guida|come)\b/i.test(combinedText)) return 'it';
-            
-            // Якщо не знайшли чітких маркерів, але додаток для українця - резервно ставимо українську замість англійської
+        function detectSiteLanguage() {
             return 'uk';
         }
 
@@ -2268,20 +2246,20 @@
 
         function generateLocalizedMeta(siteLang, catKey, cleanName, domain, humanTitle, baseBrandTag) {
             const L = {
-                book: { uk: { defaultTitle: `${cleanName} — Книги та наука`, tags: ['#книги', '#література', '#наука', baseBrandTag], noteWithTitle: `Літературна або наукова добірка на ${cleanName}: «${humanTitle}». Збережено для читання.`, noteGeneric: `Матеріал про книги, науку та освіту на ресурсі ${cleanName} (${domain}).` }, en: { defaultTitle: `${cleanName} — Books & Science`, tags: ['#books', '#science', '#reading', baseBrandTag], noteWithTitle: `Book & science feature on ${cleanName}: "${humanTitle}". Saved to reading list.`, noteGeneric: `Educational, literature, and science resource on ${cleanName} (${domain}).` } },
-                music: { uk: { defaultTitle: `${cleanName} — Музика та аудіо`, tags: ['#музика', '#аудіо', baseBrandTag], noteWithTitle: `Музична добірка або аудіоматеріал «${humanTitle}» на ${cleanName} (${domain}).`, noteGeneric: `Аудіострімінг та музичний каталог на платформі ${cleanName} (${domain}).` }, en: { defaultTitle: `${cleanName} — Music & Audio`, tags: ['#music', '#audio', baseBrandTag], noteWithTitle: `Music playlist or audio release "${humanTitle}" on ${cleanName} (${domain}).`, noteGeneric: `Audio streaming and music catalog on ${cleanName} (${domain}).` } },
-                video: { uk: { defaultTitle: `${cleanName} — Кіно та серіали`, tags: ['#кіно', '#серіали', baseBrandTag], noteWithTitle: `Відео або матеріал про кіно: «${humanTitle}» (${domain}) — збережено на перегляд.`, noteGeneric: `Відеоплатформа ${cleanName}: кіно, серіали та ефіри для перегляду.` }, en: { defaultTitle: `${cleanName} — Movies & Video`, tags: ['#video', '#movies', baseBrandTag], noteWithTitle: `Video or series feature "${humanTitle}" on ${cleanName} (${domain}) — saved to watchlist.`, noteGeneric: `Streaming platform ${cleanName} (${domain}): movies, series, and video broadcasts.` } },
-                social: { uk: { defaultTitle: `${cleanName} — Канали та спільноти`, tags: ['#telegram', '#канали', '#медіа', baseBrandTag], noteWithTitle: `Добірка або публікація у спільноті: «${humanTitle}» (${domain}).`, noteGeneric: `Сторінка або авторський канал на платформі ${cleanName} (${domain}).` }, en: { defaultTitle: `${cleanName} — Social & Channels`, tags: ['#social', '#community', baseBrandTag], noteWithTitle: `Community thread or channel spotlight: "${humanTitle}" on ${cleanName} (${domain}).`, noteGeneric: `Social feed, creator channel, or community discussion on ${cleanName} (${domain}).` } },
-                code: { uk: { defaultTitle: `${cleanName} — Технології та ІТ`, tags: ['#технології', '#гаджети', baseBrandTag], noteWithTitle: `Технологічний матеріал на ${cleanName}: «${humanTitle}» (${domain}).`, noteGeneric: `Технологічний ресурс ${cleanName} (${domain}): гаджети, код та ІТ-огляди.` }, en: { defaultTitle: `${cleanName} — Tech & Development`, tags: ['#tech', '#code', baseBrandTag], noteWithTitle: `Technical resource or review on ${cleanName}: "${humanTitle}" (${domain}).`, noteGeneric: `Developer & tech platform ${cleanName} (${domain}): software, gadgets, and engineering docs.` } },
-                shop: { uk: { defaultTitle: `${cleanName} — Товар у каталозі`, tags: ['#покупки', '#каталог', baseBrandTag], noteWithTitle: `Товарна пропозиція або добірка на ${cleanName}: «${humanTitle}».`, noteGeneric: `Онлайн-каталог ${cleanName} (${domain}): порівняння цін та характеристик.` }, en: { defaultTitle: `${cleanName} — Store Listing`, tags: ['#shopping', '#deals', baseBrandTag], noteWithTitle: `Product listing or curated deal on ${cleanName}: "${humanTitle}".`, noteGeneric: `Online store ${cleanName} (${domain}): product specs, reviews, and price comparison.` } },
-                design: { uk: { defaultTitle: `${cleanName} — Дизайн-референс`, tags: ['#дизайн', '#референс', baseBrandTag], noteWithTitle: `Дизайн-проєкт «${humanTitle}» на ${cleanName}: збережено як візуальний референс.`, noteGeneric: `Колекція інтерфейсів, графіки та дизайн-рішень на платформі ${cleanName}.` }, en: { defaultTitle: `${cleanName} — Design Reference`, tags: ['#design', '#ui', baseBrandTag], noteWithTitle: `Design showcase "${humanTitle}" on ${cleanName}: saved as a visual & UI reference.`, noteGeneric: `Visual inspiration, UI systems, and creative portfolio on ${cleanName} (${domain}).` } },
-                travel: { uk: { defaultTitle: `${cleanName} — Подорожі та маршрути`, tags: ['#поїздки', '#маршрут', baseBrandTag], noteWithTitle: `Локація або маршрут «${humanTitle}» на ${cleanName} для планування поїздки.`, noteGeneric: `Сервіс подорожей ${cleanName} (${domain}): маршрути, квитки та бронювання житла.` }, en: { defaultTitle: `${cleanName} — Travel & Stay`, tags: ['#travel', '#booking', baseBrandTag], noteWithTitle: `Destination or stay "${humanTitle}" on ${cleanName} saved for trip planning.`, noteGeneric: `Travel platform ${cleanName} (${domain}): stays, routes, and booking options.` } },
-                finance: { uk: { defaultTitle: `${cleanName} — Фінанси та бізнес`, tags: ['#фінанси', '#бізнес', baseBrandTag], noteWithTitle: `Економічний матеріал на ${cleanName}: «${humanTitle}» (${domain}).`, noteGeneric: `Діловий портал ${cleanName} (${domain}): фінанси, ринки та бізнес-аналітика.` }, en: { defaultTitle: `${cleanName} — Finance & Business`, tags: ['#finance', '#business', baseBrandTag], noteWithTitle: `Market or business analysis on ${cleanName}: "${humanTitle}" (${domain}).`, noteGeneric: `Financial service & market portal ${cleanName} (${domain}): banking, analytics, and economy.` } },
-                news: { uk: { defaultTitle: `${cleanName} — Публікація`, tags: ['#новини', '#стаття', baseBrandTag], noteWithTitle: `Стаття на ${cleanName} (${domain}): «${humanTitle}».`, noteGeneric: `Публікація на медіапорталі ${cleanName} (${domain}) для швидкого перегляду.` }, en: { defaultTitle: `${cleanName} — News & Editorial`, tags: ['#news', '#article', baseBrandTag], noteWithTitle: `Editorial article on ${cleanName} (${domain}): "${humanTitle}".`, noteGeneric: `News report and media coverage on ${cleanName} (${domain}).` } },
-                nsfw: { uk: { defaultTitle: `${cleanName} — 18+ Контент`, tags: ['#nsfw', baseBrandTag], noteWithTitle: `Матеріал для дорослих на ${cleanName}: «${humanTitle}».`, noteGeneric: `Контент для дорослих на ресурсі ${cleanName} (${domain}).` }, en: { defaultTitle: `${cleanName} — 18+ Content`, tags: ['#nsfw', baseBrandTag], noteWithTitle: `Adult material on ${cleanName}: "${humanTitle}".`, noteGeneric: `Adult content on ${cleanName} (${domain}).` } },
-                web: { uk: { defaultTitle: `${cleanName} — Веб-сторінка`, tags: ['#веб', baseBrandTag], noteWithTitle: `Сторінка «${humanTitle}» на ресурсі ${cleanName} (${domain}).`, noteGeneric: `Веб-сторінка на домені ${domain} (${cleanName}) у колекції посилань.` }, en: { defaultTitle: `${cleanName} — Web Page`, tags: ['#web', baseBrandTag], noteWithTitle: `Web page "${humanTitle}" saved from ${cleanName} (${domain}).`, noteGeneric: `Bookmarked web resource on ${cleanName} (${domain}).` } }
+                book: { defaultTitle: `${cleanName} — Книги та наука`, tags: ['#книги', '#література', '#наука', baseBrandTag], noteWithTitle: `Літературна або наукова добірка на ${cleanName}: «${humanTitle}». Збережено для читання.`, noteGeneric: `Матеріал про книги, науку та освіту на ресурсі ${cleanName} (${domain}).` },
+                music: { defaultTitle: `${cleanName} — Музика та аудіо`, tags: ['#музика', '#аудіо', baseBrandTag], noteWithTitle: `Музична добірка або реліз «${humanTitle}» на ${cleanName} (${domain}).`, noteGeneric: `Аудіострімінг та музичний каталог на платформі ${cleanName} (${domain}).` },
+                video: { defaultTitle: `${cleanName} — Кіно та серіали`, tags: ['#кіно', '#серіали', baseBrandTag], noteWithTitle: `Відео або матеріал про кіно: «${humanTitle}» (${domain}) — збережено на перегляд.`, noteGeneric: `Відеоплатформа ${cleanName}: кіно, серіали та ефіри для перегляду.` },
+                social: { defaultTitle: `${cleanName} — Канали та спільноти`, tags: ['#telegram', '#канали', '#медіа', baseBrandTag], noteWithTitle: `Добірка або публікація у спільноті: «${humanTitle}» (${domain}).`, noteGeneric: `Сторінка або авторський канал на платформі ${cleanName} (${domain}).` },
+                code: { defaultTitle: `${cleanName} — Технології та ІТ`, tags: ['#технології', '#гаджети', baseBrandTag], noteWithTitle: `Технологічний матеріал на ${cleanName}: «${humanTitle}» (${domain}).`, noteGeneric: `Технологічний ресурс ${cleanName} (${domain}): гаджети, код та ІТ-огляди.` },
+                shop: { defaultTitle: `${cleanName} — Товар у каталозі`, tags: ['#покупки', '#каталог', baseBrandTag], noteWithTitle: `Товарна пропозиція або добірка на ${cleanName}: «${humanTitle}».`, noteGeneric: `Онлайн-каталог ${cleanName} (${domain}): порівняння цін та характеристик.` },
+                design: { defaultTitle: `${cleanName} — Дизайн-референс`, tags: ['#дизайн', '#референс', baseBrandTag], noteWithTitle: `Дизайн-проєкт «${humanTitle}» на ${cleanName}: збережено як візуальний референс.`, noteGeneric: `Колекція інтерфейсів, графіки та дизайн-рішень на платформі ${cleanName}.` },
+                travel: { defaultTitle: `${cleanName} — Подорожі та маршрути`, tags: ['#поїздки', '#маршрут', baseBrandTag], noteWithTitle: `Локація або маршрут «${humanTitle}» на ${cleanName} для планування поїздки.`, noteGeneric: `Сервіс подорожей ${cleanName} (${domain}): маршрути, квитки та бронювання житла.` },
+                finance: { defaultTitle: `${cleanName} — Фінанси та бізнес`, tags: ['#фінанси', '#бізнес', baseBrandTag], noteWithTitle: `Економічний матеріал на ${cleanName}: «${humanTitle}» (${domain}).`, noteGeneric: `Діловий портал ${cleanName} (${domain}): фінанси, ринки та бізнес-аналітика.` },
+                news: { defaultTitle: `${cleanName} — Публікація`, tags: ['#новини', '#стаття', baseBrandTag], noteWithTitle: `Стаття на ${cleanName} (${domain}): «${humanTitle}».`, noteGeneric: `Публікація на медіапорталі ${cleanName} (${domain}) для швидкого перегляду.` },
+                nsfw: { defaultTitle: `${cleanName} — 18+ Контент`, tags: ['#nsfw', baseBrandTag], noteWithTitle: `Матеріал для дорослих на ${cleanName}: «${humanTitle}».`, noteGeneric: `Контент для дорослих на ресурсі ${cleanName} (${domain}).` },
+                web: { defaultTitle: `${cleanName} — Веб-сторінка`, tags: ['#веб', baseBrandTag], noteWithTitle: `Сторінка «${humanTitle}» на ресурсі ${cleanName} (${domain}).`, noteGeneric: `Веб-сторінка на домені ${domain} (${cleanName}) у колекції посилань.` }
             };
-            const group = L[catKey] || L.web; const langPack = group[siteLang] || group.uk;
+            const langPack = L[catKey] || L.web;
             return { defaultTitle: langPack.defaultTitle, tags: langPack.tags, note: humanTitle ? langPack.noteWithTitle : langPack.noteGeneric };
         }
 
@@ -2289,7 +2267,6 @@
             const finalUrl = cleanRawUrl(rawUrl); const domain = finalUrl.replace(/^https?:\/\//i, '').replace(/^www\./i, '').split('/')[0].toLowerCase();
             const cleanName = extractCleanBrandName(domain); const { topic: slugTopic, sectionHint } = decodeUrlPathToHumanTopic(finalUrl);
             const humanTitle = sanitizeBookmarkTitle(customTitle, cleanName) || slugTopic;
-            const siteLang = detectSiteLanguage(finalUrl, domain, humanTitle, slugTopic);
             const pageTopicSignal = `${humanTitle} ${sectionHint} ${finalUrl}`.toLowerCase(); const domainOnlySignal = domain.toLowerCase();
 
             let catKey = 'web'; let cat = 'Веб-ресурси'; let color = '#7A8A6A'; let svg = LINE_ICONS.globe;
@@ -2297,7 +2274,7 @@
 
             if (/pornhub|xvideos|xnxx|xhamster|sex|porn|nsfw|onlyfans|rule34|hentai|boobs|nude|chaturbate|bongacams|redtube|youporn|spankbang|eporner/i.test(pageTopicSignal)) { catKey = 'nsfw'; cat = 'Полуничка 18+'; color = '#E11D48'; svg = LINE_ICONS.nsfw; }
             else if (/roman|роман|книг|літератур|литератур|фантастик|chtivo|чтиво|science|наук|scienza|libri|romanzo|wikipedia|coursera|udemy|prometheus|yakaboo|goodreads|duolingo|book|wiki|library|освіт|курс|словник|енциклопед|навчан/.test(pageTopicSignal)) { catKey = 'book'; cat = 'Книги та Освіта'; color = '#A0705A'; svg = LINE_ICONS.book; }
-            else if (/spotify|soundcloud|music\.apple|deezer|bandcamp|last\.fm|shazam|mp3|radio|podcast|audio|музик|музык|musica|canzoni|пісн|альбом|плейлист/.test(pageTopicSignal)) { catKey = 'music'; cat = 'Музика'; color = '#2F8F6B'; svg = LINE_ICONS.music; }
+            else if (/spotify|soundcloud|music\.apple|deezer|bandcamp|last\.fm|shazam|mp3|flac|ape|lossless|discography|дискограф|radio|podcast|audio|музик|музык|musica|canzoni|пісн|альбом|плейлист/.test(pageTopicSignal)) { catKey = 'music'; cat = 'Музика'; color = '#2F8F6B'; svg = LINE_ICONS.music; }
             else if (/youtube|youtu\.be|netflix|megogo|sweet\.tv|takflix|kinopoisk|imdb|vimeo|twitch|rezka|filmix|uaserial|raiplay|serial|серіал|сериал|кіно|кино|фільм|фильм|мульт|movie|cinema|video|serietv/.test(pageTopicSignal)) { catKey = 'video'; cat = 'Кіно та Серіали'; color = '#C8553D'; svg = LINE_ICONS.video; }
             else if (/t\.me|telegram|телеграм|мемы|меми|канал|canali|instagram|facebook|twitter|x\.com|threads|linkedin|reddit|tiktok|discord|viber|соцмереж|форум/.test(pageTopicSignal)) { catKey = 'social'; cat = 'Соцмережі та Канали'; color = '#B5527A'; svg = LINE_ICONS.social; }
             else if (/techno\.|gadgets|гаджет|смартфон|github|gitlab|stackoverflow|habr|dou\.ua|dev\.to|itc\.ua|ain\.ua|gagadget|internetua|volia|kyivstar|vodafone|lifecell|chatgpt|openai|claude|gemini|vercel|docker|linux|android|apk|4pda|xda|aranzulla|soft|app|tehnologii|технолог|tecnologia|програм|код|сервер/.test(pageTopicSignal)) { catKey = 'code'; cat = 'Код та Технології'; color = '#6E6A63'; svg = LINE_ICONS.code; }
@@ -2307,7 +2284,7 @@
             else if (/biz\.|privatbank|privat24|monobank|oschadbank|sense|minfin|finance\.ua|kurs\.com|binance|tradingview|diia\.gov|tax\.gov|ilsole24ore|market|bank|finanza|фінанс|банк|бізнес|бизнес|економік|курс|податк/.test(pageTopicSignal)) { catKey = 'finance'; cat = 'Фінанси та Бізнес'; color = '#1F8A8A'; svg = LINE_ICONS.finance; }
             else if (/news|pravda|unian|nv\.ua|tsn|rbc|liga\.net|censor|telegraf|ukranews|24tv|hromadske|babel|forbes|bbc|reuters|bloomberg|repubblica|corriere|ansa|gazzetta|ilpost|fanpage|korrespondent|zn\.ua|gazeta|obozrevatel|focus\.ua|espreso|новин|новости|notizie|статт|медіа|преса/.test(pageTopicSignal) || /nv\.ua|pravda|unian|tsn|telegraf|ukranews|repubblica\.it|corriere\.it|ansa\.it/.test(domainOnlySignal)) { catKey = 'news'; cat = 'Новини та ЗМІ'; color = '#8A7A5C'; svg = LINE_ICONS.news; }
 
-            const localized = generateLocalizedMeta(siteLang, catKey, cleanName, domain, humanTitle, baseBrandTag);
+            const localized = generateLocalizedMeta('uk', catKey, cleanName, domain, humanTitle, baseBrandTag);
             const finalTitle = humanTitle || localized.defaultTitle;
             const now = new Date(); const dateStr = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${String(now.getFullYear()).slice(-2)}`;
             const suggestedCats = [];
@@ -2319,53 +2296,109 @@
                 if (/design|дизайн|ui|ux|figma|behance/i.test(pageTopicSignal)) suggestedCats.push('Дизайн');
                 if (/shop|rozetka|amazon|купит|ціна|товар|покупки/i.test(pageTopicSignal)) suggestedCats.push('Покупки');
                 if (/movie|кіно|кино|серіал|сериал|netflix|youtube/i.test(pageTopicSignal)) suggestedCats.push('Кіно та Серіали');
-                if (/music|музик|музык|spotify|soundcloud/i.test(pageTopicSignal)) suggestedCats.push('Музика');
+                if (/music|музик|музык|spotify|soundcloud|flac|ape|дискограф/i.test(pageTopicSignal)) suggestedCats.push('Музика');
                 if (/travel|airbnb|booking|карпат|подорож/i.test(pageTopicSignal)) suggestedCats.push('Поїздки');
             }
 
             return {
                 id: Date.now() + Math.floor(Math.random() * 100000), name: cleanName, domain, url: finalUrl, title: finalTitle,
                 cat, cats: [cat], aiSuggestedCats: Array.from(new Set([cat, ...suggestedCats])), date: dateStr, color,
-                note: localized.note, tags: localized.tags, svg, siteLang: siteLang.toUpperCase(),
+                note: localized.note, tags: localized.tags, svg, siteLang: 'UK',
                 lockedOverride: catKey === 'nsfw' ? true : null, pinned: false, folderPriority: false, pendingOffline: false, isRead: false
             };
         }
 
-        async function fetchRealTitleAndDesc(url) {
-            try {
-                const res = await fetch(`https://api.microlink.io/?url=${encodeURIComponent(url)}&filter=title,description`);
-                if (res.ok) {
-                    const data = await res.json();
-                    if (data.status === 'success' && data.data && data.data.title) {
-                        return { title: data.data.title, desc: data.data.description };
+        const _nativeFetchCallbacks = new Map();
+        window.__onNativePageMeta = function(reqId, title, desc) {
+            const cb = _nativeFetchCallbacks.get(reqId);
+            if (cb) {
+                _nativeFetchCallbacks.delete(reqId);
+                cb({ title: (title || '').trim(), desc: (desc || '').trim() });
+            }
+        };
+
+        function fetchRealTitleAndDesc(url) {
+            return new Promise((resolve) => {
+                if (window.LinkBoxNative && typeof window.LinkBoxNative.fetchPageMeta === 'function') {
+                    const reqId = 'req_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
+                    const timer = setTimeout(() => {
+                        if (_nativeFetchCallbacks.has(reqId)) {
+                            _nativeFetchCallbacks.delete(reqId);
+                            resolve(null);
+                        }
+                    }, 9000);
+                    _nativeFetchCallbacks.set(reqId, (res) => {
+                        clearTimeout(timer);
+                        resolve(res && (res.title || res.desc) ? res : null);
+                    });
+                    try {
+                        window.LinkBoxNative.fetchPageMeta(reqId, url);
+                    } catch (e) {
+                        clearTimeout(timer);
+                        _nativeFetchCallbacks.delete(reqId);
+                        resolve(null);
                     }
+                } else {
+                    resolve(null);
                 }
-            } catch (e) {}
-            return null;
+            });
         }
 
+        let _isQueueRunning = false;
         async function processOfflineQueue(manualTap = false) {
-            const pending = ITEMS.filter(i => i.pendingOffline); if (pending.length === 0) return;
-            if (!navigator.onLine) { if (manualTap) { selectedFolder = OFFLINE_FOLDER_KEY; renderApp(); showToast(t('offlineStillNoNet')); } return; }
-            
+            const pending = ITEMS.filter(i => i.pendingOffline);
+            if (pending.length === 0 || _isQueueRunning) return;
+            if (!navigator.onLine) {
+                if (manualTap) { selectedFolder = OFFLINE_FOLDER_KEY; renderApp(); showToast(t('offlineStillNoNet')); }
+                return;
+            }
+            _isQueueRunning = true;
             let processedCount = 0;
             const offlineCountEl = document.getElementById('offline-queue-count');
-            if (offlineCountEl) offlineCountEl.textContent = '...';
+            if (offlineCountEl) offlineCountEl.textContent = `${pending.length}`;
 
-            for (const item of pending) { 
-                const meta = await fetchRealTitleAndDesc(item.url);
-                if (meta && meta.title) {
-                    item.title = meta.title.slice(0, 100);
-                    if (meta.desc) item.note = meta.desc.slice(0, 200);
+            const CONCURRENCY = 4;
+            let idx = 0;
+            async function worker() {
+                while (idx < pending.length) {
+                    const item = pending[idx++];
+                    const meta = await fetchRealTitleAndDesc(item.url);
+                    if (meta) {
+                        if (meta.title && meta.title.length > 2) {
+                            item.title = meta.title.slice(0, 120);
+                            const reSmart = buildSmartAIItem(item.url, item.title);
+                            if (item.cat === 'Веб-ресурси' && reSmart.cat !== 'Веб-ресурси') {
+                                item.cat = reSmart.cat;
+                                item.cats = [reSmart.cat];
+                                item.color = reSmart.color;
+                                item.svg = reSmart.svg;
+                            }
+                        }
+                        if (meta.desc && meta.desc.length > 5) {
+                            item.note = meta.desc.slice(0, 260);
+                        } else if (meta.title) {
+                            item.note = `Сторінка «${item.title}» на ресурсі ${item.name} (${item.domain}).`;
+                        }
+                    }
+                    item.pendingOffline = false;
+                    processedCount++;
+                    if (processedCount % 5 === 0 || processedCount === pending.length) {
+                        saveStateToStorage();
+                        renderApp();
+                    }
                 }
-                item.pendingOffline = false; 
-                processedCount++; 
-                saveStateToStorage();
-                renderApp();
             }
-            if (processedCount > 0) {
-                if (selectedFolder === OFFLINE_FOLDER_KEY && ITEMS.filter(i => i.pendingOffline).length === 0) selectedFolder = 'ALL';
-                saveStateToStorage(); renderApp(); showToast(`${t('offlineSyncedToast')}${processedCount} ✓`);
+
+            try {
+                await Promise.all(Array.from({ length: Math.min(CONCURRENCY, pending.length) }, () => worker()));
+            } finally {
+                _isQueueRunning = false;
+                if (processedCount > 0) {
+                    if (selectedFolder === OFFLINE_FOLDER_KEY && ITEMS.filter(i => i.pendingOffline).length === 0) selectedFolder = 'ALL';
+                    saveStateToStorage();
+                    renderApp();
+                    showToast(`${t('offlineSyncedToast')}${processedCount} ✓`);
+                }
             }
         }
 
@@ -2437,16 +2470,17 @@
                 if (anchors.length > 0) {
                     anchors.forEach(a => {
                         const href = cleanRawUrl(a.getAttribute('href') || ''); if (!/^https?:\/\//i.test(href)) return;
-                        if (findDuplicateItem(href)) dups++; else { const textTitle = (a.textContent || '').trim(); const created = buildSmartAIItem(href, textTitle); if (isOfflineNow) created.pendingOffline = true; ITEMS.unshift(created); added++; }
+                        if (findDuplicateItem(href)) dups++; else { const textTitle = (a.textContent || '').trim(); const created = buildSmartAIItem(href, textTitle); created.pendingOffline = true; ITEMS.unshift(created); added++; }
                     });
                 } else {
                     const rawMatches = content.match(/(?:https?:\/\/|www\.)[^\s"'<>]+/gi) || [];
                     rawMatches.forEach(rawU => {
                         const cleanU = cleanRawUrl(rawU); if (!cleanU) return;
-                        if (findDuplicateItem(cleanU)) dups++; else { const created = buildSmartAIItem(cleanU); if (isOfflineNow) created.pendingOffline = true; ITEMS.unshift(created); added++; }
+                        if (findDuplicateItem(cleanU)) dups++; else { const created = buildSmartAIItem(cleanU); created.pendingOffline = true; ITEMS.unshift(created); added++; }
                     });
                 }
                 saveStateToStorage(); renderFoldersInMenu(); renderApp(); closeMobileSidebar(); showToast(t('aiImportReport').replace('{added}', added).replace('{dups}', dups));
+                if (!isOfflineNow && added > 0) processOfflineQueue(false);
             };
             reader.readAsText(file);
         }
@@ -2506,6 +2540,7 @@
         }
 
         function openEditSheet(id) {
+            markAsRead(id);
             _pushModalState(); const item = ITEMS.find(x => x.id === id); if (!item) return; editingId = id;
             sheetTempLocked = isItemLocked(item); sheetTempFolderPriority = Boolean(item.folderPriority);
             const fav = document.getElementById('sheet-favicon'); fav.style.background = 'transparent'; fav.innerHTML = getSiteFaviconHtml(item, 'w-9 h-9', 'w-5 h-5');
@@ -2523,30 +2558,60 @@
             panel.style.transform = ''; modal.classList.remove('open'); setTimeout(() => { modal.classList.add('hidden'); modal.style.display = 'none'; }, 340); editingId = null;
         }
 
-        function regenerateAINote() {
+        let _regenCycleIdx = 0;
+        async function regenerateAINote() {
             const item = ITEMS.find(x => x.id === editingId); if (!item) return;
-            const currentUrl = cleanRawUrl(document.getElementById('sheet-url').value || item.url); 
-            const currentTitle = document.getElementById('sheet-title').value.trim();
-            const smart = buildSmartAIItem(currentUrl, currentTitle);
-            
+            const btn = document.getElementById('btn-regen');
+            const origBtnText = btn ? btn.textContent : 'Переписати';
+            if (btn) { btn.textContent = 'Шукаю...'; btn.setAttribute('disabled', '1'); }
+
+            const currentUrl = cleanRawUrl(document.getElementById('sheet-url').value || item.url);
+            let currentTitle = document.getElementById('sheet-title').value.trim();
             const noteEl = document.getElementById('sheet-note');
-            let newNote = smart.note;
-            
-            // Якщо локальний ІІ генерує той самий текст, трохи міняємо формулювання для різноманітності
-            if (noteEl.value === newNote) {
-                const variations = [
-                    `Збережено з ${smart.name} (${smart.domain}). Тема: ${currentTitle || 'Веб-ресурс'}`,
-                    `Матеріал: «${currentTitle}»\nДжерело: ${smart.domain}`,
-                    `Посилання на ${smart.domain} для детального ознайомлення.`
-                ];
-                newNote = variations[Math.floor(Math.random() * variations.length)];
+
+            let liveMeta = null;
+            if (navigator.onLine && currentUrl) {
+                liveMeta = await fetchRealTitleAndDesc(currentUrl);
             }
-            
-            noteEl.value = newNote;
-            document.getElementById('sheet-cat').value = (smart.aiSuggestedCats || [smart.cat]).join(', ');
-            document.getElementById('sheet-tags').value = smart.tags.join(' ');
+
+            if (liveMeta && liveMeta.title && liveMeta.title.length > 2) {
+                currentTitle = liveMeta.title.slice(0, 120);
+                document.getElementById('sheet-title').value = currentTitle;
+            }
+
+            const smart = buildSmartAIItem(currentUrl, currentTitle);
+            const cleanTitle = currentTitle || smart.title;
+            const candidates = [];
+
+            if (liveMeta && liveMeta.desc && liveMeta.desc.length > 8) {
+                candidates.push(liveMeta.desc.slice(0, 280));
+            }
+            candidates.push(
+                smart.note,
+                `Збережено з ${smart.name} (${smart.domain}): «${cleanTitle}».`,
+                `Матеріал на ресурсі ${smart.domain} — ${cleanTitle}.`,
+                `Корисне посилання (${smart.cat}): «${cleanTitle}» на сайті ${smart.name}.`,
+                `Джерело: ${smart.domain} • Тема: ${cleanTitle}.`
+            );
+
+            const uniqueCandidates = Array.from(new Set(candidates.map(s => s.trim()).filter(Boolean)));
+            let picked = uniqueCandidates[_regenCycleIdx % uniqueCandidates.length];
+            if (picked === noteEl.value.trim() && uniqueCandidates.length > 1) {
+                _regenCycleIdx++;
+                picked = uniqueCandidates[_regenCycleIdx % uniqueCandidates.length];
+            }
+            _regenCycleIdx++;
+
+            noteEl.value = picked;
+            if (!document.getElementById('sheet-cat').value.trim()) {
+                document.getElementById('sheet-cat').value = (smart.aiSuggestedCats || [smart.cat]).join(', ');
+            }
+            if (!document.getElementById('sheet-tags').value.trim()) {
+                document.getElementById('sheet-tags').value = smart.tags.join(' ');
+            }
             renderCategorySuggestions();
-            showToast('Опис оновлено ІІ ✨');
+            if (btn) { btn.textContent = origBtnText; btn.removeAttribute('disabled'); }
+            showToast(liveMeta && liveMeta.desc ? 'Підтягнуто опис із сайту ✓' : 'Опис переписано ✓');
         }
 
         function saveSheet() {
@@ -2772,22 +2837,7 @@
             }
         }
 
-        // Override existing open functions to hook markAsRead
-        const _origOpenById = openItemById;
-        openItemById = function(id, e) { _origOpenById(id, e); markAsRead(id); };
-        
-        const _origOpenRandom = openRandomLink;
-        openRandomLink = function() {
-            const unlocked = ITEMS.filter(i => !isItemLocked(i));
-            if(unlocked.length) {
-                const rand = unlocked[Math.floor(Math.random() * unlocked.length)];
-                markAsRead(rand.id);
-            }
-            _origOpenRandom();
-        };
 
-        const _origOpenSheet = openSheetUrl;
-        openSheetUrl = function() { if(!sheetTempLocked) markAsRead(editingId); _origOpenSheet(); };
 
         // Bulk Actions
         function shareSelectedItems() {
