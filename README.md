@@ -1,5 +1,3 @@
-Українська мова
-LinkBox
 LinkBox — це відкритий (open-source) мобільний веб-додаток та Android APK, створений для швидкої організації, збереження та керування посиланнями. Додаток розроблено на базі HTML, Tailwind CSS, JavaScript та Capacitor, що забезпечує швидку роботу прямо у браузері або як повноцінний мобільний додаток.
 Основні можливості
  * Розумне додавання: Автоматичне розпізнавання та очищення URL, перевірка на дублікати та визначення мови сайту.
@@ -8,8 +6,8 @@ LinkBox — це відкритий (open-source) мобільний веб-до
  * Безпека та Сейф: Індивідуальне або групове блокування папок для захисту від випадкових переходів.
  * Бекап та експорт: Підтримка експорту даних у стандартизований формат HTML для браузерів та повний JSON-бекап.
  * QR-коди: Вбудований локальний генератор QR-кодів для кожного посилання.
-English
-LinkBox
+
+
 LinkBox is an open-source mobile web application and Android APK designed for fast and efficient bookmarking and link organization. Built with HTML, Tailwind CSS, JavaScript, and Capacitor, it runs smoothly both as a web app and a native mobile tool.
 Core Features
  * Smart Input: Automatic URL sanitization, duplicate detection, and site language recognition.
