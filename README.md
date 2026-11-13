@@ -21,8 +21,7 @@ Android-додаток для тих, хто зберігає посилання
 ---
 
 **Встановити**  
-APK → [releases]
-
+АПК → [Releases](https://github.com/13symbols/LinkBox/tree/main/releases)
 ---
 
 # LinkBox - Smart Link Organiser 
@@ -44,4 +43,4 @@ In short: so your bookmarks finally stop being the place where things go to disa
 ---
 
 **Install**  
-APK → [releases](https://github.com/13symbols/LinkBox/releases)
+APK → [Releases](https://github.com/13symbols/LinkBox/tree/main/releases)
