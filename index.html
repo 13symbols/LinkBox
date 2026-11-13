@@ -608,6 +608,9 @@
                     <svg class="w-4 h-4 mono-icon shrink-0" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/><line x1="12" y1="16" x2="12" y2="10"/><polyline points="9 13 12 10 15 13"/></svg>
                     <span id="btn-export-html" class="truncate">Експорт</span>
                 </button>
+                <button data-action="open-ai-sheet" title="Розумні папки: ШІ та перерозпізнавання" class="key-press w-10 h-10 rounded-lg theme-input flex items-center justify-center hover:text-accent transition shrink-0">
+                    <svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24"><path d="M12 3l1.9 4.6L18.5 9.5l-4.6 1.9L12 16l-1.9-4.6L5.5 9.5l4.6-1.9z"/><path d="M19 15l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z"/></svg>
+                </button>
                 <button data-action="open-about-sheet" title="Про додаток та авторські права" class="key-press w-10 h-10 rounded-lg theme-input flex items-center justify-center hover:text-accent transition shrink-0">
                     <svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><line x1="12" y1="16" x2="12" y2="11.5"/><circle cx="12" cy="8" r="0.6" fill="currentColor"/></svg>
                 </button>
@@ -908,6 +911,50 @@
                 <button data-action="close-about-sheet" class="key-press w-9 h-9 rounded-lg theme-input flex items-center justify-center"><svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
             </div>
             <div id="about-sheet-body" class="space-y-3 text-sm leading-relaxed pb-3"></div>
+        </div>
+    </div>
+
+    <div id="ai-sheet-modal" data-backdrop="close-ai-sheet" class="sheet-backdrop fixed inset-0 bg-black/60 z-50 hidden items-end sm:items-center justify-center p-0 sm:p-4">
+        <div id="ai-sheet-panel" class="sheet-panel theme-surface w-full max-w-md rounded-t-2xl sm:rounded-xl p-5 border-t sm:border space-y-3 max-h-[90vh] overflow-y-auto">
+            <div id="ai-drag-handle" class="w-12 h-2 bg-stone-400/50 rounded-full mx-auto -mt-1 cursor-grab active:cursor-grabbing touch-none sm:hidden"></div>
+            <div class="flex items-center justify-between">
+                <span class="font-black text-base uppercase tracking-tight">Розумні папки</span>
+                <button data-action="close-ai-sheet" class="key-press w-9 h-9 rounded-lg theme-input flex items-center justify-center"><svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+            </div>
+            <div id="ai-mode-badge" class="font-mono-code text-[11px] px-2.5 py-1.5 rounded-lg theme-input"></div>
+            <p class="text-xs theme-muted leading-relaxed">Без ключа працюють вбудовані правила: оцінка за сайтом і змістом, навчання на твоїх правках. З ключем папки визначає нейромережа, а вбудовані правила вимикаються. Якщо ШІ недоступний, правила вмикаються самі. У ШІ йдуть тільки заголовок, опис і домен.</p>
+            <div class="space-y-1"><label class="text-[11px] font-bold uppercase theme-muted">Провайдер</label>
+                <select id="ai-provider" class="theme-input w-full rounded-lg px-3 py-2.5 text-sm"></select></div>
+            <div id="ai-guide" class="theme-card border rounded-xl p-3"></div>
+            <div class="space-y-1"><label class="text-[11px] font-bold uppercase theme-muted">API-ключ</label>
+                <input id="ai-key" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="встав ключ" class="theme-input w-full rounded-lg px-3 py-2.5 text-sm font-mono-code"></div>
+            <div class="space-y-1"><label class="text-[11px] font-bold uppercase theme-muted">Модель (необов'язково)</label>
+                <input id="ai-model" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" class="theme-input w-full rounded-lg px-3 py-2.5 text-sm font-mono-code"></div>
+            <div id="ai-base-wrap" class="space-y-1" style="display:none"><label class="text-[11px] font-bold uppercase theme-muted">Base URL</label>
+                <input id="ai-base" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="https://host/v1" class="theme-input w-full rounded-lg px-3 py-2.5 text-sm font-mono-code"></div>
+            <div id="ai-status" class="text-xs min-h-[1.25rem] break-words"></div>
+            <div class="flex gap-2">
+                <button data-action="ai-save" class="key-press flex-1 py-3 rounded-lg bg-accent text-onaccent text-xs font-black">Зберегти</button>
+                <button data-action="ai-test" class="key-press flex-1 py-3 rounded-lg theme-input text-xs font-bold">Перевірити</button>
+                <button data-action="ai-clear" class="key-press flex-1 py-3 rounded-lg theme-input text-xs font-bold">Стерти</button>
+            </div>
+            <div id="resort-card" class="theme-card border rounded-xl p-3.5 space-y-2.5 mt-1">
+                <div class="flex items-center justify-between gap-2">
+                    <span class="font-extrabold text-sm">Перерозпізнати папки</span>
+                    <span id="resort-count" class="font-mono-code text-[11px] theme-muted" title="Веб-ресурси / усі"></span>
+                </div>
+                <p class="text-xs theme-muted leading-relaxed">Застосовує поточний режим (правила або ШІ) до вже збережених посилань. Закриті та 18+ не чіпає.</p>
+                <div class="flex gap-1.5">
+                    <button id="resort-mode-web" data-action="resort-mode" data-mode="web" class="key-press flex-1 py-2 rounded-lg text-xs font-bold theme-input">Лише «Веб-ресурси»</button>
+                    <button id="resort-mode-all" data-action="resort-mode" data-mode="all" class="key-press flex-1 py-2 rounded-lg text-xs font-bold theme-input">Усі посилання</button>
+                </div>
+                <div id="resort-progress" class="h-1.5 rounded-full bg-black/10 overflow-hidden" style="display:none"><div id="resort-bar" class="h-full bg-accent" style="width:0%"></div></div>
+                <div id="resort-status" class="text-xs theme-muted min-h-[1rem] break-words"></div>
+                <div class="flex gap-2">
+                    <button id="resort-run" data-action="resort-run" class="key-press flex-1 py-3 rounded-lg bg-accent text-onaccent text-xs font-black">Перерозпізнати</button>
+                    <button id="resort-undo" data-action="resort-undo" class="key-press px-4 py-3 rounded-lg theme-input text-xs font-bold" style="display:none">Скасувати</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -1264,6 +1311,11 @@
             }
             if (document.getElementById('tags-sheet-modal')?.classList.contains('open')) {
                 viaHistory ? _hideTagsSheet() : closeTagsSheet();
+                if (viaHistory) _restoreGuardHash();
+                return true;
+            }
+            if (document.getElementById('ai-sheet-modal')?.classList.contains('open')) {
+                viaHistory ? _hideAiSheet() : closeAiSheet();
                 if (viaHistory) _restoreGuardHash();
                 return true;
             }
@@ -2263,46 +2315,408 @@
             return { defaultTitle: langPack.defaultTitle, tags: langPack.tags, note: humanTitle ? langPack.noteWithTitle : langPack.noteGeneric };
         }
 
-        function buildSmartAIItem(rawUrl, customTitle = '') {
+        // ===== Розумні правила (оцінки + навчання) та ШІ-режим =====
+        const CAT_DEFS = [
+            { key: 'nsfw', name: 'Полуничка 18+', color: '#E11D48', icon: 'nsfw', min: 4,
+              domains: ['pornhub', 'xvideos', 'xnxx', 'xhamster', 'onlyfans', 'rule34', 'chaturbate', 'bongacams', 'redtube', 'youporn', 'spankbang', 'eporner'],
+              words: ['porn', 'porno', 'порно', 'nsfw', 'hentai', 'хентай', 'nude', 'nudes', 'эротика', 'ероти', 'эроти', 'onlyfans', 'sex', 'секс'] },
+            { key: 'book', name: 'Книги та Освіта', color: '#A0705A', icon: 'book',
+              domains: ['wikipedia.org', 'coursera', 'udemy', 'prometheus.org.ua', 'yakaboo', 'goodreads', 'duolingo', 'chtivo', 'litres', 'ridero'],
+              words: ['роман', 'книг*', 'книж*', 'літератур', 'литератур', 'фантастик', 'науков', 'наука', 'освіт', 'образован', 'навчан', 'обучен', 'словник', 'енциклопед', 'энциклопед', 'підручник', 'учебник', 'лекці', 'лекци', 'бібліотек', 'библиотек', 'вірш*', 'стихи', 'стихотвор', 'поезі', 'поэзи', 'book', 'books', 'novel', 'library', 'wiki', 'course', 'education', 'libri', 'romanzo', 'scienza'] },
+            { key: 'music', name: 'Музика', color: '#2F8F6B', icon: 'music',
+              domains: ['spotify', 'soundcloud', 'music.apple.com', 'deezer', 'bandcamp', 'last.fm', 'shazam'],
+              words: ['музик', 'музык', 'пісн*', 'песн*', 'альбом', 'плейліст', 'плейлист', 'дискограф', 'подкаст', 'гітар', 'гитар', 'фортепіан', 'піаніно', 'вокал', 'концерт', 'мелоді', 'мелоди', 'джаз', 'радіо', 'радио', 'music', 'album', 'playlist', 'lyrics', 'podcast', 'radio', 'jazz', 'mp3', 'flac', 'lossless', 'musica', 'canzoni'] },
+            { key: 'video', name: 'Кіно та Серіали', color: '#C8553D', icon: 'video',
+              domains: ['youtube.com', 'youtu.be', 'netflix', 'megogo', 'sweet.tv', 'takflix', 'kinopoisk', 'imdb', 'vimeo', 'twitch', 'rezka', 'filmix', 'uaserial', 'raiplay'],
+              words: ['фільм', 'фильм', 'серіал', 'сериал', 'кіно', 'кино', 'мульт', 'аніме', 'аниме', 'трейлер', 'кінотеатр', 'кинотеатр', 'режисер', 'режиссер', 'movie', 'movies', 'film', 'cinema', 'trailer', 'episode', 'serietv'] },
+            { key: 'social', name: 'Соцмережі та Канали', color: '#B5527A', icon: 'social',
+              domains: ['t.me', 'telegram.org', 'telegram.me', 'instagram.com', 'facebook.com', 'fb.com', 'twitter.com', 'x.com', 'threads.net', 'linkedin.com', 'reddit.com', 'tiktok.com', 'discord.com', 'discord.gg', 'viber.com', 'vk.com'],
+              words: ['телеграм', 'telegram', 'мем', 'меми', 'мемы', 'інстаграм', 'инстаграм', 'instagram', 'фейсбук', 'facebook', 'твіттер', 'твиттер', 'twitter', 'tiktok', 'тікток', 'тикток', 'reddit', 'discord', 'viber', 'вайбер', 'соцмереж', 'соцсет', 'форум', 'блогер', 'canali'] },
+            { key: 'code', name: 'Код та Технології', color: '#6E6A63', icon: 'code',
+              domains: ['github.com', 'gitlab.com', 'stackoverflow.com', 'habr', 'dou.ua', 'dev.to', 'itc.ua', 'ain.ua', 'gagadget', 'internetua', '4pda', 'xda-developers.com', 'aranzulla.it', 'openai.com', 'anthropic.com', 'claude.ai', 'chatgpt.com', 'vercel.com', 'docker.com', 'kyivstar', 'vodafone', 'lifecell'],
+              words: ['процесор', 'процессор', 'ноутбук', 'компютер', 'комп’ютер', 'смартфон', 'планшет', 'гаджет', 'програм', 'код', 'коду', 'кодом', 'api', 'sdk', 'linux', 'windows', 'android', 'ios', 'python', 'javascript', 'java', 'html', 'css', 'github', 'git', 'docker', 'сервер', 'server', 'нейромереж', 'нейросет', 'ai', 'gpt', 'llm', 'технолог', 'technology', 'tech', 'software', 'hardware', 'laptop', 'processor', 'cpu', 'gpu', 'ssd', 'ram', 'wifi', 'роутер', 'відеокарт', 'видеокарт', 'прошивк', 'firmware', 'apk', 'vpn', 'bluetooth', 'usb', 'ubuntu', 'чіп', 'чип', 'tecnologia'] },
+            { key: 'shop', name: 'Покупки', color: '#6A9A3A', icon: 'shop',
+              domains: ['rozetka', 'prom.ua', 'olx', 'epicentrk', 'allo.ua', 'comfy', 'foxtrot', 'moyo', 'citrus', 'amazon', 'aliexpress', 'ebay', 'subito.it', 'trovaprezzi', 'makeup', 'shafa', 'kasta', 'zakaz.ua', 'silpo', 'atb', 'mvideo.ru', 'dns-shop.ru'],
+              words: ['купити', 'купить', 'купівл', 'покупк', 'ціна', 'цена', 'ціни', 'цены', 'ціну', 'цену', 'ціною', 'цені', 'знижк', 'скидк', 'магазин', 'замовити', 'заказать', 'доставк', 'кошик', 'корзин', 'товар', 'недорог', 'price', 'buy', 'shop', 'store', 'sale', 'discount', 'deal', 'cheap', 'order', 'cart', 'prezzo', 'offerte', 'acquista'] },
+            { key: 'design', name: 'Дизайн', color: '#D98E2B', icon: 'design',
+              domains: ['figma.com', 'behance.net', 'dribbble.com', 'awwwards.com', 'pinterest', 'framer.com', 'unsplash.com', 'freepik.com', 'canva.com', 'adobe.com', 'artstation.com'],
+              words: ['дизайн', 'design', 'ілюстрац', 'иллюстрац', 'шрифт', 'font', 'figma', 'ui', 'ux', 'логотип', 'logo', 'макет', 'mockup', 'типограф', 'брендинг', 'branding', 'палітр', 'палитр', 'grafica'] },
+            { key: 'travel', name: 'Поїздки', color: '#D2546A', icon: 'travel',
+              domains: ['airbnb', 'booking.com', 'skyscanner', 'tripadvisor', 'ryanair', 'trenitalia', 'italotreno', 'uz.gov.ua', 'tickets.ua', 'infobus', 'maps.google.com', 'waze.com', 'wizzair'],
+              words: ['подорож', 'путешеств', 'мандрів', 'готел', 'отел', 'hotel', 'travel', 'trip', 'квитк', 'билет', 'авіаквитк', 'авиабилет', 'маршрут', 'карпат', 'відпустк', 'отпуск', 'viaggi', 'vacation', 'flight', 'курорт', 'пляж', 'hostel', 'хостел'] },
+            { key: 'finance', name: 'Фінанси та Бізнес', color: '#1F8A8A', icon: 'finance',
+              domains: ['privatbank', 'privat24', 'monobank', 'oschadbank', 'minfin.com.ua', 'finance.ua', 'kurs.com.ua', 'binance.com', 'tradingview.com', 'diia.gov.ua', 'tax.gov.ua', 'ilsole24ore'],
+              words: ['фінанс', 'финанс', 'банк', 'банку', 'банки', 'банків', 'банка', 'кредит', 'інвест', 'инвест', 'біткоїн', 'биткоин', 'bitcoin', 'крипт', 'податк', 'налог', 'гривн', 'валют', 'економік', 'экономик', 'бізнес', 'бизнес', 'стартап', 'дивіденд', 'finance', 'bank', 'invest', 'stock', 'trading', 'трейдинг', 'forex', 'форекс', 'ипотек', 'іпотек', 'страхув', 'страхов', 'finanza'] },
+            { key: 'news', name: 'Новини та ЗМІ', color: '#8A7A5C', icon: 'news',
+              domains: ['pravda.com.ua', 'unian', 'nv.ua', 'tsn.ua', 'rbc', 'liga.net', 'censor.net', 'telegraf', 'ukranews', '24tv', 'hromadske', 'babel.ua', 'forbes', 'bbc', 'reuters', 'bloomberg', 'repubblica.it', 'corriere.it', 'ansa.it', 'gazzetta', 'ilpost', 'fanpage', 'korrespondent', 'zn.ua', 'obozrevatel', 'nytimes.com', 'theguardian.com', 'cnn.com'],
+              words: ['новин', 'новости', 'news', 'notizie', 'змі', 'сми', 'преса', 'пресс', 'репортаж', 'breaking', 'політик', 'политик', 'війна', 'война', 'уряд', 'правительств', 'президент', 'парламент'] }
+        ];
+        const WEB_DEF = { key: 'web', name: 'Веб-ресурси', color: '#7A8A6A', icon: 'globe' };
+        function _normWord(w) { return String(w).toLowerCase().replace(/[ʼ’'`]/g, ''); }
+        CAT_DEFS.forEach(d => {
+            d.matcher = { ex: new Set(), pf: [] };
+            d.words.forEach(w => { const star = /\*$/.test(w); const x = _normWord(w).replace(/\*$/, ''); if (star || x.length >= 5) d.matcher.pf.push(x); else d.matcher.ex.add(x); });
+        });
+        function _tokens(str) { return _normWord(str || '').match(/[\p{L}\p{N}]+/gu) || []; }
+        function _countHits(tokens, m) {
+            const hit = new Set();
+            tokens.forEach(tk => { if (m.ex.has(tk) || m.pf.some(p => tk.startsWith(p))) hit.add(tk); });
+            return hit.size;
+        }
+
+        const LEARN_KEY = 'linkbox_learn_v1';
+        function _loadLearn() {
+            try { const o = JSON.parse(localStorage.getItem(LEARN_KEY) || '{}'); return { d: o.d || {}, w: o.w || {} }; }
+            catch (e) { return { d: {}, w: {} }; }
+        }
+        function learnFromItem(item, prevCats) {
+            const L = _loadLearn(); const host = String(item.domain || '').toLowerCase().replace(/^www\./, '');
+            const cats = getItemCats(item); const prev = Array.isArray(prevCats) ? prevCats : [];
+            if (host) {
+                L.d[host] = L.d[host] || {};
+                prev.forEach(c => { if (!cats.includes(c) && L.d[host][c]) L.d[host][c] = Math.max(0, L.d[host][c] - 1); });
+                cats.forEach(c => { L.d[host][c] = (L.d[host][c] || 0) + 1; });
+            }
+            const toks = Array.from(new Set(_tokens(item.title).filter(x => x.length >= 4))).slice(0, 8);
+            toks.forEach(tk => { L.w[tk] = L.w[tk] || {}; cats.forEach(c => { L.w[tk][c] = (L.w[tk][c] || 0) + 1; }); });
+            const wk = Object.keys(L.w); if (wk.length > 4000) wk.slice(0, wk.length - 4000).forEach(k => delete L.w[k]);
+            try { localStorage.setItem(LEARN_KEY, JSON.stringify(L)); } catch (e) {}
+        }
+        function _lookupFolderLook(name) {
+            const def = CAT_DEFS.find(d => d.name.toLowerCase() === String(name).toLowerCase());
+            if (def) return { color: def.color, svg: LINE_ICONS[def.icon] };
+            const it = ITEMS.find(x => getItemCats(x).some(c => c.toLowerCase() === String(name).toLowerCase()));
+            if (it) return { color: it.color || WEB_DEF.color, svg: it.svg || LINE_ICONS.globe };
+            return { color: WEB_DEF.color, svg: LINE_ICONS.globe };
+        }
+
+        function scoreCategories(sig) {
+            const host = String(sig.domain || '').toLowerCase().replace(/^www\./, ''); const labels = host.split('.');
+            const T = _tokens(sig.title), D = _tokens(sig.desc), P = _tokens(sig.path);
+            const scores = new Map(); const mins = new Map();
+            CAT_DEFS.forEach(def => {
+                let sc = 0;
+                if (def.domains.some(d => d.includes('.') ? (host === d || host.endsWith('.' + d)) : labels.includes(d))) sc += 6;
+                sc += Math.min(3, _countHits(T, def.matcher)) * 2;
+                sc += Math.min(4, _countHits(D, def.matcher)) * 1;
+                sc += Math.min(2, _countHits(P, def.matcher)) * 0.5;
+                scores.set(def.name, sc); mins.set(def.name, def.min || 3);
+            });
+            const L = _loadLearn();
+            const dl = L.d[host] || {};
+            Object.keys(dl).forEach(c => { scores.set(c, (scores.get(c) || 0) + 1.5 + 1.5 * Math.min(dl[c], 3)); if (!mins.has(c)) mins.set(c, 3); });
+            const wb = {};
+            Array.from(new Set(T)).forEach(tk => { const e = L.w[tk]; if (e) Object.keys(e).forEach(c => { wb[c] = (wb[c] || 0) + Math.min(e[c], 2) * 0.75; }); });
+            Object.keys(wb).forEach(c => { scores.set(c, (scores.get(c) || 0) + Math.min(wb[c], 4)); if (!mins.has(c)) mins.set(c, 3); });
+            const ranked = Array.from(scores.entries()).sort((a, b) => b[1] - a[1]);
+            const top = ranked[0];
+            if (!top || top[1] < (mins.get(top[0]) || 3)) {
+                return { catKey: 'web', cats: [WEB_DEF.name], color: WEB_DEF.color, svg: LINE_ICONS.globe, suggested: ranked.filter(r => r[1] >= 1.5).slice(0, 3).map(r => r[0]), ranked };
+            }
+            const topDef = CAT_DEFS.find(d => d.name === top[0]);
+            let cats = [top[0]];
+            if (topDef && topDef.key !== 'nsfw') {
+                const second = ranked.find((r, i) => i > 0 && r[0] !== 'Полуничка 18+' && r[1] >= Math.max(3, top[1] * 0.6));
+                if (second) cats.push(second[0]);
+            }
+            const look = _lookupFolderLook(top[0]);
+            const suggested = topDef && topDef.key === 'nsfw' ? [] : ranked.filter(r => r[0] !== 'Полуничка 18+' && r[1] >= 1.5).slice(0, 5).map(r => r[0]);
+            return { catKey: topDef ? topDef.key : 'web', cats, color: look.color, svg: look.svg, suggested, ranked };
+        }
+
+        // ---- Мережа: рідний міст Android або fetch у браузері ----
+        const _nativeHttpCbs = new Map();
+        window.__onNativeHttp = function (reqId, status, text) {
+            const cb = _nativeHttpCbs.get(reqId);
+            if (cb) { _nativeHttpCbs.delete(reqId); cb({ status: Number(status) || 0, text: String(text || '') }); }
+        };
+        function httpRequest(url, opts) {
+            opts = opts || {}; const method = opts.method || 'POST'; const headers = opts.headers || {}; const body = opts.body || '';
+            if (window.LinkBoxNative && typeof window.LinkBoxNative.httpRequest === 'function') {
+                return new Promise((resolve, reject) => {
+                    const reqId = 'http_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
+                    const timer = setTimeout(() => { _nativeHttpCbs.delete(reqId); reject(new Error('Таймаут запиту')); }, 40000);
+                    _nativeHttpCbs.set(reqId, (res) => { clearTimeout(timer); if (res.status === 0 && /^ERR:/.test(res.text)) reject(new Error(res.text.slice(4))); else resolve(res); });
+                    try { window.LinkBoxNative.httpRequest(reqId, method, url, JSON.stringify(headers), body); }
+                    catch (e) { clearTimeout(timer); _nativeHttpCbs.delete(reqId); reject(e); }
+                });
+            }
+            return fetch(url, { method, headers, body: method === 'GET' ? undefined : body }).then(async r => ({ status: r.status, text: await r.text() }));
+        }
+
+        // ---- ШІ: налаштування і провайдери ----
+        const AI_KEY = 'linkbox_ai_v1';
+        const AI_PROVIDERS = {
+            gemini: { label: 'Google Gemini (є безкоштовний)', kind: 'gemini', model: 'gemini-2.5-flash', link: 'https://aistudio.google.com/apikey',
+                steps: ['Відкрий aistudio.google.com/apikey', 'Увійди в Google-акаунт', 'Натисни Create API key', 'Скопіюй ключ і встав нижче'] },
+            groq: { label: 'Groq (безкоштовний)', kind: 'openai', base: 'https://api.groq.com/openai/v1', model: 'llama-3.3-70b-versatile', link: 'https://console.groq.com/keys',
+                steps: ['Відкрий console.groq.com/keys', 'Зареєструйся (без картки)', 'Натисни Create API Key', 'Скопіюй ключ (gsk_…) і встав нижче'] },
+            openrouter: { label: 'OpenRouter (є безкоштовні моделі)', kind: 'openai', base: 'https://openrouter.ai/api/v1', model: 'meta-llama/llama-3.3-70b-instruct:free', link: 'https://openrouter.ai/keys',
+                steps: ['Відкрий openrouter.ai/keys', 'Зареєструйся', 'Натисни Create Key', 'Скопіюй ключ і встав нижче', 'Модель з «:free» у назві безкоштовна, але з лімітом'] },
+            deepseek: { label: 'DeepSeek (платний, дешевий)', kind: 'openai', base: 'https://api.deepseek.com', model: 'deepseek-chat', link: 'https://platform.deepseek.com/api_keys',
+                steps: ['Відкрий platform.deepseek.com/api_keys', 'Зареєструйся й поповни баланс мінімальною сумою', 'Натисни Create new API key', 'Скопіюй ключ і встав нижче'] },
+            claude: { label: 'Claude (платний)', kind: 'anthropic', model: 'claude-haiku-5-5', link: 'https://console.anthropic.com/settings/keys',
+                steps: ['Відкрий console.anthropic.com/settings/keys', 'Зареєструйся й поповни баланс', 'Натисни Create Key', 'Скопіюй ключ і встав нижче'] },
+            openai: { label: 'OpenAI (платний)', kind: 'openai', base: 'https://api.openai.com/v1', model: 'gpt-4o-mini', link: 'https://platform.openai.com/api-keys',
+                steps: ['Відкрий platform.openai.com/api-keys', 'Зареєструйся й поповни баланс', 'Натисни Create new secret key', 'Скопіюй ключ і встав нижче'] },
+            custom: { label: 'Свій (OpenAI-сумісний)', kind: 'openai', base: '', model: '', link: '',
+                steps: ['Вкажи Base URL (наприклад https://host/v1), модель і ключ свого сервісу', 'Підходить будь-який сервіс із форматом /chat/completions'] }
+        };
+        let _aiBatchError = '';
+        function _loadAiRaw() { try { return JSON.parse(localStorage.getItem(AI_KEY) || '{}') || {}; } catch (e) { return {}; } }
+        function getAiConfig() {
+            const o = _loadAiRaw(); if (!o.key || !o.provider || !AI_PROVIDERS[o.provider]) return null;
+            const p = AI_PROVIDERS[o.provider];
+            const cfg = { provider: o.provider, kind: p.kind, key: String(o.key).trim(), model: (o.model || p.model || '').trim(), base: (o.base || p.base || '').trim().replace(/\/+$/, '') };
+            if (!cfg.key || !cfg.model || (cfg.kind === 'openai' && !cfg.base)) return null;
+            return cfg;
+        }
+        function _aiHttpError(status, text) {
+            if (status === 401 || status === 403) return 'ключ не підходить (' + status + ')';
+            if (status === 429) return 'ліміт вичерпано (429)';
+            if (status === 404) return 'модель або адреса не знайдені (404)';
+            let msg = ''; try { const j = JSON.parse(text); msg = (j.error && (j.error.message || j.error)) || j.message || ''; } catch (e) {}
+            return 'помилка ' + status + (msg ? ': ' + String(msg).slice(0, 120) : '');
+        }
+        async function callLLM(cfg, system, user) {
+            let url, headers, body;
+            if (cfg.kind === 'gemini') {
+                url = 'https://generativelanguage.googleapis.com/v1beta/models/' + encodeURIComponent(cfg.model) + ':generateContent';
+                headers = { 'Content-Type': 'application/json', 'x-goog-api-key': cfg.key };
+                body = { systemInstruction: { parts: [{ text: system }] }, contents: [{ role: 'user', parts: [{ text: user }] }], generationConfig: { temperature: 0.2, responseMimeType: 'application/json' } };
+            } else if (cfg.kind === 'anthropic') {
+                url = 'https://api.anthropic.com/v1/messages';
+                headers = { 'Content-Type': 'application/json', 'x-api-key': cfg.key, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' };
+                body = { model: cfg.model, max_tokens: 300, system: system, messages: [{ role: 'user', content: user }] };
+            } else {
+                url = cfg.base + '/chat/completions';
+                headers = { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + cfg.key };
+                body = { model: cfg.model, messages: [{ role: 'system', content: system }, { role: 'user', content: user }], temperature: 0.2, max_tokens: 300 };
+            }
+            const res = await httpRequest(url, { method: 'POST', headers, body: JSON.stringify(body) });
+            if (res.status < 200 || res.status >= 300) throw new Error(_aiHttpError(res.status, res.text));
+            let j; try { j = JSON.parse(res.text); } catch (e) { throw new Error('відповідь не розпізнано'); }
+            if (cfg.kind === 'gemini') return ((j.candidates && j.candidates[0] && j.candidates[0].content && j.candidates[0].content.parts) || []).map(p => p.text || '').join('');
+            if (cfg.kind === 'anthropic') return (j.content || []).map(p => p.text || '').join('');
+            return (j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content) || '';
+        }
+        function _allFolderNames() {
+            const set = new Map(); CAT_DEFS.forEach(d => { if (d.key !== 'nsfw') set.set(d.name.toLowerCase(), d.name); });
+            ITEMS.forEach(it => getItemCats(it).forEach(c => { if (c && !set.has(c.toLowerCase()) && !/18\+/.test(c)) set.set(c.toLowerCase(), c); }));
+            return Array.from(set.values()).slice(0, 60);
+        }
+        function parseAiJson(text) {
+            const s = String(text || '').replace(/```json|```/gi, ''); const a = s.indexOf('{'), b = s.lastIndexOf('}');
+            if (a < 0 || b <= a) return null;
+            let j; try { j = JSON.parse(s.slice(a, b + 1)); } catch (e) { return null; }
+            const names = _allFolderNames(); const byLower = new Map(names.map(n => [n.toLowerCase(), n]));
+            const folders = []; (Array.isArray(j.folders) ? j.folders : []).forEach(f => {
+                let n = String(f || '').trim().replace(/\s+/g, ' ').slice(0, 40); if (!n) return;
+                n = byLower.get(n.toLowerCase()) || n; if (!folders.includes(n)) folders.push(n);
+            });
+            const tags = []; (Array.isArray(j.tags) ? j.tags : []).forEach(tg => {
+                let x = String(tg || '').trim().replace(/^#+/, '').replace(/\s+/g, '').slice(0, 24); if (x) { x = '#' + x.toLowerCase(); if (!tags.includes(x)) tags.push(x); }
+            });
+            const clean = folders.filter(f => f !== WEB_DEF.name); const out = (clean.length ? clean : folders).slice(0, 3);
+            return out.length ? { folders: out, tags: tags.slice(0, 4) } : null;
+        }
+        const AI_SYSTEM = 'Ти класифікатор закладок. Обери 1-3 папки для сторінки за її ЗМІСТОМ (заголовок і опис), а не за словами в адресі чи назві сайту. Віддавай перевагу папкам зі списку; нову (коротку, українською, 1-3 слова) пропонуй лише якщо жодна не підходить. Сторінка може бути в кількох папках, якщо тема справді на перетині (наприклад, процесори для музикантів: Код та Технології + Музика). Додай 2-4 короткі теги. Відповідай ТІЛЬКИ JSON: {"folders":["..."],"tags":["#..."]}';
+        async function aiClassifyRaw(cfg, domain, title, desc) {
+            const user = 'Домен: ' + domain + '\nЗаголовок: ' + (title || '—') + '\nОпис: ' + (desc || '—').slice(0, 500) + '\nІснуючі папки: ' + _allFolderNames().join('; ');
+            const out = await callLLM(cfg, AI_SYSTEM, user); const parsed = parseAiJson(out);
+            if (!parsed) throw new Error('ШІ повернув неочікувану відповідь');
+            return parsed;
+        }
+        function _applyCats(item, names, tags) {
+            item.cats = names.slice(); item.cat = names[0];
+            const look = _lookupFolderLook(names[0]); item.color = look.color; item.svg = look.svg;
+            if (tags && tags.length) item.tags = Array.from(new Set([(item.tags && item.tags[0]) || ('#' + (item.name || '').toLowerCase().replace(/\s+/g, '')), ...tags]));
+        }
+        async function reclassifyItem(item, meta) {
+            const cfg = getAiConfig();
+            if (cfg && ((meta && (meta.title || meta.desc)) || item.title)) {
+                try {
+                    const r = await aiClassifyRaw(cfg, item.domain, (meta && meta.title) || item.title, meta && meta.desc);
+                    _applyCats(item, r.folders, r.tags); item.classifiedBy = 'ai'; return;
+                } catch (e) { _aiBatchError = (e && e.message) || String(e); }
+            }
+            const smart = buildSmartAIItem(item.url, item.title, (meta && meta.desc) || '');
+            _applyCats(item, smart.cats, null); item.color = smart.color; item.svg = smart.svg; item.classifiedBy = 'local';
+        }
+
+        // ---- Вікно налаштувань ШІ ----
+        function _aiEl(id) { return document.getElementById(id); }
+        function renderAiGuide() {
+            const pid = _aiEl('ai-provider').value; const p = AI_PROVIDERS[pid]; const box = _aiEl('ai-guide'); if (!box || !p) return;
+            const open = p.link ? `<button type="button" data-action="ai-open-guide" class="key-press mt-2 px-3 py-2 rounded-lg bg-accent text-onaccent text-xs font-black">Відкрити сторінку ключа</button>` : '';
+            box.innerHTML = `<div class="font-bold text-xs mb-1">Де взяти ключ</div><ol class="list-decimal pl-4 text-xs theme-muted space-y-0.5">${p.steps.map(x => `<li>${esc(x)}</li>`).join('')}</ol>${open}`;
+            _aiEl('ai-base-wrap').style.display = pid === 'custom' ? 'block' : 'none';
+            _aiEl('ai-model').placeholder = p.model || 'назва моделі';
+        }
+        function onAiProviderChange() { _aiEl('ai-model').value = ''; renderAiGuide(); }
+        function renderAiBadge() {
+            const cfg = getAiConfig(); const b = _aiEl('ai-mode-badge'); if (!b) return;
+            b.textContent = cfg ? ('Режим: ШІ — ' + AI_PROVIDERS[cfg.provider].label.replace(/ \(.*/, '') + ' (вбудовані правила вимкнені)') : 'Режим: вбудовані правила (без ключа)';
+        }
+        function openAiSheet() {
+            _pushModalState(); _hideSidebar();
+            const o = _loadAiRaw(); const sel = _aiEl('ai-provider');
+            sel.innerHTML = Object.keys(AI_PROVIDERS).map(k => `<option value="${k}">${esc(AI_PROVIDERS[k].label)}</option>`).join('');
+            sel.value = AI_PROVIDERS[o.provider] ? o.provider : 'gemini';
+            _aiEl('ai-key').value = o.key || ''; _aiEl('ai-model').value = o.model || ''; _aiEl('ai-base').value = o.base || '';
+            _aiEl('ai-status').textContent = ''; renderAiGuide(); renderAiBadge(); _resortArmed = false; if (!_resortRunning) _aiEl('resort-status').textContent = ''; renderResortCard();
+            const modal = _aiEl('ai-sheet-modal'); const panel = _aiEl('ai-sheet-panel');
+            panel.style.transform = ''; panel.scrollTop = 0; modal.classList.remove('hidden'); modal.style.display = 'flex'; setTimeout(() => modal.classList.add('open'), 10);
+        }
+        function closeAiSheet() { safeCloseModal(_hideAiSheet); }
+        function _hideAiSheet() {
+            const modal = _aiEl('ai-sheet-modal'); const panel = _aiEl('ai-sheet-panel');
+            panel.style.transform = ''; modal.classList.remove('open'); setTimeout(() => { modal.classList.add('hidden'); modal.style.display = 'none'; }, 340);
+        }
+        function _readAiForm() {
+            const provider = _aiEl('ai-provider').value;
+            return { provider, key: _aiEl('ai-key').value.trim(), model: _aiEl('ai-model').value.trim(), base: _aiEl('ai-base').value.trim() };
+        }
+        function saveAiSettings() {
+            const f = _readAiForm();
+            try { localStorage.setItem(AI_KEY, JSON.stringify(f)); } catch (e) {}
+            renderAiBadge(); const st = _aiEl('ai-status');
+            st.textContent = getAiConfig() ? 'Збережено. ШІ вмикається для нових посилань.' : (f.key ? 'Збережено, але не вистачає моделі або адреси.' : 'Ключ порожній: працюють вбудовані правила.');
+            showToast(t('saved'));
+        }
+        function clearAiSettings() {
+            try { localStorage.removeItem(AI_KEY); } catch (e) {}
+            _aiEl('ai-key').value = ''; _aiEl('ai-model').value = ''; _aiEl('ai-base').value = '';
+            renderAiBadge(); _aiEl('ai-status').textContent = 'Ключ видалено. Працюють вбудовані правила.';
+        }
+        async function testAiSettings() {
+            const f = _readAiForm(); const p = AI_PROVIDERS[f.provider]; const st = _aiEl('ai-status');
+            const cfg = { provider: f.provider, kind: p.kind, key: f.key, model: f.model || p.model || '', base: (f.base || p.base || '').replace(/\/+$/, '') };
+            if (!cfg.key) { st.textContent = 'Встав ключ.'; return; }
+            if (!cfg.model || (cfg.kind === 'openai' && !cfg.base)) { st.textContent = 'Вкажи модель і адресу.'; return; }
+            st.textContent = 'Перевіряю…';
+            try {
+                const r = await aiClassifyRaw(cfg, 'habr.com', 'Процесори в бюджетних ноутбуках: що вибрати', 'Огляд процесорів для недорогих ноутбуків');
+                st.textContent = 'Працює. Тест: ' + r.folders.join(', ');
+            } catch (e) { st.textContent = 'Помилка: ' + ((e && e.message) || e); }
+        }
+        function openAiKeyPage() { const p = AI_PROVIDERS[_aiEl('ai-provider').value]; if (p && p.link) openExternalUrlInNewTab(p.link); }
+
+        // ---- Перерозпізнавання вже збережених посилань ----
+        const RESORT_UNDO_KEY = 'linkbox_resort_undo_v1';
+        const AUTO_TITLE_SUFFIX = /^\s*—\s*(Книги та наука|Музика та аудіо|Кіно та серіали|Канали та спільноти|Технології та ІТ|Товар у каталозі|Дизайн-референс|Подорожі та маршрути|Фінанси та бізнес|Публікація|18\+ Контент|Веб-сторінка)\s*$/;
+        let _resortMode = 'web', _resortRunning = false, _resortAbort = false, _resortArmed = false, _resortArmTimer = null;
+        function _usableTitle(it) {
+            const tt = String(it.title || '').trim(); const nm = String(it.name || '').trim();
+            if (!tt) return '';
+            if (nm && tt.startsWith(nm) && AUTO_TITLE_SUFFIX.test(tt.slice(nm.length))) return '';
+            return tt;
+        }
+        function _usableDesc(it) {
+            const n = String(it.note || '').trim(); if (!n) return '';
+            if (n.indexOf('«') !== -1) return '';
+            if (it.domain && n.toLowerCase().indexOf(String(it.domain).toLowerCase()) !== -1) return '';
+            const low = n.toLowerCase(); if (CAT_DEFS.some(d => low.indexOf(d.name.toLowerCase()) !== -1)) return '';
+            return n;
+        }
+        function _resortTargets(mode) {
+            return ITEMS.filter(it => {
+                if (it.pendingOffline || it.lockedOverride === true) return false;
+                const cats = getItemCats(it); if (cats.some(c => /18\+/.test(c))) return false;
+                return mode === 'all' ? true : (cats.length === 1 && cats[0] === WEB_DEF.name);
+            });
+        }
+        function _hasResortUndo() { try { const u = JSON.parse(localStorage.getItem(RESORT_UNDO_KEY) || 'null'); return u && Array.isArray(u.items) ? u.items.length : 0; } catch (e) { return 0; } }
+        function renderResortCard() {
+            if (!_aiEl('resort-card')) return;
+            const nWeb = _resortTargets('web').length, nAll = _resortTargets('all').length;
+            const n = _resortMode === 'all' ? nAll : nWeb;
+            _aiEl('resort-count').textContent = `${nWeb} / ${nAll}`;
+            ['web', 'all'].forEach(m => {
+                const b = _aiEl('resort-mode-' + m); if (!b) return;
+                b.className = 'key-press flex-1 py-2 rounded-lg text-xs font-bold ' + (_resortMode === m ? 'bg-accent text-onaccent' : 'theme-input');
+            });
+            const run = _aiEl('resort-run');
+            if (run) {
+                run.textContent = _resortRunning ? 'Стоп' : (_resortArmed ? `Підтвердити: перезапис ${n}` : 'Перерозпізнати');
+                run.className = 'key-press flex-1 py-3 rounded-lg text-xs font-black ' + (_resortArmed || _resortRunning ? 'bg-accent text-onaccent' : 'bg-accent text-onaccent');
+                run.style.opacity = (!_resortRunning && n === 0) ? '0.45' : '1';
+            }
+            const u = _hasResortUndo(); const ub = _aiEl('resort-undo');
+            if (ub) { ub.style.display = (u && !_resortRunning) ? 'block' : 'none'; ub.textContent = `Скасувати (${u})`; }
+        }
+        function setResortMode(m) {
+            if (_resortRunning) return;
+            _resortMode = m === 'all' ? 'all' : 'web'; _resortArmed = false; clearTimeout(_resortArmTimer);
+            _aiEl('resort-status').textContent = _resortMode === 'all' ? 'Усі посилання: ручні папки теж будуть перезаписані. Це можна скасувати.' : 'Лише ті, що зараз у «Веб-ресурси». Безпечно.';
+            renderResortCard();
+        }
+        async function runResort() {
+            if (_resortRunning) { _resortAbort = true; return; }
+            const targets = _resortTargets(_resortMode); const st = _aiEl('resort-status');
+            if (!targets.length) { st.textContent = 'Немає посилань для перерозпізнавання.'; renderResortCard(); return; }
+            if (_resortMode === 'all' && !_resortArmed) {
+                _resortArmed = true; renderResortCard();
+                _resortArmTimer = setTimeout(() => { _resortArmed = false; renderResortCard(); }, 5000); return;
+            }
+            _resortArmed = false; clearTimeout(_resortArmTimer);
+            const snapshot = targets.map(it => ({ id: it.id, cats: getItemCats(it).slice(), cat: it.cat, color: it.color, svg: it.svg, tags: (it.tags || []).slice() }));
+            try { localStorage.setItem(RESORT_UNDO_KEY, JSON.stringify({ items: snapshot, at: Date.now() })); } catch (e) {}
+            _resortRunning = true; _resortAbort = false; renderResortCard();
+            const bar = _aiEl('resort-bar'), wrap = _aiEl('resort-progress'); if (wrap) wrap.style.display = 'block';
+            const cfg = getAiConfig(); let aiDead = false, aiErr = '', changed = 0, done = 0; const queue = targets.slice();
+            async function worker() {
+                while (queue.length && !_resortAbort) {
+                    const it = queue.shift(); const before = getItemCats(it).join('|'); let res = null;
+                    const title = _usableTitle(it), desc = _usableDesc(it);
+                    if (cfg && !aiDead && (title || desc)) {
+                        try { res = await aiClassifyRaw(cfg, it.domain, title, desc); } catch (e) { aiDead = true; aiErr = (e && e.message) || String(e); }
+                    }
+                    if (res) _applyCats(it, res.folders, res.tags);
+                    else { const sm = buildSmartAIItem(it.url, title, desc); _applyCats(it, sm.cats, null); it.color = sm.color; it.svg = sm.svg; }
+                    if (getItemCats(it).join('|') !== before) changed++;
+                    done++;
+                    if (done % 10 === 0 || done === targets.length) { if (bar) bar.style.width = Math.round(done / targets.length * 100) + '%'; st.textContent = `${done} / ${targets.length}`; }
+                    if (done % 25 === 0) { saveStateToStorage(); await new Promise(r => setTimeout(r, 0)); }
+                }
+            }
+            try { await Promise.all(Array.from({ length: cfg ? 2 : 1 }, () => worker())); }
+            finally {
+                _resortRunning = false; saveStateToStorage(); renderFoldersInMenu(); renderApp();
+                if (wrap) wrap.style.display = 'none'; if (bar) bar.style.width = '0%';
+                st.textContent = (_resortAbort ? 'Зупинено. ' : 'Готово. ') + `Змінено: ${changed} з ${done}.` + (aiErr ? ` ШІ недоступний (${aiErr}), решту оброблено правилами.` : '');
+                renderResortCard();
+            }
+        }
+        function undoResort() {
+            let u; try { u = JSON.parse(localStorage.getItem(RESORT_UNDO_KEY) || 'null'); } catch (e) { u = null; }
+            if (!u || !Array.isArray(u.items) || _resortRunning) return;
+            const byId = new Map(ITEMS.map(it => [it.id, it])); let n = 0;
+            u.items.forEach(s => { const it = byId.get(s.id); if (!it) return; it.cats = s.cats.slice(); it.cat = s.cat; it.color = s.color; it.svg = s.svg; it.tags = s.tags.slice(); n++; });
+            try { localStorage.removeItem(RESORT_UNDO_KEY); } catch (e) {}
+            saveStateToStorage(); renderFoldersInMenu(); renderApp();
+            _aiEl('resort-status').textContent = `Скасовано: повернуто ${n}.`; renderResortCard();
+        }
+
+        function buildSmartAIItem(rawUrl, customTitle = '', customDesc = '') {
             const finalUrl = cleanRawUrl(rawUrl); const domain = finalUrl.replace(/^https?:\/\//i, '').replace(/^www\./i, '').split('/')[0].toLowerCase();
             const cleanName = extractCleanBrandName(domain); const { topic: slugTopic, sectionHint } = decodeUrlPathToHumanTopic(finalUrl);
             const humanTitle = sanitizeBookmarkTitle(customTitle, cleanName) || slugTopic;
             const pageTopicSignal = `${humanTitle} ${sectionHint} ${finalUrl}`.toLowerCase(); const domainOnlySignal = domain.toLowerCase();
 
-            let catKey = 'web'; let cat = 'Веб-ресурси'; let color = '#7A8A6A'; let svg = LINE_ICONS.globe;
+            const pathSignal = `${sectionHint} ${finalUrl.replace(/^https?:\/\/[^\/]+/i, '')}`;
+            const scored = scoreCategories({ domain, title: humanTitle, desc: customDesc, path: pathSignal });
+            let catKey = scored.catKey; let cat = scored.cats[0]; let color = scored.color; let svg = scored.svg;
             const baseBrandTag = `#${cleanName.toLowerCase().replace(/\s+/g, '')}`;
-
-            if (/pornhub|xvideos|xnxx|xhamster|sex|porn|nsfw|onlyfans|rule34|hentai|boobs|nude|chaturbate|bongacams|redtube|youporn|spankbang|eporner/i.test(pageTopicSignal)) { catKey = 'nsfw'; cat = 'Полуничка 18+'; color = '#E11D48'; svg = LINE_ICONS.nsfw; }
-            else if (/roman|роман|книг|літератур|литератур|фантастик|chtivo|чтиво|science|наук|scienza|libri|romanzo|wikipedia|coursera|udemy|prometheus|yakaboo|goodreads|duolingo|book|wiki|library|освіт|курс|словник|енциклопед|навчан/.test(pageTopicSignal)) { catKey = 'book'; cat = 'Книги та Освіта'; color = '#A0705A'; svg = LINE_ICONS.book; }
-            else if (/spotify|soundcloud|music\.apple|deezer|bandcamp|last\.fm|shazam|mp3|flac|ape|lossless|discography|дискограф|radio|podcast|audio|музик|музык|musica|canzoni|пісн|альбом|плейлист/.test(pageTopicSignal)) { catKey = 'music'; cat = 'Музика'; color = '#2F8F6B'; svg = LINE_ICONS.music; }
-            else if (/youtube|youtu\.be|netflix|megogo|sweet\.tv|takflix|kinopoisk|imdb|vimeo|twitch|rezka|filmix|uaserial|raiplay|serial|серіал|сериал|кіно|кино|фільм|фильм|мульт|movie|cinema|video|serietv/.test(pageTopicSignal)) { catKey = 'video'; cat = 'Кіно та Серіали'; color = '#C8553D'; svg = LINE_ICONS.video; }
-            else if (/t\.me|telegram|телеграм|мемы|меми|канал|canali|instagram|facebook|twitter|x\.com|threads|linkedin|reddit|tiktok|discord|viber|соцмереж|форум/.test(pageTopicSignal)) { catKey = 'social'; cat = 'Соцмережі та Канали'; color = '#B5527A'; svg = LINE_ICONS.social; }
-            else if (/techno\.|gadgets|гаджет|смартфон|github|gitlab|stackoverflow|habr|dou\.ua|dev\.to|itc\.ua|ain\.ua|gagadget|internetua|volia|kyivstar|vodafone|lifecell|chatgpt|openai|claude|gemini|vercel|docker|linux|android|apk|4pda|xda|aranzulla|soft|app|tehnologii|технолог|tecnologia|програм|код|сервер/.test(pageTopicSignal)) { catKey = 'code'; cat = 'Код та Технології'; color = '#6E6A63'; svg = LINE_ICONS.code; }
-            else if (/rozetka|prom\.ua|olx|epicentr|allo|comfy|foxtrot|moyo|citrus|amazon|aliexpress|ebay|subito\.it|trovaprezzi|makeup|shafa|kasta|zakaz|silpo|atb|shop|store|market|buy|price|prezzo|offerte|nedorogoy|недорогой|купит|ціна|цена|товар|магазин|знижк/.test(pageTopicSignal)) { catKey = 'shop'; cat = 'Покупки'; color = '#6A9A3A'; svg = LINE_ICONS.shop; }
-            else if (/figma|behance|dribbble|awwwards|pinterest|framer|unsplash|freepik|canva|adobe|artstation|дизайн|ілюстрац|шрифт|grafica/.test(pageTopicSignal)) { catKey = 'design'; cat = 'Дизайн'; color = '#D98E2B'; svg = LINE_ICONS.design; }
-            else if (/airbnb|booking|skyscanner|tripadvisor|ryanair|trenitalia|italotreno|uz\.gov|tickets\.ua|infobus|maps\.google|waze|hotel|travel|viaggi|карпат|подорож|маршрут|квитк|готел/.test(pageTopicSignal)) { catKey = 'travel'; cat = 'Поїздки'; color = '#D2546A'; svg = LINE_ICONS.travel; }
-            else if (/biz\.|privatbank|privat24|monobank|oschadbank|sense|minfin|finance\.ua|kurs\.com|binance|tradingview|diia\.gov|tax\.gov|ilsole24ore|market|bank|finanza|фінанс|банк|бізнес|бизнес|економік|курс|податк/.test(pageTopicSignal)) { catKey = 'finance'; cat = 'Фінанси та Бізнес'; color = '#1F8A8A'; svg = LINE_ICONS.finance; }
-            else if (/news|pravda|unian|nv\.ua|tsn|rbc|liga\.net|censor|telegraf|ukranews|24tv|hromadske|babel|forbes|bbc|reuters|bloomberg|repubblica|corriere|ansa|gazzetta|ilpost|fanpage|korrespondent|zn\.ua|gazeta|obozrevatel|focus\.ua|espreso|новин|новости|notizie|статт|медіа|преса/.test(pageTopicSignal) || /nv\.ua|pravda|unian|tsn|telegraf|ukranews|repubblica\.it|corriere\.it|ansa\.it/.test(domainOnlySignal)) { catKey = 'news'; cat = 'Новини та ЗМІ'; color = '#8A7A5C'; svg = LINE_ICONS.news; }
 
             const localized = generateLocalizedMeta('uk', catKey, cleanName, domain, humanTitle, baseBrandTag);
             const finalTitle = humanTitle || localized.defaultTitle;
             const now = new Date(); const dateStr = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${String(now.getFullYear()).slice(-2)}`;
-            const suggestedCats = [];
-            if (catKey !== 'nsfw') {
-                if (/roman|книг|літератур|литератур|наук|science|book|wiki/i.test(pageTopicSignal)) suggestedCats.push('Книги та Освіта');
-                if (/techno|gadgets|гаджет|github|code|код|ai|it|смартфон|ecoflow|starlink/i.test(pageTopicSignal)) suggestedCats.push('Код та Технології');
-                if (/telegram|t\.me|канал|мем|соцмереж|social/i.test(pageTopicSignal)) suggestedCats.push('Соцмережі та Канали');
-                if (/news|новин|новости|notizie|pravda|nv\.ua|unian|bbc|reuters/i.test(pageTopicSignal)) suggestedCats.push('Новини та ЗМІ');
-                if (/design|дизайн|ui|ux|figma|behance/i.test(pageTopicSignal)) suggestedCats.push('Дизайн');
-                if (/shop|rozetka|amazon|купит|ціна|товар|покупки/i.test(pageTopicSignal)) suggestedCats.push('Покупки');
-                if (/movie|кіно|кино|серіал|сериал|netflix|youtube/i.test(pageTopicSignal)) suggestedCats.push('Кіно та Серіали');
-                if (/music|музик|музык|spotify|soundcloud|flac|ape|дискограф/i.test(pageTopicSignal)) suggestedCats.push('Музика');
-                if (/travel|airbnb|booking|карпат|подорож/i.test(pageTopicSignal)) suggestedCats.push('Поїздки');
-            }
+            const suggestedCats = scored.suggested;
 
             return {
                 id: Date.now() + Math.floor(Math.random() * 100000), name: cleanName, domain, url: finalUrl, title: finalTitle,
-                cat, cats: [cat], aiSuggestedCats: Array.from(new Set([cat, ...suggestedCats])), date: dateStr, color,
+                cat, cats: scored.cats.slice(), aiSuggestedCats: Array.from(new Set([...scored.cats, ...suggestedCats])), date: dateStr, color, autoCat: true,
                 note: localized.note, tags: localized.tags, svg, siteLang: 'UK',
                 lockedOverride: catKey === 'nsfw' ? true : null, pinned: false, folderPriority: false, pendingOffline: false, isRead: false
             };
@@ -2352,7 +2766,7 @@
                 if (manualTap) { selectedFolder = OFFLINE_FOLDER_KEY; renderApp(); showToast(t('offlineStillNoNet')); }
                 return;
             }
-            _isQueueRunning = true;
+            _isQueueRunning = true; _aiBatchError = '';
             let processedCount = 0;
             const offlineCountEl = document.getElementById('offline-queue-count');
             if (offlineCountEl) offlineCountEl.textContent = `${pending.length}`;
@@ -2364,21 +2778,13 @@
                     const item = pending[idx++];
                     const meta = await fetchRealTitleAndDesc(item.url);
                     if (meta) {
-                        if (meta.title && meta.title.length > 2) {
-                            item.title = meta.title.slice(0, 120);
-                            const reSmart = buildSmartAIItem(item.url, item.title);
-                            if (item.cat === 'Веб-ресурси' && reSmart.cat !== 'Веб-ресурси') {
-                                item.cat = reSmart.cat;
-                                item.cats = [reSmart.cat];
-                                item.color = reSmart.color;
-                                item.svg = reSmart.svg;
-                            }
-                        }
+                        if (meta.title && meta.title.length > 2) item.title = meta.title.slice(0, 120);
                         if (meta.desc && meta.desc.length > 5) {
                             item.note = meta.desc.slice(0, 260);
                         } else if (meta.title) {
                             item.note = `Сторінка «${item.title}» на ресурсі ${item.name} (${item.domain}).`;
                         }
+                        if (item.autoCat === true) { try { await reclassifyItem(item, meta); } catch (e) {} }
                     }
                     item.pendingOffline = false;
                     processedCount++;
@@ -2398,6 +2804,7 @@
                     saveStateToStorage();
                     renderApp();
                     showToast(`${t('offlineSyncedToast')}${processedCount} ✓`);
+                    if (_aiBatchError) setTimeout(() => showToast('ШІ недоступний (' + _aiBatchError + '), працюють вбудовані правила'), 1800);
                 }
             }
         }
@@ -2620,7 +3027,10 @@
             if (newUrl) { item.url = newUrl; item.domain = newUrl.replace(/^https?:\/\//i, '').replace(/^www\./i, '').split('/')[0].toLowerCase(); }
             item.title = document.getElementById('sheet-title').value.trim() || item.title; item.note = document.getElementById('sheet-note').value.trim() || item.note;
             const parsedCats = document.getElementById('sheet-cat').value.split(',').map(c => c.trim()).filter(Boolean);
+            const _prevCats = getItemCats(item).slice();
             if (parsedCats.length > 0) { item.cats = Array.from(new Set(parsedCats)); item.cat = item.cats[0]; }
+            item.autoCat = false;
+            try { if (parsedCats.length > 0 && _prevCats.join('|') !== item.cats.join('|')) learnFromItem(item, _prevCats); } catch (e) {}
             const rawTags = document.getElementById('sheet-tags').value.trim();
             item.tags = rawTags ? rawTags.split(/\s+/).filter(Boolean).map(tg => tg.startsWith('#') ? tg : `#${tg}`) : [];
             item.lockedOverride = sheetTempLocked; item.folderPriority = sheetTempFolderPriority;
@@ -3273,6 +3683,7 @@
             document.getElementById('cats-search-input')?.addEventListener('input', renderCategoriesCloud);
             document.getElementById('tags-search-input')?.addEventListener('input', renderTagsCloud);
             document.getElementById('sheet-cat')?.addEventListener('input', renderCategorySuggestions);
+            document.getElementById('ai-provider')?.addEventListener('change', onAiProviderChange);
             document.getElementById('ai-import-file')?.addEventListener('change', handleAIFileImport);
             document.getElementById('url-input')?.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter') addLinkByAI();
@@ -3289,6 +3700,7 @@
                     else if (bdAction === 'close-cats-sheet') closeCategoriesSheet();
                     else if (bdAction === 'close-tags-sheet') closeTagsSheet();
                     else if (bdAction === 'close-about-sheet') closeAboutSheet();
+                    else if (bdAction === 'close-ai-sheet') closeAiSheet();
                     else if (bdAction === 'close-edit-sheet') closeEditSheet();
                     return;
                 }
@@ -3312,6 +3724,15 @@
                     case 'close-tags-sheet': closeTagsSheet(); break;
                     case 'open-about-sheet': openAboutSheet(); break;
                     case 'close-about-sheet': closeAboutSheet(); break;
+                    case 'open-ai-sheet': openAiSheet(); break;
+                    case 'close-ai-sheet': closeAiSheet(); break;
+                    case 'ai-save': saveAiSettings(); break;
+                    case 'ai-test': testAiSettings(); break;
+                    case 'ai-clear': clearAiSettings(); break;
+                    case 'ai-open-guide': openAiKeyPage(); break;
+                    case 'resort-mode': setResortMode(actionEl.dataset.mode); break;
+                    case 'resort-run': runResort(); break;
+                    case 'resort-undo': undoResort(); break;
                     case 'open-calendar-sheet': openCalendarSheet(); break;
                     case 'close-calendar': closeCalendarSheet(); break;
                     case 'set-layout': setLayoutMode(actionEl.dataset.mode); break;
@@ -3409,6 +3830,7 @@
             attachSheetDrag('cats-drag-handle', 'cats-sheet-panel', closeCategoriesSheet);
             attachSheetDrag('tags-drag-handle', 'tags-sheet-panel', closeTagsSheet);
             attachSheetDrag('about-drag-handle', 'about-sheet-panel', closeAboutSheet);
+            attachSheetDrag('ai-drag-handle', 'ai-sheet-panel', closeAiSheet);
             attachSheetDrag('edit-drag-handle', 'edit-sheet-panel', closeEditSheet);
             attachSheetDrag('calendar-drag-handle', 'calendar-sheet-panel', closeCalendarSheet);
             attachSheetDrag('bulk-edit-drag-handle', 'bulk-edit-sheet-panel', closeBulkEditSheet);
