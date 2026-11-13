@@ -247,6 +247,171 @@ jobs:
                 });
               }
 
+              @JavascriptInterface
+              public void httpRequest(final String reqId, final String method, final String url, final String headersJson, final String body) {
+                netPool.execute(new Runnable() {
+                  @Override
+                  public void run() {
+                    int status = 0;
+                    String text = "";
+                    HttpURLConnection conn = null;
+                    try {
+                      conn = (HttpURLConnection) new URL(url).openConnection();
+                      conn.setRequestMethod(method);
+                      conn.setConnectTimeout(15000);
+                      conn.setReadTimeout(30000);
+                      JSONObject h = new JSONObject(headersJson);
+                      java.util.Iterator<String> it = h.keys();
+                      while (it.hasNext()) {
+                        String k = it.next();
+                        conn.setRequestProperty(k, h.getString(k));
+                      }
+                      if (body != null && !body.isEmpty()) {
+                        conn.setDoOutput(true);
+                        try (OutputStream os = conn.getOutputStream()) {
+                          os.write(body.getBytes(StandardCharsets.UTF_8));
+                        }
+                      }
+                      status = conn.getResponseCode();
+                      InputStream is = status >= 400 ? conn.getErrorStream() : conn.getInputStream();
+                      if (is != null) {
+                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                        byte[] buf = new byte[4096];
+                        int n, total = 0;
+                        while ((n = is.read(buf)) != -1 && total < 1048576) {
+                          baos.write(buf, 0, n);
+                          total += n;
+                        }
+                        is.close();
+                        text = baos.toString("UTF-8");
+                      }
+                    } catch (Exception e) {
+                      text = "ERR:" + e.getClass().getSimpleName() + ": " + String.valueOf(e.getMessage());
+                    } finally {
+                      if (conn != null) conn.disconnect();
+                    }
+                    final String js = "window.__onNativeHttp && window.__onNativeHttp(" + JSONObject.quote(reqId) + "," + status + "," + JSONObject.quote(text) + ");";
+                    runOnUiThread(new Runnable() {
+                      @Override
+                      public void run() {
+                        if (getBridge() != null && getBridge().getWebView() != null) {
+                          getBridge().getWebView().evaluateJavascript(js, null);
+                        }
+                      }
+                    });
+                  }
+                });
+              }
+
+              private String extractMeta(String html, String attrPattern) {
+                Pattern p1 = Pattern.compile("<meta[^>]*?" + attrPattern + "[^>]*?content\\s*=\\s*[\"'](.*?)[\"'][^>]*?>", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+                Matcher m1 = p1.matcher(html);
+                if (m1.find()) return cleanHtmlText(m1.group(1));
+                Pattern p2 = Pattern.compile("<meta[^>]*?content\\s*=\\s*[\"'](.*?)[\"'][^>]*?" + attrPattern + "[^>]*?>", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+                Matcher m2 = p2.matcher(html);
+                if (m2.find()) return cleanHtmlText(m2.group(1));
+                return "";
+              }
+
+              private String cleanHtmlText(String raw) {
+                if (raw == null) return "";
+                String stripped = raw.replaceAll("<[^>]+>", " ");
+                String decoded = Html.fromHtml(stripped, Html.FROM_HTML_MODE_LEGACY).toString();
+                return decoded.replaceAll("\\s+", " ").trim();
+              }
+            }
+
+            @Override
+            protected void onNewIntent(Intent intent) {
+              super.onNewIntent(intent);
+              setIntent(intent);
+              handleShare(intent);
+            }
+            private void handleShare(Intent intent) {
+              if (intent == null || !Intent.ACTION_SEND.equals(intent.getAction())) return;
+              String text = intent.getStringExtra(Intent.EXTRA_TEXT);
+              if (text == null || text.isEmpty()) return;
+              intent.removeExtra(Intent.EXTRA_TEXT);
+              trySend(JSONObject.quote(text), 0);
+            }
+            private void trySend(final String quoted, final int attempt) {
+              new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                  if (getBridge() == null || getBridge().getWebView() == null) {
+                    if (attempt < 30) trySend(quoted, attempt + 1);
+                    return;
+                  }
+                  getBridge().getWebView().evaluateJavascript(
+                    "(function(){return window.receiveShared ? window.receiveShared(" + quoted + ") : false;})()",
+                    new android.webkit.ValueCallback<String>() {
+                      @Override
+                      public void onReceiveValue(String value) {
+                        if (!"true".equals(value) && attempt < 30) trySend(quoted, attempt + 1);
+                      }
+                    });
+                }
+              }, 500);
+            }
+          }
+          JAVA
+          npx cap sync android
+      - name: Build
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug
+      - name: Sign APK
+        run: |
+          BT=$ANDROID_HOME/build-tools/$(ls $ANDROID_HOME/build-tools | sort -V | tail -1)
+          $BT/apksigner sign --ks debug.keystore --ks-pass pass:android --key-pass pass:android --ks-key-alias androiddebugkey --v4-signing-enabled false --out LinkBox.apk android/app/build/outputs/apk/debug/app-debug.apk
+          $BT/apksigner verify --print-certs LinkBox.apk | grep "SHA-256"
+          $BT/aapt2 dump badging LinkBox.apk | head -1
+      - uses: actions/upload-artifact@v4
+        with:
+          name: LinkBox
+          path: LinkBox.apk
+}
+                        InputStream is = conn.getInputStream();
+                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                        byte[] buf = new byte[4096];
+                        int n, total = 0;
+                        while ((n = is.read(buf)) != -1 && total < 163840) {
+                          baos.write(buf, 0, n);
+                          total += n;
+                        }
+                        is.close();
+                        String html = baos.toString(charset);
+
+                        title = extractMeta(html, "(?:property|name)\\s*=\\s*[\"'](?:og:title|twitter:title)[\"']");
+                        if (title.isEmpty()) {
+                          Matcher tm = Pattern.compile("<title[^>]*>(.*?)</title>", Pattern.CASE_INSENSITIVE | Pattern.DOTALL).matcher(html);
+                          if (tm.find()) title = cleanHtmlText(tm.group(1));
+                        }
+
+                        desc = extractMeta(html, "(?:name|property)\\s*=\\s*[\"'](?:description|og:description|twitter:description)[\"']");
+                      }
+                    } catch (Exception ignored) {
+                    } finally {
+                      if (conn != null) conn.disconnect();
+                    }
+
+                    final String jsCall = "window.__onNativePageMeta && window.__onNativePageMeta("
+                      + JSONObject.quote(reqId) + ","
+                      + JSONObject.quote(title) + ","
+                      + JSONObject.quote(desc) + ");";
+                    runOnUiThread(new Runnable() {
+                      @Override
+                      public void run() {
+                        if (getBridge() != null && getBridge().getWebView() != null) {
+                          getBridge().getWebView().evaluateJavascript(jsCall, null);
+                        }
+                      }
+                    });
+                  }
+                });
+              }
+
               private String extractMeta(String html, String attrPattern) {
                 Pattern p1 = Pattern.compile("<meta[^>]*?" + attrPattern + "[^>]*?content\\s*=\\s*[\"'](.*?)[\"'][^>]*?>", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
                 Matcher m1 = p1.matcher(html);
