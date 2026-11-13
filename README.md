@@ -17,11 +17,10 @@ Android-додаток для тих, хто зберігає посилання
 Три теми (включаючи нормальний чорний AMOLED, а не «сірий із претензією»), три вигляди карток, масове редагування, імпорт і експорт. З браузера, телеграма чи будь-якого іншого додатка можна кидати посилання напряму — воно одразу потрапляє в LinkBox.
 
 Коротше, щоб закладки нарешті перестали бути місцем, куди все зникає і більше ніколи не знаходиться.
-
 ---
-
 **Встановити**  
 АПК → [Releases](https://github.com/13symbols/LinkBox/tree/main/releases)
+
 ---
 
 # LinkBox - Smart Link Organiser 
@@ -39,8 +38,6 @@ AI is optional. Built-in rules do a solid job and even learn from your correctio
 Three themes (including a proper AMOLED black, not some “almost black” gray), three card layouts, bulk editing, import and export. You can share links straight from the browser, Telegram or any other app — they land in LinkBox immediately.
 
 In short: so your bookmarks finally stop being the place where things go to disappear forever.
-
 ---
-
 **Install**  
 APK → [Releases](https://github.com/13symbols/LinkBox/tree/main/releases)
