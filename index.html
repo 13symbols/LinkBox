@@ -510,7 +510,7 @@
                 <div class="min-w-0">
                     <div class="flex items-center gap-2">
                         <h1 class="text-lg font-black tracking-tight uppercase truncate">LinkBox</h1>
-                        <span id="total-count-pill" class="text-xs font-mono-code font-bold px-2 py-0.5 rounded-md bg-accent text-onaccent shrink-0">6</span>
+                        <span id="total-count-pill" class="text-xs font-mono-code font-bold px-2 py-0.5 rounded-md bg-accent text-onaccent shrink-0">10</span>
                     </div>
                     <span class="text-[11px] font-mono-code theme-muted block truncate">Smart Link Organizer</span>
                 </div>
@@ -639,7 +639,7 @@
                     <div data-action="reset-all" data-stop="1" class="key-press flex flex-col min-w-0 cursor-pointer" title="Натисніть, щоб скинути фільтри">
                         <div class="flex items-center gap-2">
                             <h1 class="text-base sm:text-lg font-black tracking-tight uppercase truncate">LinkBox</h1>
-                            <span id="mobile-count-pill" class="text-[11px] font-mono-code font-bold px-1.5 py-0.5 rounded-md bg-accent text-onaccent shrink-0">6</span>
+                            <span id="mobile-count-pill" class="text-[11px] font-mono-code font-bold px-1.5 py-0.5 rounded-md bg-accent text-onaccent shrink-0">10</span>
                         </div>
                         <div class="flex items-center gap-1.5 mt-0.5">
                             <span class="text-[11px] font-mono-code theme-muted block truncate">Smart Link Organizer</span>
@@ -818,7 +818,7 @@
             <div id="calendar-view" class="flex-1 transition-opacity duration-150 flex flex-col space-y-4 min-h-0">
                 <div class="flex items-center justify-between px-1">
                     <button data-action="cal-month" data-delta="-1" class="key-press w-8 h-8 rounded-lg theme-input flex items-center justify-center"><svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
-                    <span id="calendar-month-label" class="font-bold text-sm uppercase tracking-wider">Жовтень 2026</span>
+                    <span id="calendar-month-label" class="font-bold text-sm uppercase tracking-wider">Листопад 2026</span>
                     <button data-action="cal-month" data-delta="1" class="key-press w-8 h-8 rounded-lg theme-input flex items-center justify-center"><svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></button>
                 </div>
                 <div class="grid grid-cols-7 gap-1 text-center mb-2">
@@ -836,7 +836,7 @@
             <div id="day-dashboard-view" class="hidden transition-opacity duration-150 opacity-0 flex-col space-y-3 flex-1 min-h-0 h-full">
                 <div class="flex items-center gap-2 px-1">
                     <button data-action="back-to-calendar" class="key-press w-8 h-8 rounded-lg theme-input flex items-center justify-center shrink-0"><svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
-                    <div class="flex-1 text-center font-bold text-sm uppercase tracking-wider" id="dash-date-label">24 Жовтня 2026</div>
+                    <div class="flex-1 text-center font-bold text-sm uppercase tracking-wider" id="dash-date-label">13 Листопада 2026</div>
                     <div class="w-8 h-8"></div>
                 </div>
                 <div class="flex items-center justify-between text-xs font-mono-code font-bold theme-muted px-2 border-b pb-2" style="border-color: var(--border-main)">
@@ -977,7 +977,7 @@
                     <span id="sheet-favicon" class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"></span>
                     <div class="min-w-0">
                         <h3 id="sheet-domain" class="text-sm font-mono-code font-bold truncate">domain.com</h3>
-                        <span id="sheet-date" class="text-xs font-mono-code theme-muted">24/10/26</span>
+                        <span id="sheet-date" class="text-xs font-mono-code theme-muted">13/11/26</span>
                     </div>
                 </div>
                 <div class="flex items-center gap-1.5 shrink-0">
@@ -1149,12 +1149,16 @@
 
         let LOCKED_FOLDERS = new Set();
         const DEFAULT_ITEMS = [
-            { id: 1, name: 'Spotify', domain: 'spotify.com', url: 'https://open.spotify.com/playlist/synthwave2026', title: 'Вечірній Synthwave 2026', cat: 'Музика', cats: ['Музика'], date: '24/10/26', color: '#2F8F6B', note: 'Інструментальний плейлист на Spotify для глибокої концентрації та роботи.', tags: ['#музика', '#фокус'], svg: LINE_ICONS.music, lockedOverride: null, pinned: true, folderPriority: false, pendingOffline: false, isRead: true },
-            { id: 2, name: 'Behance', domain: 'behance.net', url: 'https://www.behance.net/gallery/fintech-light-ui', title: 'Fintech UI — Світлі теми', cat: 'Дизайн', cats: ['Дизайн'], date: '23/10/26', color: '#D98E2B', note: 'Кейс мобільного банкінгу на Behance із чистою типографікою та теплими акцентами.', tags: ['#дизайн', '#інтерфейс'], svg: LINE_ICONS.design, lockedOverride: null, pinned: false, folderPriority: true, pendingOffline: false, isRead: true },
-            { id: 3, name: 'Airbnb', domain: 'airbnb.com', url: 'https://www.airbnb.com/rooms/carpathians-aframe', title: 'Будиночок A-Frame у Карпатах', cat: 'Поїздки', cats: ['Поїздки'], date: '21/10/26', color: '#D2546A', note: 'Затишний будинок у лісі на Airbnb з панорамним краєвидом, чаном та Starlink.', tags: ['#поїздки', '#карпати'], svg: LINE_ICONS.travel, lockedOverride: null, pinned: false, folderPriority: false, pendingOffline: false, isRead: true },
-            { id: 4, name: 'GitHub', domain: 'github.com', url: 'https://github.com/awesome-selfhosted/awesome-selfhosted', title: 'Добірка Self-Hosted 2026', cat: 'Код та Технології', cats: ['Код та Технології'], date: '19/10/26', color: '#6E6A63', note: 'Каталог відкритого програмного забезпечення та серверних рішень на GitHub.', tags: ['#код', '#сервери'], svg: LINE_ICONS.code, lockedOverride: null, pinned: true, folderPriority: false, pendingOffline: false, isRead: true },
-            { id: 5, name: 'Rozetka', domain: 'rozetka.com.ua', url: 'https://rozetka.com.ua/ecoflow-river-2/p364589/', title: 'Зарядна станція EcoFlow River', cat: 'Покупки', cats: ['Покупки', 'Код та Технології'], date: '16/10/26', color: '#6A9A3A', note: 'Портативна станція з LiFePO4 акумулятором та швидкою зарядкою за 60 хвилин на Rozetka.', tags: ['#техніка', '#дім'], svg: LINE_ICONS.shop, lockedOverride: null, pinned: false, folderPriority: false, pendingOffline: false, isRead: true },
-            { id: 6, name: 'Netflix', domain: 'netflix.com', url: 'https://www.netflix.com/title/81024821', title: 'Проблема 3 тіл', cat: 'Кіно та Серіали', cats: ['Кіно та Серіали'], date: '14/10/26', color: '#C8553D', note: 'Науково-фантастичний серіал на Netflix про підготовку людства до контакту з іншою цивілізацією.', tags: ['#кіно', '#фантастика'], svg: LINE_ICONS.video, lockedOverride: null, pinned: false, folderPriority: false, pendingOffline: false, isRead: true }
+            { id: 1, name: 'Google', domain: 'google.com.ua', url: 'https://www.google.com.ua', title: 'Пошукова система Google Україна', cat: 'Веб-ресурси', cats: ['Веб-ресурси'], date: '13/11/26', color: '#7A8A6A', note: 'Швидкий пошук інформації, новин, зображень та веб-ресурсів в Україні та світі.', tags: ['#пошук', '#інтернет', '#google'], svg: LINE_ICONS.globe, lockedOverride: null, pinned: true, folderPriority: false, pendingOffline: false, isRead: true },
+            { id: 2, name: 'OLX', domain: 'olx.ua', url: 'https://www.olx.ua', title: 'Сервіс оголошень OLX Україна', cat: 'Покупки', cats: ['Покупки'], date: '13/11/26', color: '#6A9A3A', note: 'Дошка приватних та комерційних оголошень: купівля, продаж, послуги, оренда та авто.', tags: ['#покупки', '#оголошення', '#маркетплейс'], svg: LINE_ICONS.shop, lockedOverride: null, pinned: false, folderPriority: true, pendingOffline: false, isRead: true },
+            { id: 3, name: 'Rozetka', domain: 'rozetka.com.ua', url: 'https://rozetka.com.ua', title: 'Інтернет-супермаркет Rozetka', cat: 'Покупки', cats: ['Покупки', 'Код та Технології'], date: '12/11/26', color: '#6A9A3A', note: 'Онлайн-каталог електроніки, гаджетів, побутової техніки та товарів для дому зі швидкою доставкою.', tags: ['#покупки', '#техніка', '#гаджети'], svg: LINE_ICONS.shop, lockedOverride: null, pinned: true, folderPriority: false, pendingOffline: false, isRead: true },
+            { id: 4, name: 'Work.ua', domain: 'work.ua', url: 'https://www.work.ua', title: 'Пошук роботи та вакансій в Україні', cat: 'Фінанси та Бізнес', cats: ['Фінанси та Бізнес'], date: '12/11/26', color: '#1F8A8A', note: 'Актуальні вакансії від роботодавців, розміщення резюме, статистика зарплат та дистанційна робота.', tags: ['#робота', '#карєра', '#вакансії'], svg: LINE_ICONS.finance, lockedOverride: null, pinned: false, folderPriority: false, pendingOffline: false, isRead: false },
+            { id: 5, name: 'Нова Пошта', domain: 'novaposhta.ua', url: 'https://novaposhta.ua', title: 'Експрес-доставка та відстеження посилок', cat: 'Покупки', cats: ['Покупки', 'Веб-ресурси'], date: '11/11/26', color: '#6A9A3A', note: 'Трекінг відправлень за ТТН, графік роботи відділень і поштоматів, розрахунок вартості доставки.', tags: ['#доставка', '#пошта', '#логістика'], svg: LINE_ICONS.shop, lockedOverride: null, pinned: false, folderPriority: false, pendingOffline: false, isRead: true },
+            { id: 6, name: 'Sinoptik', domain: 'sinoptik.ua', url: 'https://sinoptik.ua', title: 'Прогноз погоди в містах України', cat: 'Новини та ЗМІ', cats: ['Новини та ЗМІ', 'Поїздки'], date: '11/11/26', color: '#8A7A5C', note: 'Детальний погодинний прогноз погоди, температура повітря, опади та народний календар.', tags: ['#погода', '#прогноз', '#клімат'], svg: LINE_ICONS.news, lockedOverride: null, pinned: false, folderPriority: false, pendingOffline: false, isRead: true },
+            { id: 7, name: 'Дія', domain: 'diia.gov.ua', url: 'https://diia.gov.ua', title: 'Державні послуги онлайн — Портал Дія', cat: 'Фінанси та Бізнес', cats: ['Фінанси та Бізнес'], date: '10/11/26', color: '#1F8A8A', note: 'Цифрові документи, довідки, витяги з реєстрів, послуги для громадян та реєстрація бізнесу (ФОП).', tags: ['#держава', '#документи', '#дія'], svg: LINE_ICONS.finance, lockedOverride: null, pinned: true, folderPriority: true, pendingOffline: false, isRead: true },
+            { id: 8, name: 'Tabletki.ua', domain: 'tabletki.ua', url: 'https://tabletki.ua', title: 'Пошук та бронювання ліків в аптеках', cat: 'Покупки', cats: ['Покупки'], date: '09/11/26', color: '#6A9A3A', note: 'Перевірка наявності медикаментів, порівняння цін на мапі та онлайн-бронювання в найближчій аптеці.', tags: ['#аптека', '#здоровя', '#ліки'], svg: LINE_ICONS.shop, lockedOverride: null, pinned: false, folderPriority: false, pendingOffline: false, isRead: false },
+            { id: 9, name: 'Укрпошта', domain: 'ukrposhta.ua', url: 'https://www.ukrposhta.ua', title: 'Національний поштовий оператор України', cat: 'Веб-ресурси', cats: ['Веб-ресурси', 'Покупки'], date: '08/11/26', color: '#7A8A6A', note: 'Відстеження міжнародних і внутрішніх відправлень, пошук поштових індексів та філателія.', tags: ['#пошта', '#доставка', '#трекінг'], svg: LINE_ICONS.globe, lockedOverride: null, pinned: false, folderPriority: false, pendingOffline: false, isRead: true },
+            { id: 10, name: 'Укрзалізниця', domain: 'uz.gov.ua', url: 'https://www.uz.gov.ua', title: 'Розклад руху поїздів та залізничні квитки', cat: 'Поїздки', cats: ['Поїздки'], date: '07/11/26', color: '#D2546A', note: 'Офіційний портал Укрзалізниці: розклад пасажирських рейсів, купівля квитків та інформація для пасажирів.', tags: ['#поїздки', '#квитки', '#залізниця'], svg: LINE_ICONS.travel, lockedOverride: true, pinned: false, folderPriority: false, pendingOffline: false, isRead: true }
         ];
         let ITEMS = structuredClone(DEFAULT_ITEMS);
         const STORAGE_KEY = 'linkbox_android_v3';
