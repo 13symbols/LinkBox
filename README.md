@@ -21,7 +21,7 @@ Android-додаток для тих, хто зберігає посилання
 ---
 
 **Встановити**  
-APK → [Releases](https://github.com/13symbols/LinkBox/releases)
+APK → [releases]
 
 ---
 
@@ -31,7 +31,7 @@ An Android app for people who save links “for later” and then never open the
 
 No sign-up, no cloud, no “continue with Google”. Install and that’s it. Data stays on the phone and doesn’t wander off on its own.
 
-Throw in one link or a whole list — the app tries to figure out what the site is and drops it into a decent folder. You can add your own categories, slap on hashtags, pin the important stuff to the top so you don’t have to dig through the entire list later. There’s proper search, sorting, and even a calendar: you can check what the hell you saved that weird Tuesday three weeks ago.
+Throw in one link or a whole list — the app tries to figure ou what the site is and drops it into a decent folder. You can add your own categories, slap on hashtags, pin the important stuff to the top so you don’t have to dig through the entire list later. There’s proper search, sorting, and even a calendar: you can check what the hell you saved that weird Tuesday three weeks ago.
 
 Works offline too. Links just sit in a queue. Internet comes back — it pulls titles and descriptions. Nothing gets lost.
 
@@ -44,4 +44,4 @@ In short: so your bookmarks finally stop being the place where things go to disa
 ---
 
 **Install**  
-APK → [Releases](https://github.com/13symbols/LinkBox/releases)
+APK → [releases](https://github.com/13symbols/LinkBox/releases)
