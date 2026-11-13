@@ -486,6 +486,10 @@
             flex-shrink: 0;
         }
 
+    
+        .ai-state-ok { background-color: rgba(16, 185, 129, 0.15) !important; color: #10b981 !important; border: 1px solid rgba(16, 185, 129, 0.4) !important; }
+        .ai-state-err { background-color: rgba(244, 63, 94, 0.15) !important; color: #f43f5e !important; border: 1px solid rgba(244, 63, 94, 0.4) !important; }
+        .ai-state-wait { background-color: rgba(245, 158, 11, 0.15) !important; color: #f59e0b !important; border: 1px solid rgba(245, 158, 11, 0.4) !important; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
@@ -927,7 +931,14 @@
                 <select id="ai-provider" class="theme-input w-full rounded-lg px-3 py-2.5 text-sm"></select></div>
             <div id="ai-guide" class="theme-card border rounded-xl p-3"></div>
             <div class="space-y-1"><label class="text-[11px] font-bold uppercase theme-muted">API-ключ</label>
-                <input id="ai-key" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="встав ключ" class="theme-input w-full rounded-lg px-3 py-2.5 text-sm font-mono-code"></div>
+                <div class="flex items-center theme-input rounded-lg px-3 py-1.5 gap-2 border border-transparent focus-within:border-accent transition">
+                    <input id="ai-key" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Напр.: AIzaSyD-9x8Y7z6W5v4U3t2S1r0Q..." class="w-full bg-transparent py-1 text-sm font-mono-code outline-none min-w-0">
+                    <button type="button" data-action="toggle-ai-key-vis" title="Показати / приховати ключ" class="key-press w-7 h-7 rounded-md flex items-center justify-center opacity-60 hover:opacity-100 hover:text-accent transition shrink-0">
+                        <svg id="ai-key-eye-open" class="w-4 h-4 mono-icon" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        <svg id="ai-key-eye-off" class="w-4 h-4 mono-icon hidden" viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                    </button>
+                </div>
+            </div>
             <div class="space-y-1"><label class="text-[11px] font-bold uppercase theme-muted">Модель (необов'язково)</label>
                 <input id="ai-model" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" class="theme-input w-full rounded-lg px-3 py-2.5 text-sm font-mono-code"></div>
             <div id="ai-base-wrap" class="space-y-1" style="display:none"><label class="text-[11px] font-bold uppercase theme-muted">Base URL</label>
@@ -2447,19 +2458,71 @@
         // ---- ШІ: налаштування і провайдери ----
         const AI_KEY = 'linkbox_ai_v1';
         const AI_PROVIDERS = {
-            gemini: { label: 'Google Gemini (є безкоштовний)', kind: 'gemini', model: 'gemini-2.5-flash', link: 'https://aistudio.google.com/apikey',
-                steps: ['Відкрий aistudio.google.com/apikey', 'Увійди в Google-акаунт', 'Натисни Create API key', 'Скопіюй ключ і встав нижче'] },
-            groq: { label: 'Groq (безкоштовний)', kind: 'openai', base: 'https://api.groq.com/openai/v1', model: 'llama-3.3-70b-versatile', link: 'https://console.groq.com/keys',
+            gemini: { label: 'Google Gemini (є безкоштовний)', kind: 'gemini', model: 'gemini-3.5-flash-lite',
+                fallbackModels: ['gemini-3.5-flash-lite', 'gemini-3.8-flash', 'gemini-3.6-flash', 'gemini-2.5-flash'],
+                link: 'https://aistudio.google.com/apikey',
+                keyPrefix: ['AQ.', 'AIza'],
+                keyPlaceholder: 'Напр.: AQ.Ab8RN6... або AIzaSyD-9x...',
+                steps: ['Відкрий aistudio.google.com/apikey', 'Увійди в Google-акаунт', 'Натисни Create API key', 'Скопіюй ключ (AQ.Ab8… або AIzaSy…) і встав нижче'] },
+            groq: { label: 'Groq (безкоштовний)', kind: 'openai', base: 'https://api.groq.com/openai/v1', model: 'llama-3.3-70b-versatile',
+                fallbackModels: ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant'],
+                link: 'https://console.groq.com/keys',
+                keyPrefix: ['gsk_'],
+                keyPlaceholder: 'Напр.: gsk_9a8B7c6D5e4F3g2H1i0J...',
                 steps: ['Відкрий console.groq.com/keys', 'Зареєструйся (без картки)', 'Натисни Create API Key', 'Скопіюй ключ (gsk_…) і встав нижче'] },
-            openrouter: { label: 'OpenRouter (є безкоштовні моделі)', kind: 'openai', base: 'https://openrouter.ai/api/v1', model: 'meta-llama/llama-3.3-70b-instruct:free', link: 'https://openrouter.ai/keys',
-                steps: ['Відкрий openrouter.ai/keys', 'Зареєструйся', 'Натисни Create Key', 'Скопіюй ключ і встав нижче', 'Модель з «:free» у назві безкоштовна, але з лімітом'] },
-            deepseek: { label: 'DeepSeek (платний, дешевий)', kind: 'openai', base: 'https://api.deepseek.com', model: 'deepseek-chat', link: 'https://platform.deepseek.com/api_keys',
-                steps: ['Відкрий platform.deepseek.com/api_keys', 'Зареєструйся й поповни баланс мінімальною сумою', 'Натисни Create new API key', 'Скопіюй ключ і встав нижче'] },
-            claude: { label: 'Claude (платний)', kind: 'anthropic', model: 'claude-haiku-5-5', link: 'https://console.anthropic.com/settings/keys',
-                steps: ['Відкрий console.anthropic.com/settings/keys', 'Зареєструйся й поповни баланс', 'Натисни Create Key', 'Скопіюй ключ і встав нижче'] },
-            openai: { label: 'OpenAI (платний)', kind: 'openai', base: 'https://api.openai.com/v1', model: 'gpt-4o-mini', link: 'https://platform.openai.com/api-keys',
-                steps: ['Відкрий platform.openai.com/api-keys', 'Зареєструйся й поповни баланс', 'Натисни Create new secret key', 'Скопіюй ключ і встав нижче'] },
-            custom: { label: 'Свій (OpenAI-сумісний)', kind: 'openai', base: '', model: '', link: '',
+            mistral: { label: 'Mistral AI (є безкоштовний)', kind: 'openai', base: 'https://api.mistral.ai/v1', model: 'mistral-small-latest',
+                fallbackModels: ['mistral-small-latest', 'open-mistral-nemo'],
+                link: 'https://console.mistral.ai/api-keys',
+                keyPrefix: [],
+                keyPlaceholder: 'Напр.: 7f8e9d0c1b2a3f4e5d6c7b8a9f0e1d2c',
+                steps: ['Відкрий console.mistral.ai/api-keys', 'Активуй безкоштовний план Experiment', 'Натисни Create new key', 'Скопіюй ключ і встав нижче'] },
+            cerebras: { label: 'Cerebras (безкоштовний, швидкий)', kind: 'openai', base: 'https://api.cerebras.ai/v1', model: 'llama-3.3-70b',
+                fallbackModels: ['llama-3.3-70b', 'llama3.1-8b'],
+                link: 'https://cloud.cerebras.ai/',
+                keyPrefix: ['csk-'],
+                keyPlaceholder: 'Напр.: csk-1a2b3c4d5e6f7g8h9i0j...',
+                steps: ['Відкрий cloud.cerebras.ai', 'Увійди через Google або GitHub', 'Перейди в API Keys → Create API Key', 'Скопіюй ключ (csk-…) і встав нижче'] },
+            openrouter: { label: 'OpenRouter (є безкоштовні моделі)', kind: 'openai', base: 'https://openrouter.ai/api/v1', model: 'meta-llama/llama-3.3-70b-instruct:free',
+                fallbackModels: ['meta-llama/llama-3.3-70b-instruct:free', 'google/gemma-3-27b-it:free', 'mistralai/mistral-small-3.1-24b-instruct:free'],
+                link: 'https://openrouter.ai/keys',
+                keyPrefix: ['sk-or-'],
+                keyPlaceholder: 'Напр.: sk-or-v1-8f9e0d1c2b3a4f5e6d7c...',
+                steps: ['Відкрий openrouter.ai/keys', 'Зареєструйся', 'Натисни Create Key', 'Скопіюй ключ (sk-or-v1-…) і встав нижче', 'Модель з «:free» у назві безкоштовна, але з лімітом'] },
+            github: { label: 'GitHub Models (безкоштовно з GitHub)', kind: 'openai', base: 'https://models.inference.ai.azure.com', model: 'gpt-4o-mini',
+                fallbackModels: ['gpt-4o-mini', 'Meta-Llama-3.1-8B-Instruct'],
+                link: 'https://github.com/settings/tokens',
+                keyPrefix: ['ghp_', 'github_pat_', 'gho_'],
+                keyPlaceholder: 'Напр.: ghp_1A2b3C4d5E6f7G8h9I0j... або github_pat_...',
+                steps: ['Відкрий github.com/settings/tokens', 'Створи токен (Generate new token — classic без галочок прав)', 'Скопіюй ключ (ghp_… або github_pat_…) і встав нижче'] },
+            deepseek: { label: 'DeepSeek (платний, дешевий)', kind: 'openai', base: 'https://api.deepseek.com', model: 'deepseek-chat',
+                fallbackModels: ['deepseek-chat'],
+                link: 'https://platform.deepseek.com/api_keys',
+                keyPrefix: ['sk-'],
+                keyPlaceholder: 'Напр.: sk-4a5b6c7d8e9f0a1b2c3d4e5f...',
+                steps: ['Відкрий platform.deepseek.com/api_keys', 'Зареєструйся й поповни баланс мінімальною сумою', 'Натисни Create new API key', 'Скопіюй ключ (sk-…) і встав нижче'] },
+            xai: { label: 'xAI Grok (платний)', kind: 'openai', base: 'https://api.x.ai/v1', model: 'grok-2-latest',
+                fallbackModels: ['grok-2-latest', 'grok-3-mini'],
+                link: 'https://console.x.ai/',
+                keyPrefix: ['xai-'],
+                keyPlaceholder: 'Напр.: xai-9z8y7x6w5v4u3t2s1r0q...',
+                steps: ['Відкрий console.x.ai', 'Створи акаунт та поповни баланс', 'Натисни Create API Key', 'Скопіюй ключ (xai-…) і встав нижче'] },
+            claude: { label: 'Claude (платний)', kind: 'anthropic', model: 'claude-haiku-4-5',
+                fallbackModels: ['claude-haiku-4-5', 'claude-3-5-haiku-latest'],
+                link: 'https://console.anthropic.com/settings/keys',
+                keyPrefix: ['sk-ant-'],
+                keyPlaceholder: 'Напр.: sk-ant-api03-1a2B3c4D5e6F7g8H...',
+                steps: ['Відкрий console.anthropic.com/settings/keys', 'Зареєструйся й поповни баланс', 'Натисни Create Key', 'Скопіюй ключ (sk-ant-…) і встав нижче'] },
+            openai: { label: 'OpenAI (платний)', kind: 'openai', base: 'https://api.openai.com/v1', model: 'gpt-4o-mini',
+                fallbackModels: ['gpt-4o-mini', 'gpt-4.1-mini'],
+                link: 'https://platform.openai.com/api-keys',
+                keyPrefix: ['sk-'],
+                keyPlaceholder: 'Напр.: sk-proj-1a2B3c4D5e6F7g8H9i0J...',
+                steps: ['Відкрий platform.openai.com/api-keys', 'Зареєструйся й поповни баланс', 'Натисни Create new secret key', 'Скопіюй ключ (sk-proj-…) і встав нижче'] },
+            custom: { label: 'Свій (OpenAI-сумісний)', kind: 'openai', base: '', model: '',
+                fallbackModels: [],
+                link: '',
+                keyPrefix: [],
+                keyPlaceholder: 'Напр.: sk-xxxxxxxx... або Bearer-токен',
                 steps: ['Вкажи Base URL (наприклад https://host/v1), модель і ключ свого сервісу', 'Підходить будь-який сервіс із форматом /chat/completions'] }
         };
         let _aiBatchError = '';
@@ -2467,38 +2530,92 @@
         function getAiConfig() {
             const o = _loadAiRaw(); if (!o.key || !o.provider || !AI_PROVIDERS[o.provider]) return null;
             const p = AI_PROVIDERS[o.provider];
-            const cfg = { provider: o.provider, kind: p.kind, key: String(o.key).trim(), model: (o.model || p.model || '').trim(), base: (o.base || p.base || '').trim().replace(/\/+$/, '') };
+            let savedModel = (o.model || '').trim();
+            // Авто-міграція зі застарілої дефолтної моделі gemini-2.5-flash, яку Google закрив для нових ключів AQ.
+            if (o.provider === 'gemini' && savedModel === 'gemini-2.5-flash') savedModel = '';
+            const cfg = { provider: o.provider, kind: p.kind, key: String(o.key).trim(), model: savedModel || p.model || '', userExplicitModel: Boolean(savedModel), base: (o.base || p.base || '').trim().replace(/\/+$/, '') };
             if (!cfg.key || !cfg.model || (cfg.kind === 'openai' && !cfg.base)) return null;
             return cfg;
         }
-        function _aiHttpError(status, text) {
-            if (status === 401 || status === 403) return 'ключ не підходить (' + status + ')';
-            if (status === 429) return 'ліміт вичерпано (429)';
-            if (status === 404) return 'модель або адреса не знайдені (404)';
-            let msg = ''; try { const j = JSON.parse(text); msg = (j.error && (j.error.message || j.error)) || j.message || ''; } catch (e) {}
-            return 'помилка ' + status + (msg ? ': ' + String(msg).slice(0, 120) : '');
+        function _validateKeyFormat(providerId, keyStr) {
+            const p = AI_PROVIDERS[providerId];
+            if (!p || !keyStr) return null;
+            const k = keyStr.trim();
+            if (/\s/.test(k)) return 'Ключ містить пробіли або переноси рядків. Скопіюй лише сам ключ.';
+            if (/^https?:\/\//i.test(k)) return 'Це URL-адреса, а не API-ключ.';
+            if (k.length < 12) return 'Ключ занадто короткий — перевір, чи скопійовано його повністю.';
+            if (Array.isArray(p.keyPrefix) && p.keyPrefix.length > 0) {
+                const ok = p.keyPrefix.some(pref => k.startsWith(pref));
+                if (!ok) {
+                    return `Ключ для ${p.label.replace(/ \(.*/, '')} зазвичай починається на «${p.keyPrefix.join('» або «')}». Перевір, чи обрано правильний провайдер.`;
+                }
+            }
+            return null;
         }
-        async function callLLM(cfg, system, user) {
+        function _aiHttpError(status, text) {
+            let msg = '';
+            try {
+                const j = JSON.parse(text);
+                msg = (j.error && (j.error.message || j.error.status || (typeof j.error === 'string' ? j.error : ''))) || j.message || '';
+            } catch (e) {}
+            const cleanMsg = msg ? String(msg).replace(/\s+/g, ' ').trim().slice(0, 160) : '';
+            if (status === 401 || status === 403) return 'ключ відхилено (' + status + ')' + (cleanMsg ? ': ' + cleanMsg : '');
+            if (status === 429) return 'ліміт запитів вичерпано (429)' + (cleanMsg ? ': ' + cleanMsg : '');
+            if (status === 404) return 'модель або адреса не доступні (404)' + (cleanMsg ? ': ' + cleanMsg : '');
+            return 'помилка ' + status + (cleanMsg ? ': ' + cleanMsg : '');
+        }
+        async function _callSingleLLM(cfg, modelName, system, user) {
             let url, headers, body;
             if (cfg.kind === 'gemini') {
-                url = 'https://generativelanguage.googleapis.com/v1beta/models/' + encodeURIComponent(cfg.model) + ':generateContent';
+                url = 'https://generativelanguage.googleapis.com/v1beta/models/' + encodeURIComponent(modelName) + ':generateContent';
                 headers = { 'Content-Type': 'application/json', 'x-goog-api-key': cfg.key };
-                body = { systemInstruction: { parts: [{ text: system }] }, contents: [{ role: 'user', parts: [{ text: user }] }], generationConfig: { temperature: 0.2, responseMimeType: 'application/json' } };
+                const genCfg = { responseMimeType: 'application/json' };
+                // У нових моделях Gemini 3.5+ параметр temperature застарів
+                if (!/^gemini-3\.[5-9]/i.test(modelName)) genCfg.temperature = 0.2;
+                body = { systemInstruction: { parts: [{ text: system }] }, contents: [{ role: 'user', parts: [{ text: user }] }], generationConfig: genCfg };
             } else if (cfg.kind === 'anthropic') {
                 url = 'https://api.anthropic.com/v1/messages';
                 headers = { 'Content-Type': 'application/json', 'x-api-key': cfg.key, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' };
-                body = { model: cfg.model, max_tokens: 300, system: system, messages: [{ role: 'user', content: user }] };
+                body = { model: modelName, max_tokens: 300, system: system, messages: [{ role: 'user', content: user }] };
             } else {
                 url = cfg.base + '/chat/completions';
                 headers = { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + cfg.key };
-                body = { model: cfg.model, messages: [{ role: 'system', content: system }, { role: 'user', content: user }], temperature: 0.2, max_tokens: 300 };
+                body = { model: modelName, messages: [{ role: 'system', content: system }, { role: 'user', content: user }], temperature: 0.2, max_tokens: 300 };
             }
             const res = await httpRequest(url, { method: 'POST', headers, body: JSON.stringify(body) });
-            if (res.status < 200 || res.status >= 300) throw new Error(_aiHttpError(res.status, res.text));
+            if (res.status < 200 || res.status >= 300) {
+                const err = new Error(_aiHttpError(res.status, res.text));
+                err.httpStatus = res.status;
+                throw err;
+            }
             let j; try { j = JSON.parse(res.text); } catch (e) { throw new Error('відповідь не розпізнано'); }
             if (cfg.kind === 'gemini') return ((j.candidates && j.candidates[0] && j.candidates[0].content && j.candidates[0].content.parts) || []).map(p => p.text || '').join('');
             if (cfg.kind === 'anthropic') return (j.content || []).map(p => p.text || '').join('');
             return (j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content) || '';
+        }
+        async function callLLM(cfg, system, user) {
+            const p = AI_PROVIDERS[cfg.provider];
+            const candidates = [cfg.model];
+            if (p && Array.isArray(p.fallbackModels)) {
+                p.fallbackModels.forEach(m => { if (m && !candidates.includes(m)) candidates.push(m); });
+            }
+            let lastErr = null;
+            for (let i = 0; i < candidates.length; i++) {
+                const m = candidates[i];
+                try {
+                    const out = await _callSingleLLM(cfg, m, system, user);
+                    cfg.activeModel = m;
+                    return out;
+                } catch (e) {
+                    lastErr = e;
+                    // Якщо помилка 404 або 400 (модель недоступна для цього ключа), пробуємо наступну модель із запасу
+                    if (e && (e.httpStatus === 404 || e.httpStatus === 400) && i < candidates.length - 1) {
+                        continue;
+                    }
+                    throw e;
+                }
+            }
+            throw lastErr || new Error('не вдалося виконати запит');
         }
         function _allFolderNames() {
             const set = new Map(); CAT_DEFS.forEach(d => { if (d.key !== 'nsfw') set.set(d.name.toLowerCase(), d.name); });
@@ -2546,12 +2663,47 @@
 
         // ---- Вікно налаштувань ШІ ----
         function _aiEl(id) { return document.getElementById(id); }
+        function _setAiStatusUI(state, msg) {
+            const st = _aiEl('ai-status');
+            const testBtn = document.querySelector('[data-action="ai-test"]');
+            if (st) {
+                st.className = 'text-xs px-3 py-2 rounded-lg font-bold transition break-words ' + (
+                    state === 'ok' ? 'ai-state-ok' :
+                    state === 'err' ? 'ai-state-err' :
+                    state === 'wait' ? 'ai-state-wait' : 'theme-muted'
+                );
+                st.style.display = msg ? 'block' : 'none';
+                st.textContent = msg || '';
+            }
+            if (testBtn) {
+                testBtn.className = 'key-press flex-1 py-3 rounded-lg text-xs font-bold transition ' + (
+                    state === 'ok' ? 'ai-state-ok' :
+                    state === 'err' ? 'ai-state-err' :
+                    state === 'wait' ? 'ai-state-wait' : 'theme-input'
+                );
+                testBtn.textContent = state === 'wait' ? '⏳ Перевірка...' : (state === 'ok' ? '✓ Працює' : (state === 'err' ? '✕ Помилка' : 'Перевірити'));
+            }
+        }
+        function toggleAiKeyVisibility(forceHide = false) {
+            const input = _aiEl('ai-key');
+            const eyeOpen = _aiEl('ai-key-eye-open');
+            const eyeOff = _aiEl('ai-key-eye-off');
+            if (!input) return;
+            const show = forceHide ? false : (input.type === 'password');
+            input.type = show ? 'text' : 'password';
+            if (eyeOpen && eyeOff) {
+                eyeOpen.classList.toggle('hidden', show);
+                eyeOff.classList.toggle('hidden', !show);
+            }
+        }
         function renderAiGuide() {
             const pid = _aiEl('ai-provider').value; const p = AI_PROVIDERS[pid]; const box = _aiEl('ai-guide'); if (!box || !p) return;
             const open = p.link ? `<button type="button" data-action="ai-open-guide" class="key-press mt-2 px-3 py-2 rounded-lg bg-accent text-onaccent text-xs font-black">Відкрити сторінку ключа</button>` : '';
             box.innerHTML = `<div class="font-bold text-xs mb-1">Де взяти ключ</div><ol class="list-decimal pl-4 text-xs theme-muted space-y-0.5">${p.steps.map(x => `<li>${esc(x)}</li>`).join('')}</ol>${open}`;
             _aiEl('ai-base-wrap').style.display = pid === 'custom' ? 'block' : 'none';
             _aiEl('ai-model').placeholder = p.model || 'назва моделі';
+            _aiEl('ai-key').placeholder = p.keyPlaceholder || 'Напр.: sk-1a2b3c4d5e6f...';
+            _setAiStatusUI('idle', '');
         }
         function onAiProviderChange() { _aiEl('ai-model').value = ''; renderAiGuide(); }
         function renderAiBadge() {
@@ -2563,8 +2715,11 @@
             const o = _loadAiRaw(); const sel = _aiEl('ai-provider');
             sel.innerHTML = Object.keys(AI_PROVIDERS).map(k => `<option value="${k}">${esc(AI_PROVIDERS[k].label)}</option>`).join('');
             sel.value = AI_PROVIDERS[o.provider] ? o.provider : 'gemini';
-            _aiEl('ai-key').value = o.key || ''; _aiEl('ai-model').value = o.model || ''; _aiEl('ai-base').value = o.base || '';
-            _aiEl('ai-status').textContent = ''; renderAiGuide(); renderAiBadge(); _resortArmed = false; if (!_resortRunning) _aiEl('resort-status').textContent = ''; renderResortCard();
+            let savedModel = o.model || '';
+            if (sel.value === 'gemini' && savedModel === 'gemini-2.5-flash') savedModel = '';
+            _aiEl('ai-key').value = o.key || ''; _aiEl('ai-model').value = savedModel; _aiEl('ai-base').value = o.base || '';
+            toggleAiKeyVisibility(true);
+            renderAiGuide(); renderAiBadge(); _resortArmed = false; if (!_resortRunning) _aiEl('resort-status').textContent = ''; renderResortCard();
             const modal = _aiEl('ai-sheet-modal'); const panel = _aiEl('ai-sheet-panel');
             panel.style.transform = ''; panel.scrollTop = 0; modal.classList.remove('hidden'); modal.style.display = 'flex'; setTimeout(() => modal.classList.add('open'), 10);
         }
@@ -2579,26 +2734,48 @@
         }
         function saveAiSettings() {
             const f = _readAiForm();
+            if (f.key) {
+                const warn = _validateKeyFormat(f.provider, f.key);
+                if (warn) {
+                    _setAiStatusUI('err', '✕ ' + warn);
+                    return;
+                }
+            }
             try { localStorage.setItem(AI_KEY, JSON.stringify(f)); } catch (e) {}
-            renderAiBadge(); const st = _aiEl('ai-status');
-            st.textContent = getAiConfig() ? 'Збережено. ШІ вмикається для нових посилань.' : (f.key ? 'Збережено, але не вистачає моделі або адреси.' : 'Ключ порожній: працюють вбудовані правила.');
+            renderAiBadge();
+            if (getAiConfig()) {
+                _setAiStatusUI('ok', '✓ Збережено! ШІ увімкнено для нових посилань.');
+            } else if (f.key) {
+                _setAiStatusUI('err', '✕ Збережено, але не вистачає моделі або Base URL.');
+            } else {
+                _setAiStatusUI('idle', 'Ключ порожній: працюють вбудовані правила.');
+            }
             showToast(t('saved'));
         }
         function clearAiSettings() {
             try { localStorage.removeItem(AI_KEY); } catch (e) {}
             _aiEl('ai-key').value = ''; _aiEl('ai-model').value = ''; _aiEl('ai-base').value = '';
-            renderAiBadge(); _aiEl('ai-status').textContent = 'Ключ видалено. Працюють вбудовані правила.';
+            renderAiBadge();
+            _setAiStatusUI('idle', 'Ключ видалено. Працюють вбудовані правила.');
         }
         async function testAiSettings() {
-            const f = _readAiForm(); const p = AI_PROVIDERS[f.provider]; const st = _aiEl('ai-status');
+            const f = _readAiForm(); const p = AI_PROVIDERS[f.provider];
             const cfg = { provider: f.provider, kind: p.kind, key: f.key, model: f.model || p.model || '', base: (f.base || p.base || '').replace(/\/+$/, '') };
-            if (!cfg.key) { st.textContent = 'Встав ключ.'; return; }
-            if (!cfg.model || (cfg.kind === 'openai' && !cfg.base)) { st.textContent = 'Вкажи модель і адресу.'; return; }
-            st.textContent = 'Перевіряю…';
+            if (!cfg.key) { _setAiStatusUI('err', '✕ Спочатку встав API-ключ у поле вище.'); return; }
+            const formatWarn = _validateKeyFormat(f.provider, cfg.key);
+            if (formatWarn) { _setAiStatusUI('err', '✕ ' + formatWarn); return; }
+            if (!cfg.model || (cfg.kind === 'openai' && !cfg.base)) { _setAiStatusUI('err', '✕ Вкажи модель і Base URL.'); return; }
+            _setAiStatusUI('wait', '⏳ З’єднання з нейромережею, перевіряємо ключ…');
             try {
                 const r = await aiClassifyRaw(cfg, 'habr.com', 'Процесори в бюджетних ноутбуках: що вибрати', 'Огляд процесорів для недорогих ноутбуків');
-                st.textContent = 'Працює. Тест: ' + r.folders.join(', ');
-            } catch (e) { st.textContent = 'Помилка: ' + ((e && e.message) || e); }
+                const usedModel = cfg.activeModel || cfg.model;
+                if (f.model && cfg.activeModel && cfg.activeModel !== f.model) {
+                    _aiEl('ai-model').value = cfg.activeModel;
+                }
+                _setAiStatusUI('ok', `✓ Ключ активний (${usedModel})! Тестова папка: ` + r.folders.join(', '));
+            } catch (e) {
+                _setAiStatusUI('err', '✕ Помилка перевірки: ' + ((e && e.message) || e));
+            }
         }
         function openAiKeyPage() { const p = AI_PROVIDERS[_aiEl('ai-provider').value]; if (p && p.link) openExternalUrlInNewTab(p.link); }
 
@@ -3684,6 +3861,7 @@
             document.getElementById('tags-search-input')?.addEventListener('input', renderTagsCloud);
             document.getElementById('sheet-cat')?.addEventListener('input', renderCategorySuggestions);
             document.getElementById('ai-provider')?.addEventListener('change', onAiProviderChange);
+            document.getElementById('ai-key')?.addEventListener('input', () => _setAiStatusUI('idle', ''));
             document.getElementById('ai-import-file')?.addEventListener('change', handleAIFileImport);
             document.getElementById('url-input')?.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter') addLinkByAI();
@@ -3730,6 +3908,7 @@
                     case 'ai-test': testAiSettings(); break;
                     case 'ai-clear': clearAiSettings(); break;
                     case 'ai-open-guide': openAiKeyPage(); break;
+                    case 'toggle-ai-key-vis': toggleAiKeyVisibility(); break;
                     case 'resort-mode': setResortMode(actionEl.dataset.mode); break;
                     case 'resort-run': runResort(); break;
                     case 'resort-undo': undoResort(); break;
