@@ -490,6 +490,34 @@
         .ai-state-ok { background-color: rgba(16, 185, 129, 0.15) !important; color: #10b981 !important; border: 1px solid rgba(16, 185, 129, 0.4) !important; }
         .ai-state-err { background-color: rgba(244, 63, 94, 0.15) !important; color: #f43f5e !important; border: 1px solid rgba(244, 63, 94, 0.4) !important; }
         .ai-state-wait { background-color: rgba(245, 158, 11, 0.15) !important; color: #f59e0b !important; border: 1px solid rgba(245, 158, 11, 0.4) !important; }
+
+        #ptr-indicator {
+            position: fixed;
+            left: 50%;
+            top: calc(max(env(safe-area-inset-top, 0px), 16px) + 0.5rem);
+            z-index: 35;
+            width: 40px;
+            height: 40px;
+            border-radius: 9999px;
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-main);
+            box-shadow: 0 8px 20px -4px rgba(0, 0, 0, 0.22);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgb(var(--accent-rgb));
+            transform: translate(-50%, -80px) scale(0.6);
+            opacity: 0;
+            pointer-events: none;
+            will-change: transform, opacity;
+        }
+        #ptr-indicator.ptr-release {
+            transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.24s ease;
+        }
+        #ptr-indicator.ptr-ready {
+            border-color: rgb(var(--accent-rgb) / 0.55);
+            box-shadow: 0 8px 22px -3px rgb(var(--accent-rgb) / 0.32);
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
@@ -621,6 +649,17 @@
             </div>
         </div>
     </aside>
+
+    <!-- ІНДИКАТОР PULL-TO-REFRESH -->
+    <div id="ptr-indicator" aria-hidden="true">
+        <svg id="ptr-arrow" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12a9 9 0 1 1-2.64-6.36"/>
+            <polyline points="21 3 21 9 15 9"/>
+        </svg>
+        <svg id="ptr-spinner" class="w-5 h-5 animate-spin hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">
+            <path d="M21 12a9 9 0 1 1-6.22-8.56"/>
+        </svg>
+    </div>
 
     <div class="flex-1 flex flex-col min-w-0 w-full">
         <!-- ВЕРХНЯЯ ШАПКА -->
@@ -1971,19 +2010,54 @@
             const container = document.getElementById('about-sheet-body'); if (!container) return;
             container.innerHTML = `
                 <div class="theme-card border rounded-xl p-3.5 space-y-1.5">
-                    <div class="font-extrabold text-sm text-accent">Ласкаво просимо до LinkBox!</div>
-                    <p class="text-xs sm:text-sm theme-muted leading-relaxed">Цей розумний органайзер створено для того, щоб збережені посилання не перетворювалися на забутий цвинтар закладок, а завжди залишалися впорядкованими, захищеними та зручними для швидкого доступу.</p>
+                    <div class="font-extrabold text-sm text-accent">Анти-цвинтар для твоїх закладок 🪦✨</div>
+                    <p class="text-xs sm:text-sm theme-muted leading-relaxed">Знайома ситуація: 347 відкритих вкладок у браузері «обов’язково прочитаю в суботу», які висять там із 2019 року? <b>LinkBox</b> створений, щоб навести лад, розкласти все по поличках і не дати загубити жодного лінка.</p>
                 </div>
                 <div class="space-y-2.5 text-xs sm:text-sm">
-                    <div class="theme-card border rounded-xl p-3.5 space-y-1"><div class="font-bold">1. Верхня шапка та миттєвий скид фільтрів</div><p class="theme-muted">Ліворуч розташований логотип <b>LinkBox</b> із лічильником усіх збережених посилань та індикатором активного фільтра. Натискання на логотип у будь-який момент скидає вибрану папку, хештег або пошуковий запит і повертає до повного списку.</p></div>
-                    <div class="theme-card border rounded-xl p-3.5 space-y-1"><div class="font-bold">2. Розумне додавання, мова сайту та захист від дублікатів</div><p class="theme-muted">У рядок введення можна вставити як одне посилання, так і цілий список адрес. Кнопка <b>«+ Додати»</b> автоматично очищує URL від зайвих ком чи дужок, перевіряє базу на дублікати (підсвічуючи наявну картку) і визначає <b>мову самого сайту</b> (українська, англійська, італійська, російська тощо), генеруючи заголовок та нотатку мовою оригіналу.</p></div>
-                    <div class="theme-card border rounded-xl p-3.5 space-y-1"><div class="font-bold">3. Скріпка (Pin-бар) vs «Пріоритет у папці»</div><p class="theme-muted">У додатку чітко розділено два види закріплення:</p><ul class="list-disc list-inside space-y-1 theme-muted pt-1"><li><b>Скріпка на картці (головний екран):</b> закріплює сайт у верхній горизонтальній панелі швидкого доступу (Pin-барі) з <b>реальними фавіконами сайтів</b> над усіма папками.</li><li><b>Кнопка «Пріоритет у папці» (всередині редагування):</b> позначає посилання зірочкою ★ і завжди піднімає його на самий верх усередині своїх категорій, не займаючи місце у глобальному Pin-барі.</li></ul></div>
-                    <div class="theme-card border rounded-xl p-3.5 space-y-1"><div class="font-bold">4. Мульти-категорії та сірі підказки</div><p class="theme-muted">Одне посилання може одночасно належати до кількох папок (через кому, наприклад: <i>«Дизайн, Код та Технології»</i>). Кольорові плашки категорій на картках клікабельні для миттєвого переходу. Під час редагування система показує <b>сірим кольором розумні підказки суміжних категорій</b>.</p></div>
-                    <div class="theme-card border rounded-xl p-3.5 space-y-1"><div class="font-bold">5. Робота офлайн та черга «⏳ Очікують мережі»</div><p class="theme-muted">Якщо додати посилання без інтернету, LinkBox дбайливо збереже його у тимчасову папку <b>«⏳ Очікують мережі»</b>. Як тільки з'явиться зв'язок, додаток автоматично дообробить чергу, підтягне точні заголовки з мережі та розкладе картки по цільових папках.</p></div>
-                    <div class="theme-card border rounded-xl p-3.5 space-y-1"><div class="font-bold">6. Масовий вибір та видалення з підтвердженням</div><p class="theme-muted">У верхній шапці розташована кнопка режиму вибору (іконка з галочкою). Вона відкриває плаваючу панель групових дій, де можна відмітити потрібні картки, обрати всі видимі на екрані посилання кнопкою <b>«Вибрати всі»</b> та видалити їх із обов'язковим вікном підтвердження.</p></div>
-                    <div class="theme-card border rounded-xl p-3.5 space-y-1"><div class="font-bold">7. Режим «Сейф» та пріоритет замків</div><p class="theme-muted">Для особистих або чутливих посилань передбачено блокування прямого переходу. Замок можна увімкнути для цілої папки у боковому меню або індивідуально для окремої картки. Коли замок активний, кнопка відкриття у браузері блокується від випадкових натискань, але адресу завжди можна скопіювати кнопкою поруч.</p></div>
-                    <div class="theme-card border rounded-xl p-3.5 space-y-1"><div class="font-bold">8. Інструменти меню, Сортування та Бекап (.HTML / .JSON)</div><ul class="list-disc list-inside space-y-1 theme-muted pt-1"><li><b>Пошук та Рандом:</b> миттєвий пошук із кнопкою швидкого очищення ✕ та відкриття випадкового незаблокованого посилання.</li><li><b>Вигляд, Теми та Сортування:</b> 3 режими карток (Малі, Великі, Список), 3 теми (Світла, М'яка темна, AMOLED) та сортування списку (Нові, Старі, А–Я).</li><li><b>Імпорт та Експорт (.HTML / .JSON):</b> завантаження закладок із файлів браузера чи текстових списків, вивантаження у стандартний <b>.HTML</b> для браузерів або збереження повного <b>.JSON-бекапу</b>.</li></ul></div>
-                    <div class="theme-card border rounded-xl p-3.5 space-y-1"><div class="font-bold">9. Розумна фільтрація NSFW (Полуничка 18+)</div><p class="theme-muted">ШІ автоматично розпізнає контент для дорослих, поміщає його в окрему категорію <b>«Полуничка 18+»</b>, додає тег <code>#nsfw</code> та <b>відразу блокує прямий перехід</b> (вмикає замок Сейфу). Це гарантує відсутність випадкових відкриттів таких посилань у публічних місцях.</p></div>
+                    <div class="theme-card border rounded-xl p-3.5 space-y-1">
+                        <div class="font-bold">1. Шапка-телепорт та кнопка скидання</div>
+                        <p class="theme-muted">Закопався внизу довгого списку? Тапни по <b>верхній шапці</b> — миттєво полетиш нагору. Заблукав у фільтрах, тегах чи пошуку? Тапни на логотип <b>LinkBox</b> — і ти знову бачиш усі свої посилання.</p>
+                    </div>
+                    <div class="theme-card border rounded-xl p-3.5 space-y-1">
+                        <div class="font-bold">2. Всеїдний ввід, детектор клонів та плашка NEW</div>
+                        <p class="theme-muted">Кидай у поле вводу хоч одне посилання, хоч ціле простирадло тексту з купою адрес. Кнопка <b>«+ Додати»</b> сама вичистить сміття (<code>utm</code>-мітки, зайві коми й дужки), зловить дублікат (і підсвітить стару картку!), а на свіжі лінки повісить бейдж <b>NEW</b>, доки ти їх реально не відкриєш.</p>
+                    </div>
+                    <div class="theme-card border rounded-xl p-3.5 space-y-1">
+                        <div class="font-bold">3. Розумні папки: Автопілот vs Нейромережа (✨)</div>
+                        <p class="theme-muted">Без жодних налаштувань працює вбудований мозок, який сам розпізнає тему й навчається на твоїх правках. Хочеш турбо-магії? У меню натисни <b>✨</b>, встав безкоштовний API-ключ (Gemini, Groq, Mistral тощо) — і нейромережа розкладе по папках хоч усю стару базу в один клік (є кнопка <b>«Скасувати»</b>, якщо ШІ раптом перемудрив).</p>
+                    </div>
+                    <div class="theme-card border rounded-xl p-3.5 space-y-1">
+                        <div class="font-bold">4. Офлайн-черга ⏳ та «Потягни-онови»</div>
+                        <p class="theme-muted">Немає світла чи інтернету? Додавай лінки спокійно — вони почекають у папці <b>«⏳ Очікують мережі»</b>. Коли зв’язок з’явиться, просто <b>потягни головну стрічку вниз</b> (кружечок зверху підтягне живі заголовки, описи та кольорові фавіконки). Тільки не смикай кружечок без мережі десять разів підряд — він уміє огризатися!</p>
+                    </div>
+                    <div class="theme-card border rounded-xl p-3.5 space-y-1">
+                        <div class="font-bold">5. Скріпка (Pin-бар) vs Зірочка ★ (Топ у папці)</div>
+                        <p class="theme-muted">Два рівні крутості для важливих сайтів:</p>
+                        <ul class="list-disc list-inside space-y-1 theme-muted pt-0.5">
+                            <li><b>Скріпка на картці:</b> прибиває сайт у верхній горизонтальний Pin-бар на головній (завжди під рукою над усіма папками).</li>
+                            <li><b>Зірочка ★ (всередині картки):</b> тихо піднімає лінк на самий верх лише всередині його папок.</li>
+                        </ul>
+                    </div>
+                    <div class="theme-card border rounded-xl p-3.5 space-y-1">
+                        <div class="font-bold">6. Мульти-папки, #теги та сірі підказки</div>
+                        <p class="theme-muted">Один сайт може жити хоч у трьох папках одночасно (просто пиши їх через кому). Кольорові плашки папок і <code>#теги</code> на картках клікабельні, а у вікні редагування система підкидає <b>сірі AI-підказки</b> суміжних категорій в один тап.</p>
+                    </div>
+                    <div class="theme-card border rounded-xl p-3.5 space-y-1">
+                        <div class="font-bold">7. Режим «Сейф» 🔒 та Полуничка 18+</div>
+                        <p class="theme-muted">Пікантний контент (18+) автоматично летить у папку <b>«Полуничка 18+»</b> і закривається на замок. Такий замок можна повісити на будь-яку папку чи окрему картку: прямий клік блокується (щоб випадково не відкрити щось у маршрутці чи на нараді), але скопіювати URL кнопкою поруч можна завжди.</p>
+                    </div>
+                    <div class="theme-card border rounded-xl p-3.5 space-y-1">
+                        <div class="font-bold">8. Миттєвий QR-код (100% офлайн) та «Переписати»</div>
+                        <p class="theme-muted">У налаштуваннях кожної картки є генератор <b>QR-коду</b> з фірмовим логотипом (працює за 0 мс навіть у глибокому бункері без мережі) та кнопка <b>«Переписати»</b>, яка витягує свіжий опис прямо з сайту або генерує новий варіант нотатки.</p>
+                    </div>
+                    <div class="theme-card border rounded-xl p-3.5 space-y-1">
+                        <div class="font-bold">9. Календар, Рандом та тюнінг вигляду</div>
+                        <p class="theme-muted">У боковому меню: <b>3 види карток</b> (Малі, Великі, Список), <b>3 теми</b> (Світла, М’яка темна, чорний AMOLED), розмір шрифту (<b>A- / A / A+</b>), кнопка <b>«Рандом»</b> (відкриває випадковий незаблокований сайт) та <b>Календар активності</b>, де видно, що саме ти зберігав у конкретний день.</p>
+                    </div>
+                    <div class="theme-card border rounded-xl p-3.5 space-y-1">
+                        <div class="font-bold">10. Масові операції, Бекапи та Жести</div>
+                        <p class="theme-muted">Галочка в шапці вмикає <b>мульти-вибір</b> (групова зміна папок/тегів, шерінг списком, видалення). <b>Імпорт/Експорт</b> дружить із браузерним <code>.HTML</code> та повним бекапом <code>.JSON</code>. Свайп від лівого краю відкриває меню, свайп назад закриває шторки, а подвійний свайп на головній — закриває додаток.</p>
+                    </div>
                 </div>
                 <div class="theme-card border border-accent/40 rounded-xl p-4 text-center space-y-2 mt-3">
                     <div class="font-black text-sm sm:text-base tracking-tight">Shans</div>
@@ -2944,7 +3018,7 @@
             const pending = ITEMS.filter(i => i.pendingOffline);
             if (pending.length === 0 || _isQueueRunning) return;
             if (!navigator.onLine) {
-                if (manualTap) { selectedFolder = OFFLINE_FOLDER_KEY; renderApp(); showToast(t('offlineStillNoNet')); }
+                if (manualTap) { selectedFolder = OFFLINE_FOLDER_KEY; renderApp(); showToast(getNextOfflinePullMessage()); }
                 return;
             }
             _isQueueRunning = true; _aiBatchError = '';
@@ -2990,7 +3064,186 @@
             }
         }
 
-        window.addEventListener('online', () => { processOfflineQueue(false); });
+        let _offlinePullStreak = 0;
+        let _lastOfflineJokeIdx = -1;
+        let _onlineFreshStreak = 0;
+
+        const OFFLINE_FUNNY_TOASTS = [
+            'Годі тягнути, сказано ж — інтернету немає! 📵',
+            'Не тягни так сильно, стрічку відірвеш! 🪢',
+            'Тягни-не тягни, а гігабайти з повітря не з’являться 🤷‍♂️',
+            'Ти що, намагаєшся вручну накачати інтернет? 💪',
+            'Тут риби немає! І мережі теж 🐟',
+            'Супутники Starlink тебе чують, але просять увімкнути Wi-Fi 🛰️',
+            'Може, глянеш у вікно або завариш чайку? Мережі досі нуль ☕',
+            'Стопе! Пружинка кружечка вже димить від тертя 🔥',
+            'Роутер передає привіт і каже, що він у відпустці 🏖️',
+            'Ще один свайп — і я почну генерувати сайти силою думки 🧠'
+        ];
+
+        function getNextOfflinePullMessage() {
+            _offlinePullStreak++;
+            if (_offlinePullStreak === 1) {
+                return t('offlineStillNoNet');
+            }
+            let idx = Math.floor(Math.random() * OFFLINE_FUNNY_TOASTS.length);
+            if (idx === _lastOfflineJokeIdx && OFFLINE_FUNNY_TOASTS.length > 1) {
+                idx = (idx + 1) % OFFLINE_FUNNY_TOASTS.length;
+            }
+            _lastOfflineJokeIdx = idx;
+            return OFFLINE_FUNNY_TOASTS[idx];
+        }
+
+        function reloadFailedFavicons() {
+            let retried = 0;
+            document.querySelectorAll('img[data-favicon="1"]').forEach(img => {
+                const cleanDom = img.getAttribute('data-domain');
+                if (!cleanDom) return;
+                const isHidden = img.style.display === 'none';
+                const isBroken = img.complete && img.naturalWidth === 0;
+                if (isHidden || isBroken) {
+                    const fallback = img.nextElementSibling;
+                    if (fallback) {
+                        fallback.classList.add('hidden');
+                        fallback.classList.remove('flex');
+                    }
+                    img.style.display = '';
+                    img.dataset.g = '1';
+                    img.dataset.fb = [`https://${cleanDom}/favicon.ico`, `https://icons.duckduckgo.com/ip3/${cleanDom}.ico`].join('|');
+                    img.src = `https://www.google.com/s2/favicons?domain=${encodeURIComponent(cleanDom)}&sz=64&_t=${Date.now()}`;
+                    retried++;
+                }
+            });
+            return retried;
+        }
+
+        async function handlePullToRefresh() {
+            if (!navigator.onLine) {
+                showToast(getNextOfflinePullMessage());
+                return;
+            }
+            _offlinePullStreak = 0;
+            const pendingCount = ITEMS.filter(i => i.pendingOffline).length;
+            const retriedIcons = reloadFailedFavicons();
+
+            if (pendingCount > 0) {
+                _onlineFreshStreak = 0;
+                await processOfflineQueue(true);
+            } else {
+                _onlineFreshStreak++;
+                await new Promise(r => setTimeout(r, 380));
+                if (retriedIcons > 0) {
+                    showToast(`Оновлено іконок сайтів: ${retriedIcons} ✓`);
+                } else if (_onlineFreshStreak >= 3) {
+                    showToast('Свіжіше вже нікуди, бро! Усе на місці ✨');
+                } else {
+                    showToast('Усе актуально та синхронізовано ✓');
+                }
+            }
+        }
+
+        function attachPullToRefresh() {
+            const indicator = document.getElementById('ptr-indicator');
+            const arrow = document.getElementById('ptr-arrow');
+            const spinner = document.getElementById('ptr-spinner');
+            if (!indicator || !arrow || !spinner) return;
+
+            let startY = 0;
+            let startX = 0;
+            let pulling = false;
+            let refreshing = false;
+            let pullDist = 0;
+            const THRESHOLD = 68;
+            const MAX_PULL = 115;
+
+            document.addEventListener('touchstart', (e) => {
+                if (refreshing || e.touches.length !== 1) return;
+                if (isAnyModalOpen()) return;
+                const scTop = window.scrollY || document.documentElement.scrollTop || 0;
+                if (scTop > 2) return;
+                const target = e.target;
+                if (target instanceof HTMLElement && /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName)) return;
+
+                startY = e.touches[0].clientY;
+                startX = e.touches[0].clientX;
+                pullDist = 0;
+                pulling = true;
+                indicator.classList.remove('ptr-release');
+            }, { passive: true });
+
+            document.addEventListener('touchmove', (e) => {
+                if (!pulling || refreshing) return;
+                const scTop = window.scrollY || document.documentElement.scrollTop || 0;
+                if (scTop > 2) {
+                    pulling = false;
+                    return;
+                }
+                const dy = e.touches[0].clientY - startY;
+                const dx = e.touches[0].clientX - startX;
+
+                if (dy <= 0 || Math.abs(dx) > Math.abs(dy) * 0.85) {
+                    if (pullDist > 0) {
+                        pullDist = 0;
+                        indicator.style.opacity = '0';
+                        indicator.style.transform = 'translate(-50%, -80px) scale(0.6)';
+                    }
+                    if (dy < -5) pulling = false;
+                    return;
+                }
+
+                if (dy > 6 && e.cancelable) e.preventDefault();
+                pullDist = Math.min(MAX_PULL, Math.pow(dy, 0.82) * 1.65);
+                const progress = Math.min(1, pullDist / THRESHOLD);
+                const yOffset = -72 + pullDist;
+                const scale = 0.65 + progress * 0.35;
+                const deg = Math.round(progress * 260);
+
+                indicator.style.opacity = String(Math.min(1, progress * 1.15));
+                indicator.style.transform = `translate(-50%, ${yOffset}px) scale(${scale})`;
+                arrow.style.transform = `rotate(${deg}deg)`;
+                indicator.classList.toggle('ptr-ready', pullDist >= THRESHOLD);
+            }, { passive: false });
+
+            async function finishPull() {
+                if (!pulling || refreshing) return;
+                pulling = false;
+                indicator.classList.add('ptr-release');
+
+                if (pullDist >= THRESHOLD) {
+                    refreshing = true;
+                    arrow.classList.add('hidden');
+                    spinner.classList.remove('hidden');
+                    indicator.style.opacity = '1';
+                    indicator.style.transform = 'translate(-50%, 6px) scale(1)';
+                    try {
+                        await handlePullToRefresh();
+                    } finally {
+                        setTimeout(() => {
+                            indicator.classList.add('ptr-release');
+                            indicator.classList.remove('ptr-ready');
+                            indicator.style.opacity = '0';
+                            indicator.style.transform = 'translate(-50%, -80px) scale(0.6)';
+                            setTimeout(() => {
+                                spinner.classList.add('hidden');
+                                arrow.classList.remove('hidden');
+                                arrow.style.transform = '';
+                                refreshing = false;
+                            }, 260);
+                        }, 220);
+                    }
+                } else {
+                    indicator.classList.remove('ptr-ready');
+                    indicator.style.opacity = '0';
+                    indicator.style.transform = 'translate(-50%, -80px) scale(0.6)';
+                }
+                pullDist = 0;
+            }
+
+            document.addEventListener('touchend', finishPull, { passive: true });
+            document.addEventListener('touchcancel', finishPull, { passive: true });
+        }
+
+        window.addEventListener('online', () => { _offlinePullStreak = 0; reloadFailedFavicons(); processOfflineQueue(false); });
 
         function highlightExistingCard(item) {
             if (selectedFolder !== 'ALL' && !getItemCats(item).includes(selectedFolder)) selectedFolder = 'ALL';
@@ -4019,6 +4272,7 @@
             attachSheetDrag('bulk-edit-drag-handle', 'bulk-edit-sheet-panel', closeBulkEditSheet);
             attachSheetDrag('qr-drag-handle', 'qr-panel', closeQRModal);
             initToastSwipe();
+            attachPullToRefresh();
             _ensureBaseHistoryGuard();
             attachEdgeBackGesture();
             if (navigator.onLine) { processOfflineQueue(false); }
