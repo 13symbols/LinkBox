@@ -599,82 +599,27 @@
                 <div id="sidebar-tags-preview" class="flex flex-wrap gap-1.5"></div>
             </div>
 
-            <div class="space-y-2 pt-2 border-t" style="border-color: var(--border-main)">
-                <div class="flex items-center justify-between"><span class="text-[11px] font-mono-code font-bold uppercase theme-muted">Вигляд та сортування</span></div>
-                <div class="grid grid-cols-12 gap-1.5">
-                    <div class="col-span-7 grid grid-cols-3 gap-1 p-1 rounded-lg theme-input">
-                        <button data-action="set-layout" data-mode="small" id="layout-small-btn" title="Малі картки" class="key-press py-1.5 rounded-md flex items-center justify-center text-xs font-bold transition"><svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg></button>
-                        <button data-action="set-layout" data-mode="large" id="layout-large-btn" title="Великі картки" class="key-press py-1.5 rounded-md flex items-center justify-center text-xs font-bold transition"><svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="6"/><rect x="3" y="14" width="18" height="6"/></svg></button>
-                        <button data-action="set-layout" data-mode="list" id="layout-list-btn" title="Список" class="key-press py-1.5 rounded-md flex items-center justify-center text-xs font-bold transition"><svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
-                    </div>
-                    <div class="col-span-5 grid grid-cols-3 gap-1 p-1 rounded-lg theme-input">
-                        <button data-action="set-theme" data-mode="light" id="theme-light-btn" title="Світла тема" class="key-press py-1.5 rounded-md flex items-center justify-center transition"><svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg></button>
-                        <button data-action="set-theme" data-mode="dim" id="theme-dim-btn" title="Темна тема" class="key-press py-1.5 rounded-md flex items-center justify-center transition"><svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button>
-                        <button data-action="set-theme" data-mode="device" id="theme-device-btn" title="AMOLED" class="key-press py-1.5 rounded-md flex items-center justify-center transition"><svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 0 0 16Z" fill="currentColor" stroke="none"/></svg></button>
-                    </div>
-                </div>
-                <div class="flex items-stretch gap-1.5">
-                    <div class="flex-1 grid grid-cols-3 gap-1 p-1 rounded-lg theme-input">
-                        <button data-action="set-sort" data-mode="newest" id="sort-newest-btn" class="key-press py-1.5 rounded-md text-xs font-bold transition">↓ Нові</button>
-                        <button data-action="set-sort" data-mode="oldest" id="sort-oldest-btn" class="key-press py-1.5 rounded-md text-xs font-bold transition">↑ Старі</button>
-                        <button data-action="set-sort" data-mode="az" id="sort-az-btn" class="key-press py-1.5 rounded-md text-xs font-bold transition">А–Я</button>
-                    </div>
-                    <button type="button" data-action="open-calendar-sheet" title="Календар активності" class="key-press w-[46px] rounded-lg theme-input flex items-center justify-center text-accent hover:bg-accent/15 transition shrink-0">
-                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                            <line x1="16" y1="2" x2="16" y2="6"></line>
-                            <line x1="8" y1="2" x2="8" y2="6"></line>
-                            <line x1="3" y1="10" x2="21" y2="10"></line>
-                            <path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01" stroke-width="3" stroke-linecap="round"/>
-                        </svg>
-                    </button>
-                    <button data-action="cycle-font" id="font-cycle-btn" class="key-press w-[46px] rounded-lg theme-input flex items-center justify-center font-mono-code font-black text-[13px] transition shrink-0" title="Розмір тексту">A</button>
-                </div>
-            </div>
+
         </div>
 
-        <div class="p-4 border-t space-y-2 touch-none" style="border-color: var(--border-main)">
-            <div id="import-choice-bar" class="hidden flex-col gap-1.5 p-1.5 rounded-xl theme-input">
-                <div class="grid grid-cols-2 gap-1.5">
-                    <button data-action="import-with-mode" data-mode="skip" class="key-press py-2 px-2.5 rounded-lg theme-card border text-xs font-bold flex items-center justify-center gap-1.5">
-                        <span class="font-mono-code text-accent">⏭</span>
-                        <span>Без дублів</span>
-                    </button>
-                    <button data-action="import-with-mode" data-mode="update" class="key-press py-2 px-2.5 rounded-lg theme-card border text-xs font-bold flex items-center justify-center gap-1.5">
-                        <span class="font-mono-code text-accent">↻</span>
-                        <span>Оновлювати</span>
-                    </button>
-                </div>
-                <button type="button" data-action="restore-auto-snapshot" id="btn-restore-autosnap" class="hidden key-press w-full py-2 px-2.5 rounded-lg theme-card border text-xs font-bold items-center justify-center gap-1.5">
-                    <span class="font-mono-code text-accent">↺</span>
-                    <span id="autosnap-btn-text" class="truncate">Відновити авто-зліпок</span>
+        <div class="p-4 border-t touch-none" style="border-color: var(--border-main)">
+            <input id="ai-import-file" type="file" accept=".html,.htm,.txt,.json,.csv" class="hidden">
+            <div class="flex items-center gap-2">
+                <button type="button" data-action="toggle-select-mode-from-sidebar" id="select-mode-btn" title="Масовий вибір та групові дії" class="key-press w-10 h-10 rounded-xl theme-input flex items-center justify-center hover:text-accent transition shrink-0">
+                    <svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
                 </button>
-            </div>
-            <div id="export-choice-bar" class="hidden grid-cols-2 gap-1.5 p-1.5 rounded-xl theme-input">
-                <button data-action="export-html" class="key-press py-2 px-2.5 rounded-lg theme-card border text-xs font-bold flex items-center justify-center gap-1.5">
-                    <span class="font-mono-code text-accent">.HTML</span>
-                    <span id="lbl-exp-html">Для браузера</span>
+                <button type="button" data-action="open-calendar-sheet" title="Календар активності" class="key-press w-10 h-10 rounded-xl theme-input flex items-center justify-center text-accent hover:bg-accent/15 transition shrink-0">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                        <path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01" stroke-width="3" stroke-linecap="round"/>
+                    </svg>
                 </button>
-                <button data-action="export-json" class="key-press py-2 px-2.5 rounded-lg theme-card border text-xs font-bold flex items-center justify-center gap-1.5">
-                    <span class="font-mono-code text-accent">.JSON</span>
-                    <span id="lbl-exp-json">Повний бекап</span>
-                </button>
-            </div>
-            <div class="flex items-center gap-1.5">
-                <input id="ai-import-file" type="file" accept=".html,.htm,.txt,.json,.csv" class="hidden" >
-                <button data-action="trigger-import" class="key-press flex-1 h-10 px-2.5 rounded-lg bg-accent text-onaccent text-xs font-black flex items-center justify-center gap-1.5 min-w-0">
-                    <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/><line x1="12" y1="10" x2="12" y2="16"/><polyline points="9 13 12 16 15 13"/></svg>
-                    <span id="btn-import-ai" class="truncate">Імпорт</span>
-                </button>
-                <button data-action="toggle-export-bar" class="key-press flex-1 h-10 px-2.5 rounded-lg theme-input text-xs font-bold flex items-center justify-center gap-1.5 min-w-0">
-                    <svg class="w-4 h-4 mono-icon shrink-0" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/><line x1="12" y1="16" x2="12" y2="10"/><polyline points="9 13 12 10 15 13"/></svg>
-                    <span id="btn-export-html" class="truncate">Експорт</span>
-                </button>
-                <button data-action="open-ai-sheet" title="Розумні папки: ШІ та перерозпізнавання" class="key-press w-10 h-10 rounded-lg theme-input flex items-center justify-center hover:text-accent transition shrink-0">
-                    <svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24"><path d="M12 3l1.9 4.6L18.5 9.5l-4.6 1.9L12 16l-1.9-4.6L5.5 9.5l4.6-1.9z"/><path d="M19 15l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z"/></svg>
-                </button>
-                <button data-action="open-about-sheet" title="Про додаток та авторські права" class="key-press w-10 h-10 rounded-lg theme-input flex items-center justify-center hover:text-accent transition shrink-0">
-                    <svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><line x1="12" y1="16" x2="12" y2="11.5"/><circle cx="12" cy="8" r="0.6" fill="currentColor"/></svg>
+                <button type="button" data-action="open-settings-sheet" title="Налаштування" class="key-press flex-1 h-10 px-3.5 rounded-xl theme-input flex items-center justify-center gap-2 text-xs sm:text-sm font-extrabold hover:text-accent transition min-w-0">
+                    <svg class="w-4 h-4 mono-icon shrink-0" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                    <span class="truncate" id="btn-settings-label">Налаштування</span>
                 </button>
             </div>
         </div>
@@ -720,9 +665,6 @@
                 </div>
 
                 <div class="flex items-center gap-2 shrink-0">
-                    <button data-action="toggle-select-mode" data-stop="1" id="select-mode-btn" title="Масовий вибір та видалення" class="key-press w-10 h-10 rounded-lg theme-input flex items-center justify-center transition">
-                        <svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-                    </button>
                     <button data-action="open-sidebar" data-stop="1" class="key-press h-10 px-3.5 rounded-lg theme-input flex items-center gap-2 font-bold text-sm hover:opacity-90 transition">
                         <svg class="w-5 h-5 mono-icon" viewBox="0 0 24 24"><line x1="3" y1="7" x2="21" y2="7"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="17" x2="15" y2="17"/></svg>
                         <span id="btn-menu-label">Меню</span>
@@ -962,6 +904,170 @@
                 </div>
             </div>
             <div id="tags-cloud-container" class="flex flex-wrap gap-2 py-1"></div>
+        </div>
+    </div>
+
+    <!-- ШТОРКА НАЛАШТУВАНЬ (ANDROID / CHROME STYLE) -->
+    <div id="settings-sheet-modal" data-backdrop="close-settings-sheet" class="sheet-backdrop fixed inset-0 bg-black/60 z-50 hidden items-end sm:items-center justify-center p-0 sm:p-4">
+        <div id="settings-sheet-panel" class="sheet-panel theme-surface w-full max-w-md rounded-t-2xl sm:rounded-xl p-5 border-t sm:border space-y-5 max-h-[90vh] overflow-y-auto" style="background-color: var(--bg-body);">
+            <div id="settings-drag-handle" class="w-12 h-2 bg-stone-400/50 rounded-full mx-auto -mt-1 cursor-grab active:cursor-grabbing touch-none sm:hidden"></div>
+            <div class="sticky top-0 z-20 theme-surface backdrop-blur-md pb-3 border-b flex items-center justify-between -mx-5 -mt-5 px-5 pt-5" style="border-color: var(--border-main);">
+                <div class="flex items-center gap-2.5">
+                    <span class="w-8 h-8 rounded-xl bg-accent text-onaccent flex items-center justify-center shrink-0 shadow-xs">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                    </span>
+                    <span class="font-black text-base uppercase tracking-tight" id="settings-sheet-title">Налаштування</span>
+                </div>
+                <button data-action="close-settings-sheet" class="key-press w-9 h-9 rounded-xl theme-input flex items-center justify-center"><svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+            </div>
+
+            <div class="space-y-5 pb-3 pt-1">
+                <!-- СЕКЦІЯ 1: ВИГЛЯД ТА СОРТУВАННЯ -->
+                <div class="space-y-2">
+                    <div class="text-[11px] font-mono-code font-bold uppercase theme-muted px-1">Вигляд та інтерфейс</div>
+                    <div class="theme-card border rounded-2xl p-4 space-y-3.5 shadow-xs">
+                        <div class="space-y-2">
+                            <div class="text-xs font-extrabold">Тема оформлення</div>
+                            <div class="grid grid-cols-3 gap-1.5 p-1 rounded-xl theme-input">
+                                <button data-action="set-theme" data-mode="light" id="theme-light-btn" class="key-press py-2.5 rounded-lg flex items-center justify-center gap-1.5 text-xs font-bold transition">
+                                    <svg class="w-4 h-4 mono-icon shrink-0" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+                                    <span>Світла</span>
+                                </button>
+                                <button data-action="set-theme" data-mode="dim" id="theme-dim-btn" class="key-press py-2.5 rounded-lg flex items-center justify-center gap-1.5 text-xs font-bold transition">
+                                    <svg class="w-4 h-4 mono-icon shrink-0" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                                    <span>Темна</span>
+                                </button>
+                                <button data-action="set-theme" data-mode="device" id="theme-device-btn" class="key-press py-2.5 rounded-lg flex items-center justify-center gap-1.5 text-xs font-bold transition">
+                                    <svg class="w-4 h-4 mono-icon shrink-0" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 0 0 16Z" fill="currentColor" stroke="none"/></svg>
+                                    <span>OLED</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="space-y-2 pt-3 border-t" style="border-color: var(--border-main);">
+                            <div class="text-xs font-extrabold">Формат карток</div>
+                            <div class="grid grid-cols-3 gap-1.5 p-1 rounded-xl theme-input">
+                                <button data-action="set-layout" data-mode="small" id="layout-small-btn" class="key-press py-2.5 rounded-lg flex items-center justify-center gap-1.5 text-xs font-bold transition">
+                                    <svg class="w-4 h-4 mono-icon shrink-0" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+                                    <span>Малі</span>
+                                </button>
+                                <button data-action="set-layout" data-mode="large" id="layout-large-btn" class="key-press py-2.5 rounded-lg flex items-center justify-center gap-1.5 text-xs font-bold transition">
+                                    <svg class="w-4 h-4 mono-icon shrink-0" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="6"/><rect x="3" y="14" width="18" height="6"/></svg>
+                                    <span>Великі</span>
+                                </button>
+                                <button data-action="set-layout" data-mode="list" id="layout-list-btn" class="key-press py-2.5 rounded-lg flex items-center justify-center gap-1.5 text-xs font-bold transition">
+                                    <svg class="w-4 h-4 mono-icon shrink-0" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+                                    <span>Список</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="space-y-2 pt-3 border-t" style="border-color: var(--border-main);">
+                            <div class="text-xs font-extrabold">Сортування посилань</div>
+                            <div class="grid grid-cols-3 gap-1.5 p-1 rounded-xl theme-input">
+                                <button data-action="set-sort" data-mode="newest" id="sort-newest-btn" class="key-press py-2.5 rounded-lg text-xs font-bold transition">↓ Нові</button>
+                                <button data-action="set-sort" data-mode="oldest" id="sort-oldest-btn" class="key-press py-2.5 rounded-lg text-xs font-bold transition">↑ Старі</button>
+                                <button data-action="set-sort" data-mode="az" id="sort-az-btn" class="key-press py-2.5 rounded-lg text-xs font-bold transition">А–Я</button>
+                            </div>
+                        </div>
+
+                        <div class="space-y-2 pt-3 border-t" style="border-color: var(--border-main);">
+                            <div class="text-xs font-extrabold" id="lbl-font-scale">Розмір тексту</div>
+                            <div class="grid grid-cols-3 gap-1.5 p-1 rounded-xl theme-input">
+                                <button data-action="set-font-scale" data-scale="sm" id="font-sm-btn" class="key-press py-2.5 rounded-lg text-xs font-mono-code font-bold transition">A- Компакт</button>
+                                <button data-action="set-font-scale" data-scale="md" id="font-md-btn" class="key-press py-2.5 rounded-lg text-xs font-mono-code font-bold transition">A Стандарт</button>
+                                <button data-action="set-font-scale" data-scale="lg" id="font-lg-btn" class="key-press py-2.5 rounded-lg text-xs font-mono-code font-bold transition">A+ Великий</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- СЕКЦІЯ 2: РОЗУМНІ ПАПКИ ТА ШІ -->
+                <div class="space-y-2">
+                    <div class="text-[11px] font-mono-code font-bold uppercase theme-muted px-1">Інтелект та сортування</div>
+                    <button type="button" data-action="open-ai-sheet" class="key-press w-full theme-card border rounded-2xl p-4 flex items-center justify-between gap-3 text-left hover:border-accent transition shadow-xs">
+                        <div class="flex items-center gap-3.5 min-w-0">
+                            <span class="w-10 h-10 rounded-xl bg-accent/15 text-accent flex items-center justify-center shrink-0">
+                                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 4.6L18.5 9.5l-4.6 1.9L12 16l-1.9-4.6L5.5 9.5l4.6-1.9z"/><path d="M19 15l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z"/></svg>
+                            </span>
+                            <div class="min-w-0 space-y-0.5">
+                                <div class="text-sm font-extrabold truncate">Розумні папки та ШІ</div>
+                                <div id="settings-ai-status-sub" class="text-xs theme-muted truncate">Вбудовані правила (без ключа)</div>
+                            </div>
+                        </div>
+                        <span class="text-accent font-mono-code text-lg font-black shrink-0">›</span>
+                    </button>
+                </div>
+
+                <!-- СЕКЦІЯ 3: ДАНІ ТА РЕЗЕРВНІ КОПІЇ -->
+                <div class="space-y-2">
+                    <div class="text-[11px] font-mono-code font-bold uppercase theme-muted px-1">Дані та резервні копії</div>
+                    <div class="theme-card border rounded-2xl p-4 space-y-4 shadow-xs">
+                        <!-- Імпорт -->
+                        <div class="space-y-2.5">
+                            <div class="text-xs font-extrabold">Імпорт закладок (.HTML / .JSON)</div>
+                            <div class="grid grid-cols-2 gap-1.5 p-1 rounded-xl theme-input">
+                                <button type="button" data-action="set-import-dup-mode" data-mode="skip" id="imp-mode-skip-btn" class="key-press py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition">
+                                    <span class="font-mono-code text-accent font-black">⏭</span>
+                                    <span>Без дублів</span>
+                                </button>
+                                <button type="button" data-action="set-import-dup-mode" data-mode="update" id="imp-mode-update-btn" class="key-press py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition">
+                                    <span class="font-mono-code text-accent font-black">↻</span>
+                                    <span>Оновлювати</span>
+                                </button>
+                            </div>
+                            <button type="button" data-action="trigger-import-file" class="key-press w-full py-3 px-4 rounded-xl bg-accent text-onaccent text-xs font-black flex items-center justify-center gap-2 shadow-xs">
+                                <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/><line x1="12" y1="10" x2="12" y2="16"/><polyline points="9 13 12 16 15 13"/></svg>
+                                <span id="btn-import-ai">Вибрати файл для імпорту</span>
+                            </button>
+                        </div>
+
+                        <!-- Експорт -->
+                        <div class="space-y-2.5 pt-3.5 border-t" style="border-color: var(--border-main);">
+                            <div class="text-xs font-extrabold" id="btn-export-html">Експорт бази</div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button type="button" data-action="export-html" class="key-press py-3 px-3 rounded-xl theme-input text-xs font-bold flex items-center justify-center gap-1.5 hover:text-accent transition border">
+                                    <span class="font-mono-code text-accent font-black">.HTML</span>
+                                    <span id="lbl-exp-html">Для браузера</span>
+                                </button>
+                                <button type="button" data-action="export-json" class="key-press py-3 px-3 rounded-xl theme-input text-xs font-bold flex items-center justify-center gap-1.5 hover:text-accent transition border">
+                                    <span class="font-mono-code text-accent font-black">.JSON</span>
+                                    <span id="lbl-exp-json">Повний бекап</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Авто-зліпок -->
+                        <div id="autosnap-section-wrap" class="hidden pt-3.5 border-t space-y-2" style="border-color: var(--border-main);">
+                            <div class="flex items-center justify-between text-xs px-0.5">
+                                <span class="font-bold theme-muted">Локальний авто-зліпок</span>
+                                <span id="autosnap-meta-label" class="font-mono-code text-xs text-accent font-black"></span>
+                            </div>
+                            <button type="button" data-action="restore-auto-snapshot" id="btn-restore-autosnap" class="key-press w-full py-2.5 px-3 rounded-xl theme-input text-xs font-bold flex items-center justify-center gap-2 hover:text-accent transition border">
+                                <span class="font-mono-code text-accent font-black text-base">↺</span>
+                                <span id="autosnap-btn-text" class="truncate">Відновити з авто-зліпка</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- СЕКЦІЯ 4: ПРО ДОДАТОК -->
+                <div class="space-y-2">
+                    <div class="text-[11px] font-mono-code font-bold uppercase theme-muted px-1">Довідка</div>
+                    <button type="button" data-action="open-about-sheet" class="key-press w-full theme-card border rounded-2xl p-4 flex items-center justify-between gap-3 text-left hover:border-accent transition shadow-xs">
+                        <div class="flex items-center gap-3.5 min-w-0">
+                            <span class="w-10 h-10 rounded-xl theme-input flex items-center justify-center shrink-0">
+                                <svg class="w-5 h-5 mono-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><line x1="12" y1="16" x2="12" y2="11.5"/><circle cx="12" cy="8" r="0.6" fill="currentColor"/></svg>
+                            </span>
+                            <div class="min-w-0 space-y-0.5">
+                                <div class="text-sm font-extrabold truncate">Як усе влаштовано</div>
+                                <div class="text-xs theme-muted truncate">Гід по всіх функціях та фішках</div>
+                            </div>
+                        </div>
+                        <span class="text-accent font-mono-code text-lg font-black shrink-0">›</span>
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -1411,6 +1517,11 @@
                 if (viaHistory) _restoreGuardHash();
                 return true;
             }
+            if (document.getElementById('settings-sheet-modal')?.classList.contains('open')) {
+                viaHistory ? _hideSettingsSheet() : closeSettingsSheet();
+                if (viaHistory) _restoreGuardHash();
+                return true;
+            }
             if (isMobileSidebarOpen) {
                 viaHistory ? _hideSidebar() : closeMobileSidebar();
                 if (viaHistory) _restoreGuardHash();
@@ -1592,7 +1703,7 @@
         }
 
         function _forceCloseAllUI() {
-            _hideSidebar(); _hideCatsSheet(); _hideTagsSheet(); _hideAboutSheet(); _hideCalendarSheet(); _hideEditSheet(); _hideBulkEditSheet(); _hideQRModal(); _hideConfirmModal();
+            _hideSidebar(); _hideCatsSheet(); _hideTagsSheet(); _hideSettingsSheet(); _hideAboutSheet(); _hideCalendarSheet(); _hideEditSheet(); _hideBulkEditSheet(); _hideQRModal(); _hideConfirmModal();
         }
 
         function openMobileSidebar() {
@@ -1812,11 +1923,11 @@
             const bar = document.getElementById('bulk-action-bar'); const btn = document.getElementById('select-mode-btn'); const countLbl = document.getElementById('selected-count-label');
             if (isSelectMode) {
                 bar.classList.remove('hidden'); bar.classList.add('flex');
-                btn.className = 'key-press w-10 h-10 rounded-lg bg-accent text-onaccent flex items-center justify-center transition';
+                if (btn) btn.className = 'key-press w-10 h-10 rounded-xl bg-accent text-onaccent flex items-center justify-center transition shrink-0';
                 if (countLbl) countLbl.textContent = selectedIds.size;
             } else {
                 bar.classList.add('hidden'); bar.classList.remove('flex');
-                btn.className = 'key-press w-10 h-10 rounded-lg theme-input flex items-center justify-center transition';
+                if (btn) btn.className = 'key-press w-10 h-10 rounded-xl theme-input flex items-center justify-center hover:text-accent transition shrink-0';
             }
         }
 
@@ -1883,6 +1994,8 @@
                 const btn = document.getElementById(`layout-${m}-btn`);
                 if (btn) { btn.style.backgroundColor = (m === mode) ? 'var(--bg-card)' : 'transparent'; btn.style.boxShadow = (m === mode) ? '0 1px 2px rgba(0,0,0,0.12)' : 'none'; }
             });
+            const sub = document.getElementById('settings-layout-sub');
+            if (sub) sub.textContent = mode === 'large' ? 'Великі картки' : (mode === 'list' ? 'Список' : 'Малі картки');
             saveStateToStorage(); renderApp();
         }
 
@@ -1899,7 +2012,7 @@
             document.getElementById('lbl-folders-section').textContent = t('foldersSection'); document.getElementById('lbl-hashtags-section').textContent = t('hashtagsSection');
             document.getElementById('cats-sheet-title').textContent = t('catsSheetTitle'); document.getElementById('tags-sheet-title').textContent = t('tagsSheetTitle');
             document.getElementById('about-sheet-title').textContent = t('aboutSheetTitle'); document.getElementById('url-input').placeholder = t('urlPlaceholder');
-            document.getElementById('btn-import-ai').textContent = t('importAi'); document.getElementById('btn-export-html').textContent = t('exportHtml');
+            document.getElementById('btn-import-ai').textContent = 'Вибрати файл для імпорту'; document.getElementById('btn-export-html').textContent = 'Експорт бази';
             document.getElementById('lbl-exp-html').textContent = t('expHtmlSub'); document.getElementById('lbl-exp-json').textContent = t('expJsonSub');
             document.getElementById('btn-open').textContent = t('openBrowser'); document.getElementById('lbl-lock-link').textContent = t('lockToggleLabel');
             document.getElementById('lbl-card-title').textContent = t('titleLabel'); document.getElementById('lbl-note').textContent = t('noteLabel');
@@ -1917,11 +2030,16 @@
             if (!['sm', 'md', 'lg'].includes(scale)) scale = 'md';
             fontScale = scale;
             document.documentElement.setAttribute('data-font-scale', scale);
-            const btn = document.getElementById('font-cycle-btn');
-            if (btn) {
-                btn.textContent = scale === 'sm' ? 'A-' : (scale === 'lg' ? 'A+' : 'A');
-                btn.style.color = scale !== 'md' ? 'rgb(var(--accent-rgb))' : '';
-            }
+            ['sm', 'md', 'lg'].forEach(s => {
+                const b = document.getElementById(`font-${s}-btn`);
+                if (b) {
+                    b.style.backgroundColor = (s === scale) ? 'var(--bg-card)' : 'transparent';
+                    b.style.boxShadow = (s === scale) ? '0 1px 2px rgba(0,0,0,0.12)' : 'none';
+                    b.style.color = (s === scale) ? 'rgb(var(--accent-rgb))' : '';
+                }
+            });
+            const sub = document.getElementById('settings-font-sub');
+            if (sub) sub.textContent = scale === 'sm' ? 'Компактний' : (scale === 'lg' ? 'Великий' : 'Стандартний');
             saveStateToStorage();
         }
 
@@ -1939,6 +2057,8 @@
                 const btn = document.getElementById(`theme-${m}-btn`);
                 if (btn) { btn.style.backgroundColor = (m === mode) ? 'var(--bg-card)' : 'transparent'; btn.style.boxShadow = (m === mode) ? '0 1px 2px rgba(0,0,0,0.12)' : 'none'; }
             });
+            const sub = document.getElementById('settings-theme-sub');
+            if (sub) sub.textContent = mode === 'dim' ? 'М’яка темна' : (mode === 'device' ? 'AMOLED Чорна' : 'Світла');
             saveStateToStorage(); renderApp();
         }
 
@@ -2034,8 +2154,45 @@
             renderTagsCloud();
         }
 
+        function setImportDupMode(mode) {
+            importDuplicateMode = mode === 'update' ? 'update' : 'skip';
+            ['skip', 'update'].forEach(m => {
+                const b = document.getElementById(`imp-mode-${m}-btn`);
+                if (b) {
+                    b.style.backgroundColor = (m === importDuplicateMode) ? 'var(--bg-card)' : 'transparent';
+                    b.style.boxShadow = (m === importDuplicateMode) ? '0 1px 2px rgba(0,0,0,0.12)' : 'none';
+                }
+            });
+        }
+
+        function syncSettingsSheetUI() {
+            setImportDupMode(importDuplicateMode || 'skip');
+            syncAutoSnapButtonUI();
+            const aiSub = document.getElementById('settings-ai-status-sub');
+            if (aiSub) {
+                const cfg = getAiConfig();
+                aiSub.textContent = cfg ? ('Активний ШІ: ' + AI_PROVIDERS[cfg.provider].label.replace(/ \(.*/, '')) : 'Вбудовані правила (без ключа)';
+            }
+        }
+
+        function openSettingsSheet() {
+            _pushModalState(); _hideSidebar();
+            syncSettingsSheetUI();
+            const modal = document.getElementById('settings-sheet-modal'); const panel = document.getElementById('settings-sheet-panel');
+            if (!modal || !panel) return;
+            panel.style.transform = ''; panel.scrollTop = 0; modal.classList.remove('hidden'); modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('open'), 10);
+        }
+        function closeSettingsSheet() { safeCloseModal(_hideSettingsSheet); }
+        function _hideSettingsSheet() {
+            const modal = document.getElementById('settings-sheet-modal'); const panel = document.getElementById('settings-sheet-panel');
+            if (!modal || !panel) return;
+            panel.style.transform = ''; modal.classList.remove('open');
+            setTimeout(() => { modal.classList.add('hidden'); modal.style.display = 'none'; }, 340);
+        }
+
         function openAboutSheet() {
-            _pushModalState(); _hideSidebar(); renderAboutContent();
+            _pushModalState(); _hideSidebar(); _hideSettingsSheet(); renderAboutContent();
             const modal = document.getElementById('about-sheet-modal'); const panel = document.getElementById('about-sheet-panel');
             panel.style.transform = ''; panel.scrollTop = 0; modal.classList.remove('hidden'); modal.style.display = 'flex'; setTimeout(() => modal.classList.add('open'), 10);
         }
@@ -2090,12 +2247,12 @@
                         <p class="theme-muted">У налаштуваннях кожної картки є генератор <b>QR-коду</b> з фірмовим логотипом (працює за 0 мс навіть у глибокому бункері без мережі) та кнопка <b>«Переписати»</b>, яка витягує свіжий опис прямо з сайту або генерує новий варіант нотатки.</p>
                     </div>
                     <div class="theme-card border rounded-xl p-3.5 space-y-1">
-                        <div class="font-bold">9. Календар, Рандом та тюнінг вигляду</div>
-                        <p class="theme-muted">У боковому меню: <b>3 види карток</b> (Малі, Великі, Список), <b>3 теми</b> (Світла, М’яка темна, чорний AMOLED), розмір шрифту (<b>A- / A / A+</b>), кнопка <b>«Рандом»</b> (відкриває випадковий незаблокований сайт) та <b>Календар активності</b>, де видно, що саме ти зберігав у конкретний день.</p>
+                        <div class="font-bold">9. Підвал меню: Мульти-вибір, Календар та Налаштування</div>
+                        <p class="theme-muted">Унизу бокового меню живуть 3 головні кнопки: <b>Галочка мульти-вибору</b> (групова зміна папок/тегів, шерінг списком, видалення), <b>Календар активності</b> (історія збережень по днях) та вікно <b>«Налаштування»</b>, де зібрано 3 теми (Світла, Темна, OLED), 3 формати карток, сортування і розмір тексту (<b>A- / A / A+</b>).</p>
                     </div>
                     <div class="theme-card border rounded-xl p-3.5 space-y-1">
-                        <div class="font-bold">10. Фільтр NEW, Розумний Імпорт, Авто-зліпок та Жести</div>
-                        <p class="theme-muted">Є непрочитані лінки? У категоріях автоматично з’являється швидка папка <b>«🔥 Непрочитані (NEW)»</b>. Галочка в шапці вмикає <b>мульти-вибір</b>. Кнопка <b>Імпорт</b> дозволяє обрати, що робити з дублікатами (пропускати чи оновлювати старі), а також зберігає тижневий <b>авто-зліпок бази</b> про запас. Свайп зліва відкриває меню, справа — закриває шторки (подвійний свайп — вихід).</p>
+                        <div class="font-bold">10. Фільтр NEW, Імпорт/Експорт, Авто-зліпок та Жести</div>
+                        <p class="theme-muted">Непрочитані лінки автоматично збираються у швидку папку <b>«🔥 Непрочитані (NEW)»</b>. У <b>Налаштуваннях</b> можна імпортувати закладки (з вибором: без дублів чи оновлювати старі), зробити експорт у <code>.HTML</code> / <code>.JSON</code> або відновити тижневий <b>авто-зліпок бази</b>. Свайп зліва відкриває меню, справа — закриває вікна (подвійний свайп — вихід).</p>
                     </div>
                 </div>
                 <div class="theme-card border border-accent/40 rounded-xl p-4 text-center space-y-2 mt-3">
@@ -2223,7 +2380,7 @@
         }
 
         async function _exportFileAndroidAndShare(filename, contentStr, mimeType, toastMsg) {
-            closeMobileSidebar();
+            closeSettingsSheet(); closeMobileSidebar();
             // 1. Якщо ми всередині Android APK із нативним мостом LinkBoxNative — зберігаємо в Download і відкриваємо системне меню Поділитися
             if (window.LinkBoxNative && typeof window.LinkBoxNative.exportFile === 'function') {
                 try {
@@ -2831,7 +2988,7 @@
             b.textContent = cfg ? ('Режим: ШІ — ' + AI_PROVIDERS[cfg.provider].label.replace(/ \(.*/, '') + ' (вбудовані правила вимкнені)') : 'Режим: вбудовані правила (без ключа)';
         }
         function openAiSheet() {
-            _pushModalState(); _hideSidebar();
+            _pushModalState(); _hideSidebar(); _hideSettingsSheet();
             const o = _loadAiRaw(); const sel = _aiEl('ai-provider');
             sel.innerHTML = Object.keys(AI_PROVIDERS).map(k => `<option value="${k}">${esc(AI_PROVIDERS[k].label)}</option>`).join('');
             sel.value = AI_PROVIDERS[o.provider] ? o.provider : 'gemini';
@@ -3432,24 +3589,21 @@
         }
 
         function syncAutoSnapButtonUI() {
-            const btn = document.getElementById('btn-restore-autosnap');
-            const txt = document.getElementById('autosnap-btn-text');
-            if (!btn) return;
+            const wrap = document.getElementById('autosnap-section-wrap');
+            const meta = document.getElementById('autosnap-meta-label');
+            if (!wrap) return;
             try {
                 const raw = localStorage.getItem(AUTO_SNAP_KEY);
-                if (!raw) { btn.classList.add('hidden'); btn.classList.remove('flex'); return; }
+                if (!raw) { wrap.classList.add('hidden'); return; }
                 const snap = JSON.parse(raw);
                 if (snap && Array.isArray(snap.items) && snap.items.length > 0) {
-                    if (txt) txt.textContent = `Авто-зліпок (${snap.items.length} шт. • ${snap.dateLabel || ''})`;
-                    btn.classList.remove('hidden');
-                    btn.classList.add('flex');
+                    if (meta) meta.textContent = `${snap.items.length} шт. • ${snap.dateLabel || ''}`;
+                    wrap.classList.remove('hidden');
                 } else {
-                    btn.classList.add('hidden');
-                    btn.classList.remove('flex');
+                    wrap.classList.add('hidden');
                 }
             } catch (e) {
-                btn.classList.add('hidden');
-                btn.classList.remove('flex');
+                wrap.classList.add('hidden');
             }
         }
 
@@ -3475,7 +3629,7 @@
                 saveStateToStorage();
                 renderFoldersInMenu();
                 renderApp();
-                closeMobileSidebar();
+                closeSettingsSheet(); closeMobileSidebar();
                 showToast(`Авто-зліпок відновлено: +${added} нових, оновлено ${updated} ✓`, 4500);
             } catch (e) {
                 showToast('Помилка читання авто-зліпка');
@@ -3544,7 +3698,7 @@
                             }
                         });
                         if (Array.isArray(maybeJson.lockedFolders)) maybeJson.lockedFolders.forEach(f => LOCKED_FOLDERS.add(f));
-                        saveStateToStorage(); checkAndSaveWeeklyAutoSnapshot(true); renderFoldersInMenu(); renderApp(); closeMobileSidebar();
+                        saveStateToStorage(); checkAndSaveWeeklyAutoSnapshot(true); renderFoldersInMenu(); renderApp(); closeSettingsSheet(); closeMobileSidebar();
                         showToast(shouldUpdateDups ? `${t('restoredJson')}+${added} нових, оновлено ${updated} ✓` : `${t('restoredJson')}+${added} (пропущено дублів: ${dups})`, 4500);
                         return;
                     }
@@ -3590,7 +3744,7 @@
                         }
                     });
                 }
-                saveStateToStorage(); checkAndSaveWeeklyAutoSnapshot(true); renderFoldersInMenu(); renderApp(); closeMobileSidebar();
+                saveStateToStorage(); checkAndSaveWeeklyAutoSnapshot(true); renderFoldersInMenu(); renderApp(); closeSettingsSheet(); closeMobileSidebar();
                 if (isOfflineNow) {
                     showToast(t('aiAddedOffline'), 4500);
                 } else if (shouldUpdateDups && updated > 0) {
@@ -4412,6 +4566,7 @@
                     else if (bdAction === 'close-cats-sheet') closeCategoriesSheet();
                     else if (bdAction === 'close-tags-sheet') closeTagsSheet();
                     else if (bdAction === 'close-about-sheet') closeAboutSheet();
+                    else if (bdAction === 'close-settings-sheet') closeSettingsSheet();
                     else if (bdAction === 'close-ai-sheet') closeAiSheet();
                     else if (bdAction === 'close-edit-sheet') closeEditSheet();
                     return;
@@ -4434,6 +4589,12 @@
                     case 'close-cats-sheet': closeCategoriesSheet(); break;
                     case 'open-tags-sheet': openTagsSheet(); break;
                     case 'close-tags-sheet': closeTagsSheet(); break;
+                    case 'open-settings-sheet': openSettingsSheet(); break;
+                    case 'close-settings-sheet': closeSettingsSheet(); break;
+                    case 'set-font-scale': setFontScale(actionEl.dataset.scale); break;
+                    case 'set-import-dup-mode': setImportDupMode(actionEl.dataset.mode); break;
+                    case 'trigger-import-file': triggerAIFileImport(importDuplicateMode); break;
+                    case 'toggle-select-mode-from-sidebar': closeMobileSidebar(); toggleSelectMode(); break;
                     case 'open-about-sheet': openAboutSheet(); break;
                     case 'close-about-sheet': closeAboutSheet(); break;
                     case 'open-ai-sheet': openAiSheet(); break;
@@ -4544,6 +4705,7 @@
             attachSidebarSwipe(); attachSidebarOpenSwipe();
             attachSheetDrag('cats-drag-handle', 'cats-sheet-panel', closeCategoriesSheet);
             attachSheetDrag('tags-drag-handle', 'tags-sheet-panel', closeTagsSheet);
+            attachSheetDrag('settings-drag-handle', 'settings-sheet-panel', closeSettingsSheet);
             attachSheetDrag('about-drag-handle', 'about-sheet-panel', closeAboutSheet);
             attachSheetDrag('ai-drag-handle', 'ai-sheet-panel', closeAiSheet);
             attachSheetDrag('edit-drag-handle', 'edit-sheet-panel', closeEditSheet);
