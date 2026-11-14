@@ -634,21 +634,21 @@
         </div>
 
         <div class="p-4 border-t space-y-2 touch-none" style="border-color: var(--border-main)">
-            <div id="import-choice-bar" class="hidden flex-col gap-1.5 p-2 rounded-xl theme-input">
-                <div class="flex items-center justify-between px-1">
-                    <span class="text-[10px] font-mono-code font-bold uppercase theme-muted">Дублікати при імпорті:</span>
-                    <button type="button" data-action="restore-auto-snapshot" id="btn-restore-autosnap" class="hidden text-[10px] font-mono-code font-bold text-accent hover:underline">↺ Авто-зліпок</button>
-                </div>
+            <div id="import-choice-bar" class="hidden flex-col gap-1.5 p-1.5 rounded-xl theme-input">
                 <div class="grid grid-cols-2 gap-1.5">
-                    <button data-action="import-with-mode" data-mode="skip" class="key-press py-2 px-2 rounded-lg theme-card border text-xs font-bold flex items-center justify-center gap-1">
+                    <button data-action="import-with-mode" data-mode="skip" class="key-press py-2 px-2.5 rounded-lg theme-card border text-xs font-bold flex items-center justify-center gap-1.5">
                         <span class="font-mono-code text-accent">⏭</span>
-                        <span>Пропускати</span>
+                        <span>Без дублів</span>
                     </button>
-                    <button data-action="import-with-mode" data-mode="update" class="key-press py-2 px-2 rounded-lg theme-card border text-xs font-bold flex items-center justify-center gap-1">
+                    <button data-action="import-with-mode" data-mode="update" class="key-press py-2 px-2.5 rounded-lg theme-card border text-xs font-bold flex items-center justify-center gap-1.5">
                         <span class="font-mono-code text-accent">↻</span>
                         <span>Оновлювати</span>
                     </button>
                 </div>
+                <button type="button" data-action="restore-auto-snapshot" id="btn-restore-autosnap" class="hidden key-press w-full py-2 px-2.5 rounded-lg theme-card border text-xs font-bold items-center justify-center gap-1.5">
+                    <span class="font-mono-code text-accent">↺</span>
+                    <span id="autosnap-btn-text" class="truncate">Відновити авто-зліпок</span>
+                </button>
             </div>
             <div id="export-choice-bar" class="hidden grid-cols-2 gap-1.5 p-1.5 rounded-xl theme-input">
                 <button data-action="export-html" class="key-press py-2 px-2.5 rounded-lg theme-card border text-xs font-bold flex items-center justify-center gap-1.5">
@@ -715,7 +715,6 @@
                             <button id="offline-queue-pill" data-action="process-offline" data-stop="1" title="Черга офлайн-посилань" class="hidden text-[10px] font-mono-code font-bold px-1.5 py-0.5 rounded-md bg-amber-500/20 text-amber-600 border border-amber-500/40 shrink-0 items-center gap-1">
                                 <span>⏳</span><span id="offline-queue-count">0</span>
                             </button>
-                            <span id="active-filter-pill" class="hidden text-[10px] font-mono-code font-bold px-1.5 py-0.5 rounded-md bg-accent/15 text-accent border border-accent/30 truncate max-w-[120px] sm:max-w-[180px]"></span>
                         </div>
                     </div>
                 </div>
@@ -2305,12 +2304,7 @@
                 if (offlineCount > 0) { offlineCountEl.textContent = `${offlineCount}`; offlinePill.classList.remove('hidden'); offlinePill.classList.add('inline-flex'); }
                 else { offlinePill.classList.add('hidden'); offlinePill.classList.remove('inline-flex'); }
             }
-            const filterPill = document.getElementById('active-filter-pill');
-            if (selectedTag) { filterPill.textContent = `${selectedTag} ✕`; filterPill.classList.remove('hidden'); }
-            else if (selectedFolder === OFFLINE_FOLDER_KEY) { filterPill.textContent = `${t('offlineFolderName')} ✕`; filterPill.classList.remove('hidden'); }
-            else if (selectedFolder === UNREAD_FOLDER_KEY) { filterPill.textContent = `NEW (${ITEMS.filter(i => i.isRead === false).length}) ✕`; filterPill.classList.remove('hidden'); }
-            else if (selectedFolder !== 'ALL') { filterPill.textContent = `${selectedFolder} ✕`; filterPill.classList.remove('hidden'); }
-            else { filterPill.classList.add('hidden'); }
+
 
             renderFoldersInMenu(); renderSidebarTagsPreview(); renderPinnedBar();
             const filtered = getFilteredItems(); const cardsEl = document.getElementById('cards-container');
@@ -3439,19 +3433,23 @@
 
         function syncAutoSnapButtonUI() {
             const btn = document.getElementById('btn-restore-autosnap');
+            const txt = document.getElementById('autosnap-btn-text');
             if (!btn) return;
             try {
                 const raw = localStorage.getItem(AUTO_SNAP_KEY);
-                if (!raw) { btn.classList.add('hidden'); return; }
+                if (!raw) { btn.classList.add('hidden'); btn.classList.remove('flex'); return; }
                 const snap = JSON.parse(raw);
                 if (snap && Array.isArray(snap.items) && snap.items.length > 0) {
-                    btn.textContent = `↺ Авто-зліпок (${snap.items.length} шт. • ${snap.dateLabel || ''})`;
+                    if (txt) txt.textContent = `Авто-зліпок (${snap.items.length} шт. • ${snap.dateLabel || ''})`;
                     btn.classList.remove('hidden');
+                    btn.classList.add('flex');
                 } else {
                     btn.classList.add('hidden');
+                    btn.classList.remove('flex');
                 }
             } catch (e) {
                 btn.classList.add('hidden');
+                btn.classList.remove('flex');
             }
         }
 
