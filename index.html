@@ -518,6 +518,20 @@
             border-color: rgb(var(--accent-rgb) / 0.55);
             box-shadow: 0 8px 22px -3px rgb(var(--accent-rgb) / 0.32);
         }
+
+        .whitespace-normal { white-space: normal; }
+        .break-words { overflow-wrap: break-word; word-break: break-word; }
+        #action-toast #toast-message {
+            white-space: normal;
+            overflow-wrap: break-word;
+            word-break: break-word;
+            text-align: center;
+            line-height: 1.35;
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 3;
+            overflow: hidden;
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
@@ -620,6 +634,22 @@
         </div>
 
         <div class="p-4 border-t space-y-2 touch-none" style="border-color: var(--border-main)">
+            <div id="import-choice-bar" class="hidden flex-col gap-1.5 p-2 rounded-xl theme-input">
+                <div class="flex items-center justify-between px-1">
+                    <span class="text-[10px] font-mono-code font-bold uppercase theme-muted">Дублікати при імпорті:</span>
+                    <button type="button" data-action="restore-auto-snapshot" id="btn-restore-autosnap" class="hidden text-[10px] font-mono-code font-bold text-accent hover:underline">↺ Авто-зліпок</button>
+                </div>
+                <div class="grid grid-cols-2 gap-1.5">
+                    <button data-action="import-with-mode" data-mode="skip" class="key-press py-2 px-2 rounded-lg theme-card border text-xs font-bold flex items-center justify-center gap-1">
+                        <span class="font-mono-code text-accent">⏭</span>
+                        <span>Пропускати</span>
+                    </button>
+                    <button data-action="import-with-mode" data-mode="update" class="key-press py-2 px-2 rounded-lg theme-card border text-xs font-bold flex items-center justify-center gap-1">
+                        <span class="font-mono-code text-accent">↻</span>
+                        <span>Оновлювати</span>
+                    </button>
+                </div>
+            </div>
             <div id="export-choice-bar" class="hidden grid-cols-2 gap-1.5 p-1.5 rounded-xl theme-input">
                 <button data-action="export-html" class="key-press py-2 px-2.5 rounded-lg theme-card border text-xs font-bold flex items-center justify-center gap-1.5">
                     <span class="font-mono-code text-accent">.HTML</span>
@@ -1085,9 +1115,9 @@
     </div>
 
     <!-- Тост уведомлений -->
-    <div id="action-toast" class="fixed bottom-6 inset-x-4 max-w-sm mx-auto bg-[#1A1C20] text-white px-4 py-3.5 rounded-xl shadow-2xl hidden items-center justify-between  text-sm font-medium touch-pan-x gap-3 border border-white/5" style="will-change: transform, opacity; z-index: 99999;">
-        <span id="toast-message" class="truncate flex-1 text-[#E5E7EB]">Скопійовано</span>
-        <button data-action="hide-toast" class="text-accent font-black shrink-0 uppercase text-[11px] tracking-wider px-2 py-1 rounded-md hover:bg-white/10 transition active:scale-95">OK</button>
+    <div id="action-toast" class="fixed bottom-6 inset-x-4 max-w-sm mx-auto bg-[#1A1C20] text-white px-4 py-3 rounded-xl shadow-2xl hidden items-center justify-between text-sm font-medium touch-pan-x gap-3 border border-white/5" style="will-change: transform, opacity; z-index: 99999;">
+        <span id="toast-message" class="flex-1 text-center text-[#E5E7EB]">Скопійовано</span>
+        <button data-action="hide-toast" class="text-accent font-black shrink-0 uppercase text-[11px] tracking-wider px-2.5 py-1.5 rounded-md hover:bg-white/10 transition active:scale-95">OK</button>
     </div>
 
     <script>
@@ -1116,6 +1146,9 @@
         let isMobileSidebarOpen = false;
         let pendingDeleteAction = null;
         const OFFLINE_FOLDER_KEY = '__OFFLINE_QUEUE__';
+        const UNREAD_FOLDER_KEY = '__UNREAD_ONLY__';
+        const AUTO_SNAP_KEY = 'linkbox_weekly_autosnap_v1';
+        let importDuplicateMode = 'skip';
 
         const DICT = {
             uk: {
@@ -1142,7 +1175,7 @@
                 aboutSheetTitle: 'Як усе влаштовано', pinBtn: 'На головну у Pin-бар',
                 pinnedToast: 'Закріплено у швидкій панелі на головній', unpinnedToast: 'Відкріплено зі швидкої панелі',
                 priorityBtn: 'Пріоритет у папці', priorityActiveBtn: 'У топі папки ★',
-                offlineFolderName: '⏳ Очікують мережі', offlineBadge: '⏳ Очікує мережі',
+                offlineFolderName: '⏳ Очікують мережі', offlineBadge: '⏳ Очікує мережі', unreadFolderName: '🔥 Непрочитані (NEW)',
                 offlineSyncedToast: 'Мережа з’явилась! Оброблено посилань: ', offlineStillNoNet: 'Немає з’єднання. Посилання чекають на інтернет ⏳',
                 sortNewest: '↓ Нові', sortOldest: '↑ Старі', sortAZ: 'А–Я', tagSortPopular: 'Популярні',
                 fontScaleLabel: 'Розмір тексту'
@@ -1223,6 +1256,7 @@
 
         async function saveStateToStorage() {
             try {
+                checkAndSaveWeeklyAutoSnapshot(false);
                 const state = { items: ITEMS, lockedFolders: Array.from(LOCKED_FOLDERS), themeMode, viewMode, sortMode, fontScale };
                 const db = await getDB();
                 const tx = db.transaction(STORE_NAME, 'readwrite');
@@ -1798,6 +1832,7 @@
             let filtered = [];
             if (selectedFolder === 'ALL') filtered = [...ITEMS];
             else if (selectedFolder === OFFLINE_FOLDER_KEY) filtered = ITEMS.filter(i => i.pendingOffline);
+            else if (selectedFolder === UNREAD_FOLDER_KEY) filtered = ITEMS.filter(i => i.isRead === false);
             else filtered = ITEMS.filter(i => getItemCats(i).includes(selectedFolder));
 
             if (selectedTag) filtered = filtered.filter(i => Array.isArray(i.tags) && i.tags.some(tg => tg.toLowerCase() === selectedTag.toLowerCase()));
@@ -1909,11 +1944,11 @@
         }
 
         let toastTimeout = null;
-        function showToast(msg) {
+        function showToast(msg, duration = 3000) {
             const toast = document.getElementById('action-toast'); document.getElementById('toast-message').textContent = msg;
             toast.classList.remove('hidden'); toast.classList.add('flex'); toast.style.transform = 'translateX(0)'; toast.style.opacity = '1';
             if (toastTimeout) clearTimeout(toastTimeout);
-            toastTimeout = setTimeout(() => { hideToast(); }, 3000);
+            toastTimeout = setTimeout(() => { hideToast(); }, duration);
         }
         function hideToast() {
             const toast = document.getElementById('action-toast'); toast.style.opacity = '0';
@@ -1964,7 +1999,12 @@
             else if (catsSortMode === 'za') cats.sort((a, b) => b.cat.localeCompare(a.cat, 'uk'));
 
             const isAll = selectedFolder === 'ALL' && !selectedTag;
+            const unreadCount = ITEMS.filter(i => i.isRead === false).length;
             let html = `<button data-action="select-cat-sheet" data-cat="ALL" class="key-press rounded-lg px-3.5 py-2.5 flex items-center justify-between transition ${isAll ? 'bg-accent text-onaccent' : 'theme-input'}"><span class="text-xs sm:text-sm font-bold">${t('allFolders')}</span><span class="text-xs font-mono-code font-bold opacity-80">${ITEMS.length}</span></button>`;
+            if (unreadCount > 0) {
+                const isUnr = selectedFolder === UNREAD_FOLDER_KEY;
+                html += `<button data-action="select-cat-sheet" data-cat="${UNREAD_FOLDER_KEY}" class="key-press rounded-lg px-3.5 py-2.5 flex items-center justify-between border border-accent/40 transition ${isUnr ? 'bg-accent text-onaccent' : 'bg-accent/15 text-accent'}"><span class="text-xs sm:text-sm font-bold">${t('unreadFolderName')}</span><span class="text-xs font-mono-code font-bold">${unreadCount}</span></button>`;
+            }
             html += cats.map(c => {
                 const active = selectedFolder === c.cat; const folderLocked = LOCKED_FOLDERS.has(c.cat); const safeCat = escJsAttr(c.cat); const safeColor = sanitizeColor(c.color);
                 return `<div class="rounded-lg flex items-stretch overflow-hidden ${active ? 'text-white' : 'theme-input'}" style="${active ? `background:${safeColor};` : ''}"><button data-action="select-cat-sheet" data-cat="${esc(c.cat)}" class="key-press flex-1 px-3.5 py-2.5 text-left flex items-center justify-between min-w-0"><div class="flex items-center gap-2.5 min-w-0"><span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:${active ? '#fff' : safeColor}"></span><span class="text-xs sm:text-sm font-bold truncate">${esc(c.cat)}</span></div><span class="text-xs font-mono-code font-bold opacity-75 ml-2">${c.count}</span></button><button data-action="toggle-folder-lock" data-cat="${esc(c.cat)}" data-stop="1" class="key-press px-3 border-l flex items-center justify-center transition ${folderLocked ? (active ? 'bg-black/25 text-white' : 'bg-accent/15 text-accent') : 'opacity-45 hover:opacity-100'}" style="border-color: var(--border-main)">${folderLocked ? LINE_ICONS.lock : LINE_ICONS.unlock}</button></div>`;
@@ -2055,8 +2095,8 @@
                         <p class="theme-muted">У боковому меню: <b>3 види карток</b> (Малі, Великі, Список), <b>3 теми</b> (Світла, М’яка темна, чорний AMOLED), розмір шрифту (<b>A- / A / A+</b>), кнопка <b>«Рандом»</b> (відкриває випадковий незаблокований сайт) та <b>Календар активності</b>, де видно, що саме ти зберігав у конкретний день.</p>
                     </div>
                     <div class="theme-card border rounded-xl p-3.5 space-y-1">
-                        <div class="font-bold">10. Масові операції, Бекапи та Жести</div>
-                        <p class="theme-muted">Галочка в шапці вмикає <b>мульти-вибір</b> (групова зміна папок/тегів, шерінг списком, видалення). <b>Імпорт/Експорт</b> дружить із браузерним <code>.HTML</code> та повним бекапом <code>.JSON</code>. Свайп від лівого краю відкриває меню, свайп назад закриває шторки, а подвійний свайп на головній — закриває додаток.</p>
+                        <div class="font-bold">10. Фільтр NEW, Розумний Імпорт, Авто-зліпок та Жести</div>
+                        <p class="theme-muted">Є непрочитані лінки? У категоріях автоматично з’являється швидка папка <b>«🔥 Непрочитані (NEW)»</b>. Галочка в шапці вмикає <b>мульти-вибір</b>. Кнопка <b>Імпорт</b> дозволяє обрати, що робити з дублікатами (пропускати чи оновлювати старі), а також зберігає тижневий <b>авто-зліпок бази</b> про запас. Свайп зліва відкриває меню, справа — закриває шторки (подвійний свайп — вихід).</p>
                     </div>
                 </div>
                 <div class="theme-card border border-accent/40 rounded-xl p-4 text-center space-y-2 mt-3">
@@ -2118,7 +2158,12 @@
             const catsInlineCounterEl = document.getElementById('sidebar-cats-inline-counter'); if (catsInlineCounterEl) catsInlineCounterEl.textContent = cats.length;
             const tagsInlineCounterEl = document.getElementById('sidebar-tags-inline-counter'); if (tagsInlineCounterEl) tagsInlineCounterEl.textContent = getTagMapSorted('popular').length;
 
+            const unreadItems = ITEMS.filter(i => i.isRead === false);
             let html = '';
+            if (unreadItems.length > 0) {
+                const isUnreadActive = selectedFolder === UNREAD_FOLDER_KEY;
+                html += `<button data-action="select-folder" data-cat="${UNREAD_FOLDER_KEY}" class="key-press rounded-lg px-3 py-2 flex items-center justify-between border border-accent/40 transition ${isUnreadActive ? 'bg-accent text-onaccent' : 'bg-accent/15 text-accent'}"><span class="text-xs sm:text-sm font-bold">${t('unreadFolderName')}</span><span class="text-xs font-mono-code font-bold">${unreadItems.length}</span></button>`;
+            }
             if (offlineItems.length > 0) {
                 const isOffActive = selectedFolder === OFFLINE_FOLDER_KEY;
                 html += `<button data-action="select-folder" data-cat="${OFFLINE_FOLDER_KEY}" class="key-press rounded-lg px-3 py-2 flex items-center justify-between border border-amber-500/40 transition ${isOffActive ? 'bg-amber-600 text-white' : 'bg-amber-500/15 text-amber-600'}"><span class="text-xs sm:text-sm font-bold">${t('offlineFolderName')}</span><span class="text-xs font-mono-code font-bold">${offlineItems.length}</span></button>`;
@@ -2173,6 +2218,8 @@
 
         function toggleExportChoiceBar() {
             const bar = document.getElementById('export-choice-bar'); if (!bar) return;
+            const impBar = document.getElementById('import-choice-bar');
+            if (impBar && !impBar.classList.contains('hidden')) { impBar.classList.add('hidden'); impBar.classList.remove('flex'); }
             if (bar.classList.contains('hidden')) { bar.classList.remove('hidden'); bar.classList.add('grid'); } else { bar.classList.add('hidden'); bar.classList.remove('grid'); }
         }
 
@@ -2261,6 +2308,7 @@
             const filterPill = document.getElementById('active-filter-pill');
             if (selectedTag) { filterPill.textContent = `${selectedTag} ✕`; filterPill.classList.remove('hidden'); }
             else if (selectedFolder === OFFLINE_FOLDER_KEY) { filterPill.textContent = `${t('offlineFolderName')} ✕`; filterPill.classList.remove('hidden'); }
+            else if (selectedFolder === UNREAD_FOLDER_KEY) { filterPill.textContent = `NEW (${ITEMS.filter(i => i.isRead === false).length}) ✕`; filterPill.classList.remove('hidden'); }
             else if (selectedFolder !== 'ALL') { filterPill.textContent = `${selectedFolder} ✕`; filterPill.classList.remove('hidden'); }
             else { filterPill.classList.add('hidden'); }
 
@@ -3014,13 +3062,129 @@
         }
 
         let _isQueueRunning = false;
+        let _offlinePullStreak = 0;
+        let _onlineFreshStreak = 0;
+        let _offlineJokeDeck = [];
+        let _onlineJokeDeck = [];
+        let _lastKnownOnlineState = navigator.onLine;
+
+        const OFFLINE_FUNNY_TOASTS = [
+            'Годі тягнути, сказано ж — інтернету немає! 📵',
+            'Не тягни так сильно, стрічку відірвеш! 🪢',
+            'Тягни-не тягни, а гігабайти з повітря не з’являться 🤷‍♂️',
+            'Ти що, намагаєшся вручну накачати інтернет? 💪',
+            'Тут риби немає! І мережі теж 🐟',
+            'Супутники Starlink тебе чують, але просять увімкнути Wi-Fi 🛰️',
+            'Може, глянеш у вікно або завариш чайку? Мережі досі нуль ☕',
+            'Стопе! Пружинка кружечка вже димить від тертя 🔥',
+            'Роутер передає привіт і каже, що він у відпустці 🏖️',
+            'Ще один свайп — і я почну генерувати сайти силою думки 🧠'
+        ];
+
+        const ONLINE_FUNNY_TOASTS = [
+            'Свіжіше вже нікуди, бро! Усе на місці ✨',
+            'Інтернет є, лінки на місці. Руки чешуться? 😄',
+            'Не смикай, вже все завантажилось на 146%! 🚀',
+            'Ти тренуєш великий палець чи шукаєш секретний рівень? 🎮',
+            'Тут усе синхронізовано до останнього пікселя 👌',
+            'Гортай вниз і читай закладки, годі смикати кружечок! 📚',
+            'Сервери Google вже червоніють від твоєї уваги 😳',
+            'Новіше не стане, навіть якщо потягнути до підлоги 🧲'
+        ];
+
+        function _drawFromDeck(sourceList, deckRef) {
+            if (deckRef.length === 0) {
+                const indices = sourceList.map((_, i) => i);
+                for (let i = indices.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [indices[i], indices[j]] = [indices[j], indices[i]];
+                }
+                deckRef.push(...indices);
+            }
+            return sourceList[deckRef.shift()];
+        }
+
+        function getNextOfflinePullMessage() {
+            _onlineFreshStreak = 0;
+            _offlinePullStreak++;
+            if (_offlinePullStreak <= 2) {
+                return t('offlineStillNoNet');
+            }
+            return _drawFromDeck(OFFLINE_FUNNY_TOASTS, _offlineJokeDeck);
+        }
+
+        function getNextOnlinePullMessage() {
+            _offlinePullStreak = 0;
+            _onlineFreshStreak++;
+            if (_onlineFreshStreak <= 2) {
+                return 'Усе актуально та синхронізовано ✓';
+            }
+            return _drawFromDeck(ONLINE_FUNNY_TOASTS, _onlineJokeDeck);
+        }
+
+        // Реальна перевірка виходу в інтернет (щоб WebView не брехав через navigator.onLine)
+        function checkRealInternet(timeoutMs = 1800) {
+            if (!navigator.onLine) return Promise.resolve(false);
+            return new Promise((resolve) => {
+                let settled = false;
+                const done = (val) => {
+                    if (!settled) {
+                        settled = true;
+                        clearTimeout(timer);
+                        resolve(val);
+                    }
+                };
+                const timer = setTimeout(() => done(false), timeoutMs);
+
+                // Перевірка через легке зображення з анти-кешем (працює без CORS у будь-якому WebView та браузері)
+                const probe = new Image();
+                probe.onload = () => done(true);
+                probe.onerror = () => {
+                    // Запасний маячок на випадок блокування першого домену
+                    fetch('https://www.google.com/generate_204?_t=' + Date.now(), {
+                        method: 'GET',
+                        mode: 'no-cors',
+                        cache: 'no-store'
+                    }).then(() => done(true)).catch(() => done(false));
+                };
+                probe.src = 'https://www.google.com/favicon.ico?_ping=' + Date.now() + '_' + Math.random().toString(36).slice(2, 7);
+            });
+        }
+
+        function reloadFailedFavicons() {
+            let retried = 0;
+            document.querySelectorAll('img[data-favicon="1"]').forEach(img => {
+                const cleanDom = img.getAttribute('data-domain');
+                if (!cleanDom) return;
+                const isHidden = img.style.display === 'none';
+                const isBroken = img.complete && img.naturalWidth === 0;
+                if (isHidden || isBroken) {
+                    const fallback = img.nextElementSibling;
+                    if (fallback) {
+                        fallback.classList.add('hidden');
+                        fallback.classList.remove('flex');
+                    }
+                    img.style.display = '';
+                    img.dataset.g = '1';
+                    img.dataset.fb = [`https://${cleanDom}/favicon.ico`, `https://icons.duckduckgo.com/ip3/${cleanDom}.ico`].join('|');
+                    img.src = `https://www.google.com/s2/favicons?domain=${encodeURIComponent(cleanDom)}&sz=64&_t=${Date.now()}`;
+                    retried++;
+                }
+            });
+            return retried;
+        }
+
         async function processOfflineQueue(manualTap = false) {
             const pending = ITEMS.filter(i => i.pendingOffline);
-            if (pending.length === 0 || _isQueueRunning) return;
-            if (!navigator.onLine) {
-                if (manualTap) { selectedFolder = OFFLINE_FOLDER_KEY; renderApp(); showToast(getNextOfflinePullMessage()); }
-                return;
+            if (pending.length === 0 || _isQueueRunning) return 0;
+            const onlineNow = await checkRealInternet();
+            if (!onlineNow) {
+                _lastKnownOnlineState = false;
+                if (manualTap) { selectedFolder = OFFLINE_FOLDER_KEY; renderApp(); showToast(getNextOfflinePullMessage(), 5000); }
+                return 0;
             }
+            _lastKnownOnlineState = true;
+            _offlinePullStreak = 0;
             _isQueueRunning = true; _aiBatchError = '';
             let processedCount = 0;
             const offlineCountEl = document.getElementById('offline-queue-count');
@@ -3058,88 +3222,40 @@
                     if (selectedFolder === OFFLINE_FOLDER_KEY && ITEMS.filter(i => i.pendingOffline).length === 0) selectedFolder = 'ALL';
                     saveStateToStorage();
                     renderApp();
-                    showToast(`${t('offlineSyncedToast')}${processedCount} ✓`);
-                    if (_aiBatchError) setTimeout(() => showToast('ШІ недоступний (' + _aiBatchError + '), працюють вбудовані правила'), 1800);
+                    showToast(`${t('offlineSyncedToast')}${processedCount} ✓`, 5000);
+                    if (_aiBatchError) setTimeout(() => showToast('ШІ недоступний (' + _aiBatchError + '), працюють вбудовані правила', 5000), 1800);
                 }
             }
-        }
-
-        let _offlinePullStreak = 0;
-        let _lastOfflineJokeIdx = -1;
-        let _onlineFreshStreak = 0;
-
-        const OFFLINE_FUNNY_TOASTS = [
-            'Годі тягнути, сказано ж — інтернету немає! 📵',
-            'Не тягни так сильно, стрічку відірвеш! 🪢',
-            'Тягни-не тягни, а гігабайти з повітря не з’являться 🤷‍♂️',
-            'Ти що, намагаєшся вручну накачати інтернет? 💪',
-            'Тут риби немає! І мережі теж 🐟',
-            'Супутники Starlink тебе чують, але просять увімкнути Wi-Fi 🛰️',
-            'Може, глянеш у вікно або завариш чайку? Мережі досі нуль ☕',
-            'Стопе! Пружинка кружечка вже димить від тертя 🔥',
-            'Роутер передає привіт і каже, що він у відпустці 🏖️',
-            'Ще один свайп — і я почну генерувати сайти силою думки 🧠'
-        ];
-
-        function getNextOfflinePullMessage() {
-            _offlinePullStreak++;
-            if (_offlinePullStreak === 1) {
-                return t('offlineStillNoNet');
-            }
-            let idx = Math.floor(Math.random() * OFFLINE_FUNNY_TOASTS.length);
-            if (idx === _lastOfflineJokeIdx && OFFLINE_FUNNY_TOASTS.length > 1) {
-                idx = (idx + 1) % OFFLINE_FUNNY_TOASTS.length;
-            }
-            _lastOfflineJokeIdx = idx;
-            return OFFLINE_FUNNY_TOASTS[idx];
-        }
-
-        function reloadFailedFavicons() {
-            let retried = 0;
-            document.querySelectorAll('img[data-favicon="1"]').forEach(img => {
-                const cleanDom = img.getAttribute('data-domain');
-                if (!cleanDom) return;
-                const isHidden = img.style.display === 'none';
-                const isBroken = img.complete && img.naturalWidth === 0;
-                if (isHidden || isBroken) {
-                    const fallback = img.nextElementSibling;
-                    if (fallback) {
-                        fallback.classList.add('hidden');
-                        fallback.classList.remove('flex');
-                    }
-                    img.style.display = '';
-                    img.dataset.g = '1';
-                    img.dataset.fb = [`https://${cleanDom}/favicon.ico`, `https://icons.duckduckgo.com/ip3/${cleanDom}.ico`].join('|');
-                    img.src = `https://www.google.com/s2/favicons?domain=${encodeURIComponent(cleanDom)}&sz=64&_t=${Date.now()}`;
-                    retried++;
-                }
-            });
-            return retried;
+            return processedCount;
         }
 
         async function handlePullToRefresh() {
-            if (!navigator.onLine) {
-                showToast(getNextOfflinePullMessage());
+            const isReallyOnline = await checkRealInternet();
+            if (!isReallyOnline) {
+                _lastKnownOnlineState = false;
+                showToast(getNextOfflinePullMessage(), 5000);
                 return;
             }
-            _offlinePullStreak = 0;
-            const pendingCount = ITEMS.filter(i => i.pendingOffline).length;
-            const retriedIcons = reloadFailedFavicons();
 
+            const justCameBackOnline = !_lastKnownOnlineState || _offlinePullStreak > 0;
+            _lastKnownOnlineState = true;
+            _offlinePullStreak = 0;
+
+            // Тихо довантажуємо фавіконки на фоні, якщо якісь не провантажились в офлайні
+            reloadFailedFavicons();
+
+            const pendingCount = ITEMS.filter(i => i.pendingOffline).length;
             if (pendingCount > 0) {
                 _onlineFreshStreak = 0;
                 await processOfflineQueue(true);
-            } else {
-                _onlineFreshStreak++;
-                await new Promise(r => setTimeout(r, 380));
-                if (retriedIcons > 0) {
-                    showToast(`Оновлено іконок сайтів: ${retriedIcons} ✓`);
-                } else if (_onlineFreshStreak >= 3) {
-                    showToast('Свіжіше вже нікуди, бро! Усе на місці ✨');
-                } else {
-                    showToast('Усе актуально та синхронізовано ✓');
-                }
+                return;
             }
+
+            if (justCameBackOnline) {
+                _onlineFreshStreak = 0;
+            }
+
+            showToast(getNextOnlinePullMessage(), 5000);
         }
 
         function attachPullToRefresh() {
@@ -3243,7 +3359,20 @@
             document.addEventListener('touchcancel', finishPull, { passive: true });
         }
 
-        window.addEventListener('online', () => { _offlinePullStreak = 0; reloadFailedFavicons(); processOfflineQueue(false); });
+        window.addEventListener('online', async () => {
+            const reallyOnline = await checkRealInternet();
+            if (reallyOnline) {
+                _lastKnownOnlineState = true;
+                _offlinePullStreak = 0;
+                _onlineFreshStreak = 0;
+                reloadFailedFavicons();
+                processOfflineQueue(false);
+            }
+        });
+        window.addEventListener('offline', () => {
+            _lastKnownOnlineState = false;
+            _onlineFreshStreak = 0;
+        });
 
         function highlightExistingCard(item) {
             if (selectedFolder !== 'ALL' && !getItemCats(item).includes(selectedFolder)) selectedFolder = 'ALL';
@@ -3280,48 +3409,198 @@
             }
         }
 
-        function triggerAIFileImport() { const fileInput = document.getElementById('ai-import-file'); if (fileInput) { fileInput.value = ''; fileInput.click(); } }
+        function checkAndSaveWeeklyAutoSnapshot(force = false) {
+            try {
+                if (!Array.isArray(ITEMS) || ITEMS.length === 0) return;
+                const raw = localStorage.getItem(AUTO_SNAP_KEY);
+                const now = Date.now();
+                const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+                let shouldSnap = force;
+                if (!raw) {
+                    shouldSnap = true;
+                } else {
+                    const parsed = JSON.parse(raw);
+                    if (!parsed.savedAt || (now - parsed.savedAt) >= WEEK_MS || (ITEMS.length > (parsed.count || 0) + 10)) {
+                        shouldSnap = true;
+                    }
+                }
+                if (shouldSnap) {
+                    const snap = {
+                        savedAt: now,
+                        dateLabel: new Date(now).toLocaleDateString('uk-UA'),
+                        count: ITEMS.length,
+                        items: ITEMS,
+                        lockedFolders: Array.from(LOCKED_FOLDERS)
+                    };
+                    localStorage.setItem(AUTO_SNAP_KEY, JSON.stringify(snap));
+                }
+            } catch (e) {}
+        }
+
+        function syncAutoSnapButtonUI() {
+            const btn = document.getElementById('btn-restore-autosnap');
+            if (!btn) return;
+            try {
+                const raw = localStorage.getItem(AUTO_SNAP_KEY);
+                if (!raw) { btn.classList.add('hidden'); return; }
+                const snap = JSON.parse(raw);
+                if (snap && Array.isArray(snap.items) && snap.items.length > 0) {
+                    btn.textContent = `↺ Авто-зліпок (${snap.items.length} шт. • ${snap.dateLabel || ''})`;
+                    btn.classList.remove('hidden');
+                } else {
+                    btn.classList.add('hidden');
+                }
+            } catch (e) {
+                btn.classList.add('hidden');
+            }
+        }
+
+        function restoreFromAutoSnapshot() {
+            try {
+                const raw = localStorage.getItem(AUTO_SNAP_KEY);
+                if (!raw) { showToast('Авто-зліпок ще не створено'); return; }
+                const snap = JSON.parse(raw);
+                if (!snap || !Array.isArray(snap.items)) return;
+                let added = 0, updated = 0;
+                snap.items.forEach(it => {
+                    const existing = findDuplicateItem(it.url);
+                    if (existing) {
+                        Object.assign(existing, { title: it.title || existing.title, note: it.note || existing.note, cats: getItemCats(it), cat: getItemCats(it)[0], tags: it.tags || existing.tags });
+                        updated++;
+                    } else {
+                        const normCats = getItemCats(it);
+                        ITEMS.push({ ...it, url: cleanRawUrl(it.url), color: sanitizeColor(it.color), cat: normCats[0], cats: normCats, isRead: it.isRead !== false });
+                        added++;
+                    }
+                });
+                if (Array.isArray(snap.lockedFolders)) snap.lockedFolders.forEach(f => LOCKED_FOLDERS.add(f));
+                saveStateToStorage();
+                renderFoldersInMenu();
+                renderApp();
+                closeMobileSidebar();
+                showToast(`Авто-зліпок відновлено: +${added} нових, оновлено ${updated} ✓`, 4500);
+            } catch (e) {
+                showToast('Помилка читання авто-зліпка');
+            }
+        }
+
+        function toggleImportChoiceBar() {
+            const bar = document.getElementById('import-choice-bar');
+            const expBar = document.getElementById('export-choice-bar');
+            if (!bar) return;
+            if (expBar && !expBar.classList.contains('hidden')) {
+                expBar.classList.add('hidden');
+                expBar.classList.remove('grid');
+            }
+            syncAutoSnapButtonUI();
+            if (bar.classList.contains('hidden')) {
+                bar.classList.remove('hidden');
+                bar.classList.add('flex');
+            } else {
+                bar.classList.add('hidden');
+                bar.classList.remove('flex');
+            }
+        }
+
+        function triggerAIFileImport(mode = 'skip') {
+            importDuplicateMode = mode === 'update' ? 'update' : 'skip';
+            const bar = document.getElementById('import-choice-bar');
+            if (bar) { bar.classList.add('hidden'); bar.classList.remove('flex'); }
+            const fileInput = document.getElementById('ai-import-file');
+            if (fileInput) { fileInput.value = ''; fileInput.click(); }
+        }
 
         function handleAIFileImport(event) {
             const file = event.target.files?.[0]; if (!file) return;
             const reader = new FileReader();
             reader.onload = (e) => {
                 const content = String(e.target?.result || '');
+                const shouldUpdateDups = importDuplicateMode === 'update';
                 try {
                     const maybeJson = JSON.parse(content);
                     if (maybeJson && Array.isArray(maybeJson.items)) {
-                        let added = 0, dups = 0;
+                        let added = 0, dups = 0, updated = 0;
                         maybeJson.items.forEach(it => {
-                            if (findDuplicateItem(it.url)) dups++;
-                            else {
+                            const existing = findDuplicateItem(it.url);
+                            if (existing) {
+                                dups++;
+                                if (shouldUpdateDups) {
+                                    const normCats = getItemCats(it);
+                                    Object.assign(existing, {
+                                        name: it.name || existing.name,
+                                        title: it.title || existing.title,
+                                        note: it.note || existing.note,
+                                        cat: normCats[0],
+                                        cats: normCats,
+                                        color: sanitizeColor(it.color || existing.color),
+                                        tags: Array.isArray(it.tags) && it.tags.length ? it.tags : existing.tags,
+                                        pinned: Boolean(it.pinned ?? existing.pinned),
+                                        folderPriority: Boolean(it.folderPriority ?? existing.folderPriority)
+                                    });
+                                    updated++;
+                                }
+                            } else {
                                 const normCats = getItemCats(it);
-                                ITEMS.push({ ...it, url: cleanRawUrl(it.url), color: sanitizeColor(it.color), cat: normCats[0], cats: normCats, pinned: Boolean(it.pinned), folderPriority: Boolean(it.folderPriority), pendingOffline: Boolean(it.pendingOffline), lockedOverride: typeof it.lockedOverride === 'boolean' ? it.lockedOverride : null, faviconData: it.faviconData });
+                                ITEMS.push({ ...it, url: cleanRawUrl(it.url), color: sanitizeColor(it.color), cat: normCats[0], cats: normCats, pinned: Boolean(it.pinned), folderPriority: Boolean(it.folderPriority), pendingOffline: Boolean(it.pendingOffline), lockedOverride: typeof it.lockedOverride === 'boolean' ? it.lockedOverride : null, isRead: it.isRead !== false });
                                 added++;
                             }
                         });
                         if (Array.isArray(maybeJson.lockedFolders)) maybeJson.lockedFolders.forEach(f => LOCKED_FOLDERS.add(f));
-                        saveStateToStorage(); renderFoldersInMenu(); renderApp(); closeMobileSidebar();
-                        showToast(t('restoredJson') + `+${added} (${dups} dups)`); return;
+                        saveStateToStorage(); checkAndSaveWeeklyAutoSnapshot(true); renderFoldersInMenu(); renderApp(); closeMobileSidebar();
+                        showToast(shouldUpdateDups ? `${t('restoredJson')}+${added} нових, оновлено ${updated} ✓` : `${t('restoredJson')}+${added} (пропущено дублів: ${dups})`, 4500);
+                        return;
                     }
                 } catch (err) {}
 
                 const parser = new DOMParser(); const doc = parser.parseFromString(content, 'text/html'); const anchors = Array.from(doc.querySelectorAll('a[href]'));
-                let added = 0, dups = 0; const isOfflineNow = !navigator.onLine;
+                let added = 0, dups = 0, updated = 0; const isOfflineNow = !navigator.onLine;
 
                 if (anchors.length > 0) {
                     anchors.forEach(a => {
                         const href = cleanRawUrl(a.getAttribute('href') || ''); if (!/^https?:\/\//i.test(href)) return;
-                        if (findDuplicateItem(href)) dups++; else { const textTitle = (a.textContent || '').trim(); const created = buildSmartAIItem(href, textTitle); created.pendingOffline = true; ITEMS.unshift(created); added++; }
+                        const textTitle = (a.textContent || '').trim();
+                        const existing = findDuplicateItem(href);
+                        if (existing) {
+                            dups++;
+                            if (shouldUpdateDups) {
+                                const fresh = buildSmartAIItem(href, textTitle);
+                                existing.title = fresh.title || existing.title;
+                                existing.note = fresh.note || existing.note;
+                                existing.cats = Array.from(new Set([...getItemCats(existing), ...fresh.cats]));
+                                existing.cat = existing.cats[0];
+                                existing.tags = Array.from(new Set([...(existing.tags || []), ...(fresh.tags || [])]));
+                                existing.pendingOffline = true;
+                                updated++;
+                            }
+                        } else {
+                            const created = buildSmartAIItem(href, textTitle); created.pendingOffline = true; ITEMS.unshift(created); added++;
+                        }
                     });
                 } else {
                     const rawMatches = content.match(/(?:https?:\/\/|www\.)[^\s"'<>]+/gi) || [];
                     rawMatches.forEach(rawU => {
                         const cleanU = cleanRawUrl(rawU); if (!cleanU) return;
-                        if (findDuplicateItem(cleanU)) dups++; else { const created = buildSmartAIItem(cleanU); created.pendingOffline = true; ITEMS.unshift(created); added++; }
+                        const existing = findDuplicateItem(cleanU);
+                        if (existing) {
+                            dups++;
+                            if (shouldUpdateDups) {
+                                existing.pendingOffline = true;
+                                updated++;
+                            }
+                        } else {
+                            const created = buildSmartAIItem(cleanU); created.pendingOffline = true; ITEMS.unshift(created); added++;
+                        }
                     });
                 }
-                saveStateToStorage(); renderFoldersInMenu(); renderApp(); closeMobileSidebar(); showToast(t('aiImportReport').replace('{added}', added).replace('{dups}', dups));
-                if (!isOfflineNow && added > 0) processOfflineQueue(false);
+                saveStateToStorage(); checkAndSaveWeeklyAutoSnapshot(true); renderFoldersInMenu(); renderApp(); closeMobileSidebar();
+                if (isOfflineNow) {
+                    showToast(t('aiAddedOffline'), 4500);
+                } else if (shouldUpdateDups && updated > 0) {
+                    showToast(`Імпорт: +${added} нових, оновлено ${updated} дублікатів ✓`, 4500);
+                } else {
+                    showToast(t('aiImportReport').replace('{added}', added).replace('{dups}', dups), 4500);
+                }
+                if (!isOfflineNow && (added > 0 || updated > 0)) processOfflineQueue(false);
             };
             reader.readAsText(file);
         }
@@ -4179,7 +4458,9 @@
                     case 'cycle-font': cycleFontScale(); break;
                     case 'export-html': exportBrowserBookmarks(); break;
                     case 'export-json': exportFullJsonBackup(); break;
-                    case 'trigger-import': triggerAIFileImport(); break;
+                    case 'trigger-import': toggleImportChoiceBar(); break;
+                    case 'import-with-mode': triggerAIFileImport(actionEl.dataset.mode); break;
+                    case 'restore-auto-snapshot': restoreFromAutoSnapshot(); break;
                     case 'toggle-export-bar': toggleExportChoiceBar(); break;
                     case 'scroll-top': window.scrollTo({ top: 0, behavior: 'smooth' }); break;
                     case 'process-offline': processOfflineQueue(true); break;
