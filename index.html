@@ -88,6 +88,12 @@
         .space-y-2\.5 > :not([hidden]) ~ :not([hidden]) { margin-top: 0.625rem; }
         .space-y-3 > :not([hidden]) ~ :not([hidden]) { margin-top: 0.75rem; }
         .space-y-4 > :not([hidden]) ~ :not([hidden]) { margin-top: 1rem; }
+        .space-y-5 > :not([hidden]) ~ :not([hidden]) { margin-top: 1.35rem; }
+        .space-y-6 > :not([hidden]) ~ :not([hidden]) { margin-top: 1.65rem; }
+        .pt-3\.5 { padding-top: 0.875rem; }
+        .mt-6 { margin-top: 1.5rem; }
+        .mb-2 { margin-bottom: 0.5rem; }
+
 
         /* Sizing */
         .w-2\.5 { width: 0.625rem; }
@@ -911,7 +917,7 @@
     <div id="settings-sheet-modal" data-backdrop="close-settings-sheet" class="sheet-backdrop fixed inset-0 bg-black/60 z-50 hidden items-end sm:items-center justify-center p-0 sm:p-4">
         <div id="settings-sheet-panel" class="sheet-panel theme-surface w-full max-w-md rounded-t-2xl sm:rounded-xl p-5 border-t sm:border space-y-5 max-h-[90vh] overflow-y-auto" style="background-color: var(--bg-body);">
             <div id="settings-drag-handle" class="w-12 h-2 bg-stone-400/50 rounded-full mx-auto -mt-1 cursor-grab active:cursor-grabbing touch-none sm:hidden"></div>
-            <div class="sticky top-0 z-20 theme-surface backdrop-blur-md pb-3 border-b flex items-center justify-between -mx-5 -mt-5 px-5 pt-5" style="border-color: var(--border-main);">
+            <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2.5">
                     <span class="w-8 h-8 rounded-xl bg-accent text-onaccent flex items-center justify-center shrink-0 shadow-xs">
                         <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
@@ -983,7 +989,7 @@
                 </div>
 
                 <!-- СЕКЦІЯ 2: РОЗУМНІ ПАПКИ ТА ШІ -->
-                <div class="space-y-2">
+                <div class="space-y-2 mt-6">
                     <div class="text-[11px] font-mono-code font-bold uppercase theme-muted px-1">Інтелект та сортування</div>
                     <button type="button" data-action="open-ai-sheet" class="key-press w-full theme-card border rounded-2xl p-4 flex items-center justify-between gap-3 text-left hover:border-accent transition shadow-xs">
                         <div class="flex items-center gap-3.5 min-w-0">
@@ -1000,7 +1006,7 @@
                 </div>
 
                 <!-- СЕКЦІЯ 3: ДАНІ ТА РЕЗЕРВНІ КОПІЇ -->
-                <div class="space-y-2">
+                <div class="space-y-2 mt-6">
                     <div class="text-[11px] font-mono-code font-bold uppercase theme-muted px-1">Дані та резервні копії</div>
                     <div class="theme-card border rounded-2xl p-4 space-y-4 shadow-xs">
                         <!-- Імпорт -->
@@ -1052,7 +1058,7 @@
                 </div>
 
                 <!-- СЕКЦІЯ 4: ПРО ДОДАТОК -->
-                <div class="space-y-2">
+                <div class="space-y-2 mt-6">
                     <div class="text-[11px] font-mono-code font-bold uppercase theme-muted px-1">Довідка</div>
                     <button type="button" data-action="open-about-sheet" class="key-press w-full theme-card border rounded-2xl p-4 flex items-center justify-between gap-3 text-left hover:border-accent transition shadow-xs">
                         <div class="flex items-center gap-3.5 min-w-0">
@@ -1625,7 +1631,7 @@
                 if (!isAnyModalOpen() && location.hash === '#modal') {
                     _ignoreNextNavEvent = true;
                     history.back();
-                    setTimeout(() => { _ignoreNextNavEvent = false; }, 80);
+                    setTimeout(() => { _ignoreNextNavEvent = false; }, 260);
                 }
             } catch (e) {
                 _ignoreNextNavEvent = false;
@@ -4594,7 +4600,20 @@
                     case 'set-font-scale': setFontScale(actionEl.dataset.scale); break;
                     case 'set-import-dup-mode': setImportDupMode(actionEl.dataset.mode); break;
                     case 'trigger-import-file': triggerAIFileImport(importDuplicateMode); break;
-                    case 'toggle-select-mode-from-sidebar': closeMobileSidebar(); toggleSelectMode(); break;
+                    case 'toggle-select-mode-from-sidebar': {
+                        _ignoreNextNavEvent = true;
+                        _hideSidebar();
+                        if (location.hash === '#modal') {
+                            try { history.replaceState({ appGuard: true }, '', '#home'); } catch (err) {}
+                        }
+                        setTimeout(() => { _ignoreNextNavEvent = false; }, 300);
+                        if (!isSelectMode) {
+                            toggleSelectMode();
+                        } else {
+                            toggleSelectMode();
+                        }
+                        break;
+                    }
                     case 'open-about-sheet': openAboutSheet(); break;
                     case 'close-about-sheet': closeAboutSheet(); break;
                     case 'open-ai-sheet': openAiSheet(); break;
