@@ -33,6 +33,10 @@
         ol, ul, menu { list-style: none; margin: 0; padding: 0; }
         textarea { resize: vertical; }
         input::placeholder, textarea::placeholder { opacity: 1; color: var(--text-muted, #6B7280); }
+        #url-input::placeholder { opacity: 0.45; color: var(--text-muted, #9CA3AF); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+        .gap-3\.5 { gap: 0.875rem; }
+        .gap-5 { gap: 1.25rem; }
+
 
         /* Layout & Display */
         .block { display: block; }
@@ -647,6 +651,10 @@
         <header data-action="scroll-top" class="sticky top-0 z-30 theme-header backdrop-blur-md border-b px-4 safe-top-header cursor-pointer select-none" title="Натисніть, щоб прокрутити наверх">
             <div class="max-w-5xl mx-auto flex items-center justify-between gap-2.5">
                 <div class="flex items-center gap-2.5 min-w-0">
+                    <button data-action="open-sidebar" data-stop="1" title="Меню" class="key-press w-10 h-10 rounded-xl theme-input flex items-center justify-center hover:opacity-90 transition shrink-0">
+                        <svg class="w-5 h-5 mono-icon" viewBox="0 0 24 24"><line x1="3" y1="7" x2="21" y2="7"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="17" x2="15" y2="17"/></svg>
+                    </button>
+
                     <div data-action="reset-all" data-stop="1" class="key-press w-9 h-9 flex items-center justify-center shrink-0 cursor-pointer">
                         <svg viewBox="0 0 2048 2048" class="w-full h-full drop-shadow-xs text-ink" xmlns="http://www.w3.org/2000/svg">
                             <path fill="currentColor" d="M 820.745 774.484 C 843.943 773.99 873.918 775.257 896.837 776.679 C 976.15 781.6 1061.49 792.356 1128.78 838.041 C 1194.53 882.69 1242.68 950.654 1257.85 1029.03 C 1208.06 1030.81 1114.09 1032.21 1070.34 1012.39 C 1057.54 1006.59 1048.04 997.356 1037.19 988.759 C 1026.23 980.074 1014.43 972.7 1001.26 967.858 C 926.976 940.551 772.06 945.932 690.612 955.345 C 544.138 972.273 403.224 1022 309.048 1140.88 C 237.059 1230.09 204.079 1344.56 217.568 1458.39 C 231.435 1569.88 289.137 1671.25 377.917 1740.09 C 465.695 1809.18 578.939 1849.08 690.998 1834.81 C 903.421 1807.77 1039.63 1638.79 1082.95 1438.5 C 1088.66 1412.8 1092.59 1386.74 1094.72 1360.5 C 1095.11 1355.7 1095.66 1338.72 1097.53 1336.33 L 1102 1335.91 C 1122.33 1336.33 1146.1 1338.33 1167.22 1339.02 C 1201.81 1339.88 1236.42 1340.02 1271.01 1339.43 C 1266.42 1377.03 1265.41 1411.49 1258.02 1450.12 C 1230.46 1594.11 1175.15 1722.01 1073.17 1828.16 C 964.32 1939.53 816.106 2003.75 660.404 2006.98 C 493.262 2010.27 337.212 1952.99 216.275 1837.64 C -28.8002 1603.91 -23.8879 1230.94 211.223 991.613 C 372.412 827.536 598.052 777.654 820.745 774.484 z"/>
@@ -659,7 +667,6 @@
                     <div data-action="reset-all" data-stop="1" class="key-press flex flex-col min-w-0 cursor-pointer" title="Натисніть, щоб скинути фільтри">
                         <div class="flex items-center gap-2">
                             <h1 class="text-base sm:text-lg font-black tracking-tight uppercase truncate">LinkBox</h1>
-                            <span id="mobile-count-pill" class="text-[11px] font-mono-code font-bold px-1.5 py-0.5 rounded-md bg-accent text-onaccent shrink-0">10</span>
                         </div>
                         <div class="flex items-center gap-1.5 mt-0.5">
                             <span class="text-[11px] font-mono-code theme-muted block truncate">Smart Link Organizer</span>
@@ -671,17 +678,14 @@
                 </div>
 
                 <div class="flex items-center gap-2 shrink-0">
-                    <button data-action="open-sidebar" data-stop="1" class="key-press h-10 px-3.5 rounded-lg theme-input flex items-center gap-2 font-bold text-sm hover:opacity-90 transition">
-                        <svg class="w-5 h-5 mono-icon" viewBox="0 0 24 24"><line x1="3" y1="7" x2="21" y2="7"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="17" x2="15" y2="17"/></svg>
-                        <span id="btn-menu-label">Меню</span>
-                    </button>
+                    <span id="mobile-count-pill" title="Усього посилань у базі" class="h-9 px-3 rounded-xl bg-accent text-onaccent text-xs font-mono-code font-black flex items-center justify-center shrink-0 shadow-xs">10</span>
                 </div>
             </div>
         </header>
 
         <main class="max-w-5xl w-full mx-auto px-4 py-4 space-y-4 flex-1">
             <div class="flex items-stretch gap-2">
-                <input id="url-input" type="text"  placeholder="Вставте посилання або список посилань..." class="flex-1 theme-card border rounded-lg px-3.5 py-3 text-base outline-none font-medium focus:border-accent transition min-w-0">
+                <input id="url-input" type="text" placeholder="https://www..." class="flex-1 theme-card border rounded-lg px-3.5 py-3 text-base outline-none font-medium focus:border-accent transition min-w-0">
                 <button data-action="add-link" title="Розумне додавання посилання" class="key-press bg-accent hover:opacity-90 text-white font-black text-sm px-4 sm:px-5 rounded-lg flex items-center justify-center gap-2 shrink-0 shadow-xs">
                     <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none"><path d="M11 5v14M4 12h14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><path d="M19 2.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8.8-2.2z" fill="currentColor"/></svg>
                     <span id="btn-add-label">Додати</span>
@@ -779,8 +783,8 @@
                 </button>
             </div>
 
-            <div class="theme-card border rounded-xl p-5 flex flex-col items-center justify-center space-y-3 shadow-2xs">
-                <div class="bg-white p-3.5 rounded-2xl border border-black/10 shadow-sm flex items-center justify-center relative shrink-0" style="width: 228px; height: 228px;">
+            <div class="theme-card border rounded-xl p-4 sm:p-5 flex flex-col items-center justify-center space-y-3 shadow-2xs">
+                <div class="bg-white p-4 rounded-2xl border border-black/10 shadow-sm flex items-center justify-center relative shrink-0" style="width: min(280px, 76vw); height: min(280px, 76vw);">
                     <div id="qr-container" class="w-full h-full relative flex items-center justify-center"></div>
                 </div>
                 <div id="qr-url-preview" class="text-[11px] font-mono-code theme-muted truncate w-full text-center px-2">https://example.com</div>
@@ -992,11 +996,11 @@
                 <div class="space-y-2 mt-6">
                     <div class="text-[11px] font-mono-code font-bold uppercase theme-muted px-1">Інтелект та сортування</div>
                     <button type="button" data-action="open-ai-sheet" class="key-press w-full theme-card border rounded-2xl p-4 flex items-center justify-between gap-3 text-left hover:border-accent transition shadow-xs">
-                        <div class="flex items-center gap-3.5 min-w-0">
+                        <div class="flex items-center gap-4 min-w-0">
                             <span class="w-10 h-10 rounded-xl bg-accent/15 text-accent flex items-center justify-center shrink-0">
                                 <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 4.6L18.5 9.5l-4.6 1.9L12 16l-1.9-4.6L5.5 9.5l4.6-1.9z"/><path d="M19 15l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z"/></svg>
                             </span>
-                            <div class="min-w-0 space-y-0.5">
+                            <div class="min-w-0 space-y-0.5 ml-1">
                                 <div class="text-sm font-extrabold truncate">Розумні папки та ШІ</div>
                                 <div id="settings-ai-status-sub" class="text-xs theme-muted truncate">Вбудовані правила (без ключа)</div>
                             </div>
@@ -1061,11 +1065,11 @@
                 <div class="space-y-2 mt-6">
                     <div class="text-[11px] font-mono-code font-bold uppercase theme-muted px-1">Довідка</div>
                     <button type="button" data-action="open-about-sheet" class="key-press w-full theme-card border rounded-2xl p-4 flex items-center justify-between gap-3 text-left hover:border-accent transition shadow-xs">
-                        <div class="flex items-center gap-3.5 min-w-0">
+                        <div class="flex items-center gap-4 min-w-0">
                             <span class="w-10 h-10 rounded-xl theme-input flex items-center justify-center shrink-0">
                                 <svg class="w-5 h-5 mono-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><line x1="12" y1="16" x2="12" y2="11.5"/><circle cx="12" cy="8" r="0.6" fill="currentColor"/></svg>
                             </span>
-                            <div class="min-w-0 space-y-0.5">
+                            <div class="min-w-0 space-y-0.5 ml-1">
                                 <div class="text-sm font-extrabold truncate">Як усе влаштовано</div>
                                 <div class="text-xs theme-muted truncate">Гід по всіх функціях та фішках</div>
                             </div>
@@ -1266,7 +1270,7 @@
                 menu: 'Меню', addBtn: 'Додати', random: 'Рандом',
                 foldersSection: 'Категорії', hashtagsSection: 'Хештеги',
                 catsSheetTitle: 'Усі категорії', tagsSheetTitle: 'Усі хештеги',
-                urlPlaceholder: 'Вставте посилання або список посилань...',
+                urlPlaceholder: 'https://www...',
                 allFolders: 'Усі посилання', importAi: 'Імпорт', exportHtml: 'Експорт',
                 expHtmlSub: 'Для браузера', expJsonSub: 'Повний бекап',
                 openMain: 'Відкрити', openBrowser: 'Відкрити',
@@ -2014,7 +2018,7 @@
         }
 
         function updateStaticTexts() {
-            document.getElementById('btn-menu-label').textContent = t('menu'); document.getElementById('btn-add-label').textContent = t('addBtn'); document.getElementById('btn-random-label').textContent = t('random');
+            const menuLblEl = document.getElementById('btn-menu-label'); if (menuLblEl) menuLblEl.textContent = t('menu'); document.getElementById('btn-add-label').textContent = t('addBtn'); document.getElementById('btn-random-label').textContent = t('random');
             document.getElementById('lbl-folders-section').textContent = t('foldersSection'); document.getElementById('lbl-hashtags-section').textContent = t('hashtagsSection');
             document.getElementById('cats-sheet-title').textContent = t('catsSheetTitle'); document.getElementById('tags-sheet-title').textContent = t('tagsSheetTitle');
             document.getElementById('about-sheet-title').textContent = t('aboutSheetTitle'); document.getElementById('url-input').placeholder = t('urlPlaceholder');
@@ -2287,7 +2291,7 @@
 
         function renderSidebarTagsPreview() {
             const previewEl = document.getElementById('sidebar-tags-preview'); if (!previewEl) return;
-            const topTags = getTagMapSorted('popular').slice(0, 10);
+            const topTags = getTagMapSorted('popular').slice(0, 15);
             previewEl.innerHTML = topTags.map(tObj => {
                 const isAct = selectedTag && selectedTag.toLowerCase() === tObj.label.toLowerCase(); const safeTag = escJsAttr(tObj.label);
                 return `<button data-action="select-tag" data-tag="${esc(tObj.label)}" class="key-press px-2 py-1 rounded-md text-[11px] font-mono-code font-bold flex items-center gap-1 transition ${isAct ? 'bg-accent text-onaccent' : 'theme-input opacity-85 hover:opacity-100'}"><span>${esc(tObj.label)}</span><span class="text-[9px] opacity-70">${tObj.count}</span></button>`;
@@ -2331,7 +2335,7 @@
                 html += `<button data-action="select-folder" data-cat="${OFFLINE_FOLDER_KEY}" class="key-press rounded-lg px-3 py-2 flex items-center justify-between border border-amber-500/40 transition ${isOffActive ? 'bg-amber-600 text-white' : 'bg-amber-500/15 text-amber-600'}"><span class="text-xs sm:text-sm font-bold">${t('offlineFolderName')}</span><span class="text-xs font-mono-code font-bold">${offlineItems.length}</span></button>`;
             }
 
-            const limitedCats = cats.slice(0, 7);
+            const limitedCats = cats.slice(0, 10);
             html += limitedCats.map(c => {
                 const active = selectedFolder === c.cat; const folderLocked = LOCKED_FOLDERS.has(c.cat); const safeCat = escJsAttr(c.cat); const safeColor = sanitizeColor(c.color);
                 return `<div class="rounded-lg flex items-stretch overflow-hidden ${active ? 'text-white' : 'theme-input'}" style="${active ? `background:${safeColor};` : ''}"><button data-action="select-folder" data-cat="${esc(c.cat)}" class="key-press flex-1 px-3 py-2 text-left flex items-center justify-between min-w-0"><div class="flex items-center gap-2 min-w-0"><span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:${active ? '#fff' : safeColor}"></span><span class="text-xs sm:text-sm font-bold truncate">${esc(c.cat)}</span></div><span class="text-xs font-mono-code font-bold opacity-75 ml-1">${c.count}</span></button><button data-action="toggle-folder-lock" data-cat="${esc(c.cat)}" data-stop="1" class="key-press px-2.5 border-l flex items-center justify-center transition ${folderLocked ? (active ? 'bg-black/25 text-white' : 'bg-accent/15 text-accent') : 'opacity-45 hover:opacity-100'}" style="border-color: var(--border-main)">${folderLocked ? LINE_ICONS.lock : LINE_ICONS.unlock}</button></div>`;
@@ -2564,7 +2568,7 @@
                 }
 
                 const SLUG_DICT = {
-                    'luchshih': 'лучших', 'luchshie': 'лучшие', 'samye': 'самые', 'samyh': 'самых', 'nauchno': 'научно', 'fantasticheskih': 'фантастических', 'romanov': 'романов', 'knig': 'книг', 'knigi': 'книги', 'xxi': 'XXI', 'veka': 'века', 'chtivo': 'чтиво', 'voskresnoje': 'воскресное', 'smeshnye': 'смешные', 'zagolovki': 'заголовки', 'ukrainskiy': 'украинский', 'ukrainskie': 'украинские', 'shou': 'шоу', 'biz': 'биз', 'memy': 'мемы', 'pro': 'про', 'literaturu': 'литературу', 'veselye': 'весёлые', 'kanaly': 'каналы', 'telegram': 'Telegram', 'vybor': 'выбор', 'redakcii': 'редакции', 'kakie': 'какие', 'sajty': 'работают', 'ukraine': 'Украине', 'ukraina': 'Украина', 'besplatno': 'бесплатно', 'onlajn': 'онлайн', 'smotret': 'смотреть', 'serialy': 'сериалы', 'filmy': 'фильмы', 'kino': 'кино', 'novosti': 'новости', 'tehnologii': 'технологии', 'gadzhety': 'гаджеты', 'smartfony': 'смартфоны', 'obzor': 'обзор', 'reyting': 'рейтинг', 'top': 'ТОП', 'kak': 'как', 'chto': 'что', 'gde': 'где', 'kogda': 'когда', 'pochemu': 'почему', 'sovety': 'советы', 'instrukciya': 'инструкция', 'recepty': 'рецепты', 'igry': 'игры', 'muzyka': 'музыка', 'nauka': 'наука', 'kosmos': 'космос', 'istoriya': 'история', 'ekonomika': 'экономика', 'biznes': 'бизнес', 'kriptovalyuta': 'криптовалюта', 'kurs': 'курс', 'valyut': 'валют', 'nedorogoy': 'недорогой', 'kupit': 'купить', 'cena': 'цена'
+                    'luchshih': 'найкращих', 'luchshie': 'найкращі', 'samye': 'найкращі', 'samyh': 'найкращих', 'nauchno': 'науково', 'fantasticheskih': 'фантастичних', 'romanov': 'романів', 'knig': 'книг', 'knigi': 'книги', 'xxi': 'XXI', 'veka': 'століття', 'chtivo': 'чтиво', 'voskresnoje': 'недільне', 'smeshnye': 'смішні', 'zagolovki': 'заголовки', 'ukrainskiy': 'український', 'ukrainskie': 'українські', 'shou': 'шоу', 'biz': 'біз', 'memy': 'меми', 'pro': 'про', 'literaturu': 'літературу', 'veselye': 'веселі', 'kanaly': 'канали', 'telegram': 'Telegram', 'vybor': 'вибір', 'redakcii': 'редакції', 'kakie': 'які', 'sajty': 'сайти', 'ukraine': 'Україні', 'ukraina': 'Україна', 'besplatno': 'безкоштовно', 'onlajn': 'онлайн', 'smotret': 'дивитися', 'serialy': 'серіали', 'filmy': 'фільми', 'kino': 'кіно', 'novosti': 'новини', 'tehnologii': 'технології', 'gadzhety': 'гаджети', 'smartfony': 'смартфони', 'obzor': 'огляд', 'reyting': 'рейтинг', 'top': 'ТОП', 'kak': 'як', 'chto': 'що', 'gde': 'де', 'kogda': 'коли', 'pochemu': 'чому', 'sovety': 'поради', 'instrukciya': 'інструкція', 'recepty': 'рецепти', 'igry': 'ігри', 'muzyka': 'музика', 'nauka': 'наука', 'kosmos': 'космос', 'istoriya': 'історія', 'ekonomika': 'економіка', 'biznes': 'бізнес', 'kriptovalyuta': 'криптовалюта', 'kurs': 'курс', 'valyut': 'валют', 'nedorogoy': 'недорогий', 'kupit': 'купити', 'cena': 'ціна'
                 };
                 const hasRuDictMatch = words.some(w => Boolean(SLUG_DICT[w.toLowerCase()]));
                 const isTranslitLike = hasRuDictMatch || words.filter(w => /(shch|zh|kh|vo|oje|yye|ih|yh)$/i.test(w)).length >= 2;
@@ -2588,6 +2592,69 @@
         function sanitizeBookmarkTitle(rawTitle, cleanName) {
             if (!rawTitle) return ''; let tStr = rawTitle.trim(); if (/^https?:\/\//i.test(tStr)) return '';
             tStr = tStr.replace(/[,\s]+$/g, ''); if (/—\s*[a-z0-9_-]+\s+\d{4,}/i.test(tStr)) return ''; if (tStr.length < 2) return ''; return tStr;
+        }
+
+                function isUkrainianText(str) {
+            if (!str) return false;
+            const s = String(str);
+            const cyrCount = (s.match(/[а-яіїєґ]/gi) || []).length;
+            const latCount = (s.match(/[a-z]/gi) || []).length;
+            if (cyrCount === 0 || latCount > cyrCount * 1.2) return false;
+            if (/[ыъэё]/i.test(s) && !/[іїєґ]/i.test(s)) return false;
+            return true;
+        }
+
+        function buildUkrainianNoteForItem(item, rawTitle, rawDesc) {
+            const cleanName = item.name || extractCleanBrandName(item.domain || '');
+            const domain = item.domain || '';
+            const firstCat = getItemCats(item)[0] || 'Веб-ресурси';
+            const def = CAT_DEFS.find(d => d.name === firstCat);
+            const catKey = def ? def.key : 'web';
+            const baseBrandTag = `#${cleanName.toLowerCase().replace(/[^a-z0-9а-яіїєґ]/gi, '') || 'сайт'}`;
+            const titleToUse = sanitizeBookmarkTitle(rawTitle || item.title, cleanName);
+            if (rawDesc && rawDesc.length > 8 && isUkrainianText(rawDesc)) {
+                return rawDesc.slice(0, 260);
+            }
+            return generateLocalizedMeta('uk', catKey, cleanName, domain, titleToUse, baseBrandTag).note;
+        }
+
+        function sanitizeUkrainianTags(rawTags, item) {
+            const EN_TO_UK_TAGS = {
+                'news': '#новини', 'tech': '#технології', 'technology': '#технології', 'code': '#код',
+                'coding': '#код', 'programming': '#програмування', 'dev': '#розробка', 'developer': '#розробка',
+                'ai': '#ші', 'ml': '#ші', 'design': '#дизайн', 'ui': '#інтерфейс', 'ux': '#дизайн',
+                'shop': '#покупки', 'shopping': '#покупки', 'store': '#магазин', 'buy': '#покупки',
+                'music': '#музика', 'audio': '#аудіо', 'video': '#відео', 'movie': '#кіно', 'movies': '#кіно',
+                'film': '#кіно', 'series': '#серіали', 'book': '#книги', 'books': '#книги', 'education': '#освіта',
+                'learn': '#навчання', 'science': '#наука', 'travel': '#поїздки', 'trip': '#подорожі',
+                'hotel': '#готелі', 'finance': '#фінанси', 'business': '#бізнес', 'crypto': '#крипта',
+                'bank': '#фінанси', 'social': '#соцмережі', 'games': '#ігри', 'game': '#ігри', 'gaming': '#ігри',
+                'sport': '#спорт', 'health': '#здоровя', 'food': '#їжа', 'auto': '#авто', 'car': '#авто',
+                'cars': '#авто', 'photo': '#фото', 'art': '#мистецтво', 'work': '#робота', 'job': '#вакансії',
+                'jobs': '#вакансії', 'tools': '#інструменти', 'tool': '#інструменти', 'web': '#веб',
+                'internet': '#інтернет', 'search': '#пошук', 'blog': '#блог', 'article': '#стаття'
+            };
+            const firstCat = getItemCats(item)[0] || 'Веб-ресурси';
+            const def = CAT_DEFS.find(d => d.name === firstCat);
+            const catKey = def ? def.key : 'web';
+            const cleanName = item.name || extractCleanBrandName(item.domain || '');
+            const baseBrandTag = `#${cleanName.toLowerCase().replace(/[^a-z0-9а-яіїєґ]/gi, '') || 'веб'}`;
+            const defaultUkTags = generateLocalizedMeta('uk', catKey, cleanName, item.domain || '', '', baseBrandTag).tags;
+
+            const result = [];
+            (Array.isArray(rawTags) ? rawTags : []).forEach(tg => {
+                const clean = String(tg || '').trim().replace(/^#+/, '').toLowerCase();
+                if (!clean) return;
+                if (/[а-яіїєґ]/i.test(clean) && !/[ыъэё]/i.test(clean)) {
+                    result.push('#' + clean);
+                } else if (EN_TO_UK_TAGS[clean]) {
+                    result.push(EN_TO_UK_TAGS[clean]);
+                }
+            });
+            defaultUkTags.forEach(tUk => {
+                if (!result.includes(tUk)) result.push(tUk);
+            });
+            return Array.from(new Set(result)).slice(0, 4);
         }
 
         function generateLocalizedMeta(siteLang, catKey, cleanName, domain, humanTitle, baseBrandTag) {
@@ -2917,31 +2984,33 @@
             const tags = []; (Array.isArray(j.tags) ? j.tags : []).forEach(tg => {
                 let x = String(tg || '').trim().replace(/^#+/, '').replace(/\s+/g, '').slice(0, 24); if (x) { x = '#' + x.toLowerCase(); if (!tags.includes(x)) tags.push(x); }
             });
+            const note = typeof j.note === 'string' && isUkrainianText(j.note) ? j.note.trim().slice(0, 240) : '';
             const clean = folders.filter(f => f !== WEB_DEF.name); const out = (clean.length ? clean : folders).slice(0, 3);
-            return out.length ? { folders: out, tags: tags.slice(0, 4) } : null;
+            return out.length ? { folders: out, tags: tags.slice(0, 4), note } : null;
         }
-        const AI_SYSTEM = 'Ти класифікатор закладок. Обери 1-3 папки для сторінки за її ЗМІСТОМ (заголовок і опис), а не за словами в адресі чи назві сайту. Віддавай перевагу папкам зі списку; нову (коротку, українською, 1-3 слова) пропонуй лише якщо жодна не підходить. Сторінка може бути в кількох папках, якщо тема справді на перетині (наприклад, процесори для музикантів: Код та Технології + Музика). Додай 2-4 короткі теги. Відповідай ТІЛЬКИ JSON: {"folders":["..."],"tags":["#..."]}';
+        const AI_SYSTEM = 'Ти україномовний класифікатор закладок. Навіть якщо сайт іноземний (англійською, російською тощо), ЗАВЖДИ пиши папки, хештеги та коротку нотатку ВИКЛЮЧНО УКРАЇНСЬКОЮ мовою. Обери 1-3 папки за ЗМІСТОМ сторінки зі списку (або нову коротку українською, 1-3 слова). Додай 2-4 короткі українські хештеги та 1 речення опису українською. Відповідай ТІЛЬКИ JSON: {"folders":["..."],"tags":["#..."],"note":"..."}';
         async function aiClassifyRaw(cfg, domain, title, desc) {
             const user = 'Домен: ' + domain + '\nЗаголовок: ' + (title || '—') + '\nОпис: ' + (desc || '—').slice(0, 500) + '\nІснуючі папки: ' + _allFolderNames().join('; ');
             const out = await callLLM(cfg, AI_SYSTEM, user); const parsed = parseAiJson(out);
             if (!parsed) throw new Error('ШІ повернув неочікувану відповідь');
             return parsed;
         }
-        function _applyCats(item, names, tags) {
+        function _applyCats(item, names, tags, aiNote) {
             item.cats = names.slice(); item.cat = names[0];
             const look = _lookupFolderLook(names[0]); item.color = look.color; item.svg = look.svg;
-            if (tags && tags.length) item.tags = Array.from(new Set([(item.tags && item.tags[0]) || ('#' + (item.name || '').toLowerCase().replace(/\s+/g, '')), ...tags]));
+            item.tags = sanitizeUkrainianTags(tags || item.tags, item);
+            if (aiNote && isUkrainianText(aiNote)) item.note = aiNote;
         }
         async function reclassifyItem(item, meta) {
             const cfg = getAiConfig();
             if (cfg && ((meta && (meta.title || meta.desc)) || item.title)) {
                 try {
                     const r = await aiClassifyRaw(cfg, item.domain, (meta && meta.title) || item.title, meta && meta.desc);
-                    _applyCats(item, r.folders, r.tags); item.classifiedBy = 'ai'; return;
+                    _applyCats(item, r.folders, r.tags, r.note); item.classifiedBy = 'ai'; return;
                 } catch (e) { _aiBatchError = (e && e.message) || String(e); }
             }
             const smart = buildSmartAIItem(item.url, item.title, (meta && meta.desc) || '');
-            _applyCats(item, smart.cats, null); item.color = smart.color; item.svg = smart.svg; item.classifiedBy = 'local';
+            _applyCats(item, smart.cats, smart.tags, null); item.color = smart.color; item.svg = smart.svg; item.classifiedBy = 'local';
         }
 
         // ---- Вікно налаштувань ШІ ----
@@ -3355,12 +3424,13 @@
                     const meta = await fetchRealTitleAndDesc(item.url);
                     if (meta) {
                         if (meta.title && meta.title.length > 2) item.title = meta.title.slice(0, 120);
-                        if (meta.desc && meta.desc.length > 5) {
-                            item.note = meta.desc.slice(0, 260);
-                        } else if (meta.title) {
-                            item.note = `Сторінка «${item.title}» на ресурсі ${item.name} (${item.domain}).`;
-                        }
                         if (item.autoCat === true) { try { await reclassifyItem(item, meta); } catch (e) {} }
+                        if (!isUkrainianText(item.note) || !meta.desc || !isUkrainianText(meta.desc)) {
+                            item.note = buildUkrainianNoteForItem(item, item.title, meta.desc);
+                        } else if (meta.desc && meta.desc.length > 5 && isUkrainianText(meta.desc)) {
+                            item.note = meta.desc.slice(0, 260);
+                        }
+                        item.tags = sanitizeUkrainianTags(item.tags, item);
                     }
                     item.pendingOffline = false;
                     processedCount++;
@@ -3861,7 +3931,7 @@
             const cleanTitle = currentTitle || smart.title;
             const candidates = [];
 
-            if (liveMeta && liveMeta.desc && liveMeta.desc.length > 8) {
+            if (liveMeta && liveMeta.desc && liveMeta.desc.length > 8 && isUkrainianText(liveMeta.desc)) {
                 candidates.push(liveMeta.desc.slice(0, 280));
             }
             candidates.push(
@@ -4498,8 +4568,8 @@
             qrContainer.innerHTML = `
                 <div class="relative w-full h-full flex items-center justify-center">
                     ${svgMarkup}
-                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 46px; height: 46px; background: #FFFFFF; border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 0 3px #FFFFFF, 0 4px 12px rgba(15,17,21,0.18);">
-                        <svg viewBox="0 0 2048 2048" class="w-7 h-7" xmlns="http://www.w3.org/2000/svg">
+                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 54px; height: 54px; background: #FFFFFF; border-radius: 14px; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 0 3.5px #FFFFFF, 0 4px 14px rgba(15,17,21,0.2);">
+                        <svg viewBox="0 0 2048 2048" class="w-8 h-8" xmlns="http://www.w3.org/2000/svg">
                             <path fill="#1F1D1E" d="M 820.745 774.484 C 843.943 773.99 873.918 775.257 896.837 776.679 C 976.15 781.6 1061.49 792.356 1128.78 838.041 C 1194.53 882.69 1242.68 950.654 1257.85 1029.03 C 1208.06 1030.81 1114.09 1032.21 1070.34 1012.39 C 1057.54 1006.59 1048.04 997.356 1037.19 988.759 C 1026.23 980.074 1014.43 972.7 1001.26 967.858 C 926.976 940.551 772.06 945.932 690.612 955.345 C 544.138 972.273 403.224 1022 309.048 1140.88 C 237.059 1230.09 204.079 1344.56 217.568 1458.39 C 231.435 1569.88 289.137 1671.25 377.917 1740.09 C 465.695 1809.18 578.939 1849.08 690.998 1834.81 C 903.421 1807.77 1039.63 1638.79 1082.95 1438.5 C 1088.66 1412.8 1092.59 1386.74 1094.72 1360.5 C 1095.11 1355.7 1095.66 1338.72 1097.53 1336.33 L 1102 1335.91 C 1122.33 1336.33 1146.1 1338.33 1167.22 1339.02 C 1201.81 1339.88 1236.42 1340.02 1271.01 1339.43 C 1266.42 1377.03 1265.41 1411.49 1258.02 1450.12 C 1230.46 1594.11 1175.15 1722.01 1073.17 1828.16 C 964.32 1939.53 816.106 2003.75 660.404 2006.98 C 493.262 2010.27 337.212 1952.99 216.275 1837.64 C -28.8002 1603.91 -23.8879 1230.94 211.223 991.613 C 372.412 827.536 598.052 777.654 820.745 774.484 z"/>
                             <path fill="#DF6D27" d="M 1396.31 39.4755 C 1512.61 37.6317 1629.32 66.1793 1727.77 129.345 C 1864.71 218.317 1960.59 358.153 1994.23 517.959 C 2028.26 673.494 1996.72 832.794 1909.46 968.647 C 1732.09 1244.52 1388.18 1291.96 1087.03 1264.59 C 1048.66 1261.11 1009.23 1251.21 973.5 1236.71 C 886.848 1201.56 809.795 1113.6 790.003 1021.45 C 832.844 1021.23 946.663 1019.89 981.612 1037.17 C 998.635 1045.58 1010.96 1060.85 1027.08 1070.83 C 1056.87 1089.28 1097.11 1093.28 1131.48 1096.35 C 1235.42 1105.62 1351.69 1098.17 1453.25 1074.63 C 1620.82 1041.23 1770.82 924.626 1816.58 756.08 C 1854.48 616.481 1821.61 459.393 1726.31 349.829 C 1654.8 266.642 1552.75 215.815 1443.27 208.849 C 1329.89 200.394 1217.92 238.271 1132.96 313.824 C 1017.91 415.124 972.93 564.552 963.56 712.937 C 951.318 713.323 939.91 712.409 927.711 712.049 L 856.285 710.134 C 833.991 709.611 807.256 711.231 786.079 709.852 L 786.001 708.387 C 784.917 684.003 793.699 644.934 797.397 620.219 C 844.945 302.493 1060.97 53.5881 1396.31 39.4755 z"/>
                             <path fill="#DF6D27" d="M 629.683 1234.44 C 728.899 1227.18 815.058 1302.08 821.686 1401.34 C 828.315 1500.6 752.879 1586.29 653.58 1592.29 C 555.159 1598.24 470.396 1523.62 463.826 1425.24 C 457.257 1326.85 531.345 1241.62 629.683 1234.44 z"/>
