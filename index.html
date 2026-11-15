@@ -66,6 +66,7 @@
         .shrink-0 { flex-shrink: 0; }
         .flex-col { flex-direction: column; }
         .flex-wrap { flex-wrap: wrap; }
+        .items-start { align-items: flex-start; }
         .items-center { align-items: center; }
         .items-end { align-items: flex-end; }
         .items-stretch { align-items: stretch; }
@@ -91,6 +92,7 @@
         .space-y-2 > :not([hidden]) ~ :not([hidden]) { margin-top: 0.5rem; }
         .space-y-2\.5 > :not([hidden]) ~ :not([hidden]) { margin-top: 0.625rem; }
         .space-y-3 > :not([hidden]) ~ :not([hidden]) { margin-top: 0.75rem; }
+        .space-y-3\.5 > :not([hidden]) ~ :not([hidden]) { margin-top: 0.875rem; }
         .space-y-4 > :not([hidden]) ~ :not([hidden]) { margin-top: 1rem; }
         .space-y-5 > :not([hidden]) ~ :not([hidden]) { margin-top: 1.35rem; }
         .space-y-6 > :not([hidden]) ~ :not([hidden]) { margin-top: 1.65rem; }
@@ -416,7 +418,11 @@
         #app-sidebar { touch-action: pan-y; }
         #sidebar-overlay { transition: opacity 0.28s cubic-bezier(0.22, 1, 0.36, 1); }
 
-        .safe-top-header { padding-top: calc(max(env(safe-area-inset-top, 0px), 16px) + 0.35rem); padding-bottom: 0.7rem; }
+        .about-acc > summary { list-style: none; }
+        .about-acc > summary::-webkit-details-marker { display: none; }
+        .about-acc[open] > summary .about-chev { transform: rotate(90deg); }
+        .about-acc > summary:active { opacity: .85; }
+        .safe-top-header { padding-top: calc(max(env(safe-area-inset-top, 0px), 10px) + 0.12rem); padding-bottom: 0.42rem; }
         .safe-top-sidebar { padding-top: calc(max(env(safe-area-inset-top, 0px), 16px) + 0.35rem); padding-bottom: 0.75rem; }
 
         .font-mono-code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, 'Roboto Mono', monospace; }
@@ -545,13 +551,18 @@
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
+    <svg class="hidden" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+        <symbol id="lb-logo-fallback" viewBox="0 0 2048 2048">
+            <path fill="currentColor" d="M 820.745 774.484 C 843.943 773.99 873.918 775.257 896.837 776.679 C 976.15 781.6 1061.49 792.356 1128.78 838.041 C 1194.53 882.69 1242.68 950.654 1257.85 1029.03 C 1208.06 1030.81 1114.09 1032.21 1070.34 1012.39 C 1057.54 1006.59 1048.04 997.356 1037.19 988.759 C 1026.23 980.074 1014.43 972.7 1001.26 967.858 C 926.976 940.551 772.06 945.932 690.612 955.345 C 544.138 972.273 403.224 1022 309.048 1140.88 C 237.059 1230.09 204.079 1344.56 217.568 1458.39 C 231.435 1569.88 289.137 1671.25 377.917 1740.09 C 465.695 1809.18 578.939 1849.08 690.998 1834.81 C 903.421 1807.77 1039.63 1638.79 1082.95 1438.5 C 1088.66 1412.8 1092.59 1386.74 1094.72 1360.5 C 1095.11 1355.7 1095.66 1338.72 1097.53 1336.33 L 1102 1335.91 C 1122.33 1336.33 1146.1 1338.33 1167.22 1339.02 C 1201.81 1339.88 1236.42 1340.02 1271.01 1339.43 C 1266.42 1377.03 1265.41 1411.49 1258.02 1450.12 C 1230.46 1594.11 1175.15 1722.01 1073.17 1828.16 C 964.32 1939.53 816.106 2003.75 660.404 2006.98 C 493.262 2010.27 337.212 1952.99 216.275 1837.64 C -28.8002 1603.91 -23.8879 1230.94 211.223 991.613 C 372.412 827.536 598.052 777.654 820.745 774.484 z"/>
+        </symbol>
+    </svg>
 
     <div id="sidebar-overlay" data-action="close-sidebar" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-40 hidden opacity-0 touch-none"></div>
 
     <aside id="app-sidebar" class="fixed top-0 left-0 z-50 h-[100dvh] w-80 max-w-[86vw] theme-surface border-r flex flex-col transition-transform duration-300 ease-out -translate-x-full shrink-0 overscroll-contain select-none shadow-2xl">
-        <div class="px-4 safe-top-sidebar border-b flex items-center justify-between gap-2 touch-none" style="border-color: var(--border-main)">
-            <div data-action="reset-and-close-sidebar" title="Показати всі посилання" class="key-press flex items-center gap-2.5 min-w-0 cursor-pointer">
-                <div class="w-10 h-10 flex items-center justify-center shrink-0">
+        <div class="px-4 safe-top-header border-b flex items-center justify-between gap-2 touch-none" style="border-color: var(--border-main)">
+            <div data-action="reset-and-close-sidebar" title="Показати всі посилання" class="key-press flex items-center gap-2 min-w-0 cursor-pointer">
+                <div class="w-8 h-8 flex items-center justify-center shrink-0">
                     <svg viewBox="0 0 2048 2048" class="w-full h-full drop-shadow-xs text-ink" xmlns="http://www.w3.org/2000/svg">
                         <path fill="currentColor" d="M 820.745 774.484 C 843.943 773.99 873.918 775.257 896.837 776.679 C 976.15 781.6 1061.49 792.356 1128.78 838.041 C 1194.53 882.69 1242.68 950.654 1257.85 1029.03 C 1208.06 1030.81 1114.09 1032.21 1070.34 1012.39 C 1057.54 1006.59 1048.04 997.356 1037.19 988.759 C 1026.23 980.074 1014.43 972.7 1001.26 967.858 C 926.976 940.551 772.06 945.932 690.612 955.345 C 544.138 972.273 403.224 1022 309.048 1140.88 C 237.059 1230.09 204.079 1344.56 217.568 1458.39 C 231.435 1569.88 289.137 1671.25 377.917 1740.09 C 465.695 1809.18 578.939 1849.08 690.998 1834.81 C 903.421 1807.77 1039.63 1638.79 1082.95 1438.5 C 1088.66 1412.8 1092.59 1386.74 1094.72 1360.5 C 1095.11 1355.7 1095.66 1338.72 1097.53 1336.33 L 1102 1335.91 C 1122.33 1336.33 1146.1 1338.33 1167.22 1339.02 C 1201.81 1339.88 1236.42 1340.02 1271.01 1339.43 C 1266.42 1377.03 1265.41 1411.49 1258.02 1450.12 C 1230.46 1594.11 1175.15 1722.01 1073.17 1828.16 C 964.32 1939.53 816.106 2003.75 660.404 2006.98 C 493.262 2010.27 337.212 1952.99 216.275 1837.64 C -28.8002 1603.91 -23.8879 1230.94 211.223 991.613 C 372.412 827.536 598.052 777.654 820.745 774.484 z"/>
                         <path fill="#DF6D27" d="M 1396.31 39.4755 C 1512.61 37.6317 1629.32 66.1793 1727.77 129.345 C 1864.71 218.317 1960.59 358.153 1994.23 517.959 C 2028.26 673.494 1996.72 832.794 1909.46 968.647 C 1732.09 1244.52 1388.18 1291.96 1087.03 1264.59 C 1048.66 1261.11 1009.23 1251.21 973.5 1236.71 C 886.848 1201.56 809.795 1113.6 790.003 1021.45 C 832.844 1021.23 946.663 1019.89 981.612 1037.17 C 998.635 1045.58 1010.96 1060.85 1027.08 1070.83 C 1056.87 1089.28 1097.11 1093.28 1131.48 1096.35 C 1235.42 1105.62 1351.69 1098.17 1453.25 1074.63 C 1620.82 1041.23 1770.82 924.626 1816.58 756.08 C 1854.48 616.481 1821.61 459.393 1726.31 349.829 C 1654.8 266.642 1552.75 215.815 1443.27 208.849 C 1329.89 200.394 1217.92 238.271 1132.96 313.824 C 1017.91 415.124 972.93 564.552 963.56 712.937 C 951.318 713.323 939.91 712.409 927.711 712.049 L 856.285 710.134 C 833.991 709.611 807.256 711.231 786.079 709.852 L 786.001 708.387 C 784.917 684.003 793.699 644.934 797.397 620.219 C 844.945 302.493 1060.97 53.5881 1396.31 39.4755 z"/>
@@ -561,10 +572,9 @@
                 </div>
                 <div class="min-w-0">
                     <div class="flex items-center gap-2">
-                        <h1 class="text-lg font-black tracking-tight uppercase truncate">LinkBox</h1>
-                        <span id="total-count-pill" class="text-xs font-mono-code font-bold px-2 py-0.5 rounded-md bg-accent text-onaccent shrink-0">10</span>
+                        <h1 class="text-base sm:text-lg font-black tracking-tight uppercase truncate">LinkBox</h1>
                     </div>
-                    <span class="text-[11px] font-mono-code theme-muted block truncate">Smart Link Organizer</span>
+                    <span class="text-[10px] font-mono-code theme-muted block truncate leading-none">Smart Link Organizer</span>
                 </div>
             </div>
             <button data-action="close-sidebar" class="key-press w-9 h-9 rounded-lg theme-input flex items-center justify-center shrink-0">
@@ -648,14 +658,14 @@
 
     <div class="flex-1 flex flex-col min-w-0 w-full">
         <!-- ВЕРХНЯЯ ШАПКА -->
-        <header data-action="scroll-top" class="sticky top-0 z-30 theme-header backdrop-blur-md border-b px-4 safe-top-header cursor-pointer select-none" title="Натисніть, щоб прокрутити наверх">
-            <div class="max-w-5xl mx-auto flex items-center justify-between gap-2.5">
-                <div class="flex items-center gap-2.5 min-w-0">
-                    <button data-action="open-sidebar" data-stop="1" title="Меню" class="key-press w-10 h-10 rounded-xl theme-input flex items-center justify-center hover:opacity-90 transition shrink-0">
-                        <svg class="w-5 h-5 mono-icon" viewBox="0 0 24 24"><line x1="3" y1="7" x2="21" y2="7"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="17" x2="15" y2="17"/></svg>
+        <header data-action="scroll-top" class="sticky top-0 z-30 theme-header backdrop-blur-md border-b px-4 safe-top-header cursor-pointer select-none" title="Тап: нагору, ще тап: усі посилання">
+            <div class="max-w-5xl mx-auto flex items-center justify-between gap-2">
+                <div class="flex items-center gap-2 min-w-0">
+                    <button data-action="open-sidebar" data-stop="1" title="Меню" class="key-press w-9 h-9 rounded-xl theme-input flex items-center justify-center hover:opacity-90 transition shrink-0">
+                        <svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24"><line x1="3" y1="7" x2="21" y2="7"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="17" x2="15" y2="17"/></svg>
                     </button>
 
-                    <div data-action="reset-all" data-stop="1" class="key-press w-9 h-9 flex items-center justify-center shrink-0 cursor-pointer">
+                    <div data-action="scroll-top" data-stop="1" class="key-press w-8 h-8 flex items-center justify-center shrink-0 cursor-pointer">
                         <svg viewBox="0 0 2048 2048" class="w-full h-full drop-shadow-xs text-ink" xmlns="http://www.w3.org/2000/svg">
                             <path fill="currentColor" d="M 820.745 774.484 C 843.943 773.99 873.918 775.257 896.837 776.679 C 976.15 781.6 1061.49 792.356 1128.78 838.041 C 1194.53 882.69 1242.68 950.654 1257.85 1029.03 C 1208.06 1030.81 1114.09 1032.21 1070.34 1012.39 C 1057.54 1006.59 1048.04 997.356 1037.19 988.759 C 1026.23 980.074 1014.43 972.7 1001.26 967.858 C 926.976 940.551 772.06 945.932 690.612 955.345 C 544.138 972.273 403.224 1022 309.048 1140.88 C 237.059 1230.09 204.079 1344.56 217.568 1458.39 C 231.435 1569.88 289.137 1671.25 377.917 1740.09 C 465.695 1809.18 578.939 1849.08 690.998 1834.81 C 903.421 1807.77 1039.63 1638.79 1082.95 1438.5 C 1088.66 1412.8 1092.59 1386.74 1094.72 1360.5 C 1095.11 1355.7 1095.66 1338.72 1097.53 1336.33 L 1102 1335.91 C 1122.33 1336.33 1146.1 1338.33 1167.22 1339.02 C 1201.81 1339.88 1236.42 1340.02 1271.01 1339.43 C 1266.42 1377.03 1265.41 1411.49 1258.02 1450.12 C 1230.46 1594.11 1175.15 1722.01 1073.17 1828.16 C 964.32 1939.53 816.106 2003.75 660.404 2006.98 C 493.262 2010.27 337.212 1952.99 216.275 1837.64 C -28.8002 1603.91 -23.8879 1230.94 211.223 991.613 C 372.412 827.536 598.052 777.654 820.745 774.484 z"/>
                             <path fill="#DF6D27" d="M 1396.31 39.4755 C 1512.61 37.6317 1629.32 66.1793 1727.77 129.345 C 1864.71 218.317 1960.59 358.153 1994.23 517.959 C 2028.26 673.494 1996.72 832.794 1909.46 968.647 C 1732.09 1244.52 1388.18 1291.96 1087.03 1264.59 C 1048.66 1261.11 1009.23 1251.21 973.5 1236.71 C 886.848 1201.56 809.795 1113.6 790.003 1021.45 C 832.844 1021.23 946.663 1019.89 981.612 1037.17 C 998.635 1045.58 1010.96 1060.85 1027.08 1070.83 C 1056.87 1089.28 1097.11 1093.28 1131.48 1096.35 C 1235.42 1105.62 1351.69 1098.17 1453.25 1074.63 C 1620.82 1041.23 1770.82 924.626 1816.58 756.08 C 1854.48 616.481 1821.61 459.393 1726.31 349.829 C 1654.8 266.642 1552.75 215.815 1443.27 208.849 C 1329.89 200.394 1217.92 238.271 1132.96 313.824 C 1017.91 415.124 972.93 564.552 963.56 712.937 C 951.318 713.323 939.91 712.409 927.711 712.049 L 856.285 710.134 C 833.991 709.611 807.256 711.231 786.079 709.852 L 786.001 708.387 C 784.917 684.003 793.699 644.934 797.397 620.219 C 844.945 302.493 1060.97 53.5881 1396.31 39.4755 z"/>
@@ -664,21 +674,17 @@
                         </svg>
                     </div>
 
-                    <div data-action="reset-all" data-stop="1" class="key-press flex flex-col min-w-0 cursor-pointer" title="Натисніть, щоб скинути фільтри">
+                    <div data-action="scroll-top" data-stop="1" class="key-press flex flex-col min-w-0 cursor-pointer" title="Тап: нагору, ще тап: усі посилання">
                         <div class="flex items-center gap-2">
                             <h1 class="text-base sm:text-lg font-black tracking-tight uppercase truncate">LinkBox</h1>
                         </div>
-                        <div class="flex items-center gap-1.5 mt-0.5">
-                            <span class="text-[11px] font-mono-code theme-muted block truncate">Smart Link Organizer</span>
+                        <div class="flex items-center gap-1.5 leading-none">
+                            <span class="text-[10px] font-mono-code theme-muted block truncate">Smart Link Organizer</span>
                             <button id="offline-queue-pill" data-action="process-offline" data-stop="1" title="Черга офлайн-посилань" class="hidden text-[10px] font-mono-code font-bold px-1.5 py-0.5 rounded-md bg-amber-500/20 text-amber-600 border border-amber-500/40 shrink-0 items-center gap-1">
                                 <span>⏳</span><span id="offline-queue-count">0</span>
                             </button>
                         </div>
                     </div>
-                </div>
-
-                <div class="flex items-center gap-2 shrink-0">
-                    <span id="mobile-count-pill" title="Усього посилань у базі" class="h-9 px-3 rounded-xl bg-accent text-onaccent text-xs font-mono-code font-black flex items-center justify-center shrink-0 shadow-xs">10</span>
                 </div>
             </div>
         </header>
@@ -716,6 +722,7 @@
             </div>
 
             <div id="cards-container"></div>
+            <div id="cards-scroll-sentinel" class="h-4 w-full"></div>
         </main>
     </div>
 
@@ -1034,7 +1041,14 @@
 
                         <!-- Експорт -->
                         <div class="space-y-2.5 pt-3.5 border-t" style="border-color: var(--border-main);">
-                            <div class="text-xs font-extrabold" id="btn-export-html">Експорт бази</div>
+                            <div class="flex items-center justify-between gap-2">
+                                <div class="text-xs font-extrabold" id="btn-export-html">Експорт бази</div>
+                                <span id="storage-persist-badge" class="text-[10px] font-mono-code font-bold px-2 py-0.5 rounded-md theme-input theme-muted">Пам’ять: перевірка…</span>
+                            </div>
+                            <div id="backup-reminder-banner" class="hidden rounded-xl p-2.5 bg-amber-500/15 border border-amber-500/40 text-amber-600 text-[11px] font-bold flex items-center justify-between gap-2">
+                                <span id="backup-reminder-text">⚠️ Ви давно не зберігали копію у файл</span>
+                                <button type="button" data-action="export-json" class="key-press px-2.5 py-1 rounded-lg bg-amber-500 text-white font-black text-[10px] uppercase shrink-0">Зберегти</button>
+                            </div>
                             <div class="grid grid-cols-2 gap-2">
                                 <button type="button" data-action="export-html" class="key-press py-3 px-3 rounded-xl theme-input text-xs font-bold flex items-center justify-center gap-1.5 hover:text-accent transition border">
                                     <span class="font-mono-code text-accent font-black">.HTML</span>
@@ -1219,6 +1233,12 @@
                         <label class="text-[11px] font-mono-code font-bold uppercase theme-muted" id="lbl-tags">#Теги</label>
                         <input id="sheet-tags" type="text" class="w-full mt-1 theme-input rounded-lg px-3.5 py-2.5 text-sm font-mono-code outline-none">
                     </div>
+                    <div id="sheet-same-domain-wrap" class="hidden pt-2">
+                        <button type="button" data-action="open-domain-links-sheet" class="key-press w-full py-3 px-4 rounded-xl theme-input border flex items-center justify-between gap-3 text-xs sm:text-sm font-bold hover:border-accent hover:text-accent transition">
+                            <span>Інші посилання з цього сайту</span>
+                            <span id="sheet-same-domain-count" class="font-mono-code font-black text-accent px-2.5 py-0.5 rounded-md bg-accent/15">0</span>
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -1226,6 +1246,45 @@
                 <button data-action="delete-current" class="key-press px-4 py-2.5 rounded-lg bg-rose-500/15 text-rose-500 text-xs font-extrabold" id="btn-delete">Видалити</button>
                 <button data-action="save-sheet" class="key-press px-6 py-2.5 rounded-lg bg-ink text-onink text-xs sm:text-sm font-extrabold" id="btn-save">Зберегти</button>
             </div>
+        </div>
+    </div>
+
+    <!-- ШТОРКА ІНШИХ ПОСИЛАНЬ З ЦЬОГО САЙТУ -->
+    <div id="domain-links-sheet-modal" data-backdrop="close-domain-links-sheet" class="sheet-backdrop fixed inset-0 bg-black/60 z-50 hidden items-end sm:items-center justify-center p-0 sm:p-4">
+        <div id="domain-links-sheet-panel" class="sheet-panel theme-surface w-full max-w-md rounded-t-2xl sm:rounded-xl p-5 border-t sm:border space-y-4 max-h-[85vh] overflow-y-auto flex flex-col">
+            <div id="domain-links-drag-handle" class="w-12 h-2 bg-stone-400/50 rounded-full mx-auto -mt-1 cursor-grab active:cursor-grabbing touch-none sm:hidden shrink-0"></div>
+            <div class="flex items-center justify-between gap-3 pt-1 shrink-0">
+                <div class="flex items-center gap-3 min-w-0">
+                    <span id="domain-sheet-favicon" class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"></span>
+                    <div class="min-w-0">
+                        <div class="font-black text-sm sm:text-base uppercase tracking-tight truncate" id="domain-sheet-title">Інші посилання з сайту</div>
+                        <div class="text-xs font-mono-code theme-muted truncate mt-0.5" id="domain-sheet-sub">domain.com</div>
+                    </div>
+                </div>
+                <button data-action="close-domain-links-sheet" class="key-press w-9 h-9 rounded-lg theme-input flex items-center justify-center shrink-0"><svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+            </div>
+            <div class="flex items-center justify-between text-xs font-mono-code font-bold theme-muted px-1 border-b pb-3 shrink-0" style="border-color: var(--border-main)">
+                <span>Знайдено у базі:</span>
+                <span id="domain-sheet-count" class="text-accent bg-accent/15 px-2.5 py-0.5 rounded-md">0</span>
+            </div>
+            <div id="domain-sheet-list" class="flex-1 overflow-y-auto space-y-3 pt-1 pb-3"></div>
+        </div>
+    </div>
+
+    <!-- ПОВНОЕКРАННИЙ ОВЕРЛЕЙ ПРОГРЕСУ ІМПОРТУ (ЗАХИСТ ВІД ЗАВИСАННЯ / ANR) -->
+    <div id="import-progress-overlay" class="fixed inset-0 bg-black/60 backdrop-blur-xs hidden items-center justify-center p-4 select-none" style="z-index: 99998;">
+        <div class="theme-surface w-full max-w-sm rounded-2xl p-5 border space-y-3.5 shadow-2xl text-center">
+            <div class="w-11 h-11 rounded-xl bg-accent/15 text-accent flex items-center justify-center mx-auto">
+                <svg class="w-6 h-6 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-6.22-8.56"/></svg>
+            </div>
+            <div class="space-y-1">
+                <div class="font-black text-base tracking-tight" id="import-progress-title">Імпорт закладок...</div>
+                <div class="text-xs font-mono-code theme-muted" id="import-progress-sub">Підготовка файлу…</div>
+            </div>
+            <div class="h-2 rounded-full bg-black/10 overflow-hidden">
+                <div id="import-progress-bar" class="h-full bg-accent transition-all duration-150" style="width: 0%"></div>
+            </div>
+            <div class="text-[11px] theme-muted">Не закривайте додаток до завершення</div>
         </div>
     </div>
 
@@ -1350,13 +1409,18 @@
         let ITEMS = structuredClone(DEFAULT_ITEMS);
         const STORAGE_KEY = 'linkbox_android_v3';
 
-        // --- INDEXED_DB СХОВИЩЕ (НАДІЙНЕ ЗБЕРЕЖЕННЯ) ---
+        // --- INDEXED_DB СХОВИЩЕ (НАДІЙНЕ ЗБЕРЕЖЕННЯ БЕЗ ЛІМІТІВ ТА ГОНОК) ---
         const DB_NAME = 'LinkBoxDB';
         const DB_VERSION = 1;
         const STORE_NAME = 'StateStore';
+        let _cachedDBPromise = null;
+        let _saveStateTimer = null;
+        let _cachedAutoSnap = null;
+        let _cachedResortUndo = null;
 
         function getDB() {
-            return new Promise((resolve, reject) => {
+            if (_cachedDBPromise) return _cachedDBPromise;
+            _cachedDBPromise = new Promise((resolve, reject) => {
                 const request = indexedDB.open(DB_NAME, DB_VERSION);
                 request.onupgradeneeded = (event) => {
                     const db = event.target.result;
@@ -1364,55 +1428,142 @@
                         db.createObjectStore(STORE_NAME);
                     }
                 };
-                request.onsuccess = () => resolve(request.result);
-                request.onerror = () => reject(request.error);
+                request.onsuccess = () => {
+                    const db = request.result;
+                    db.onclose = () => { _cachedDBPromise = null; };
+                    db.onversionchange = () => { db.close(); _cachedDBPromise = null; };
+                    resolve(db);
+                };
+                request.onerror = () => {
+                    _cachedDBPromise = null;
+                    reject(request.error);
+                };
             });
+            return _cachedDBPromise;
         }
 
-        async function saveStateToStorage() {
+        async function _idbPut(key, val) {
+            try {
+                const db = await getDB();
+                return new Promise((resolve, reject) => {
+                    const tx = db.transaction(STORE_NAME, 'readwrite');
+                    tx.objectStore(STORE_NAME).put(val, key);
+                    tx.oncomplete = () => resolve(true);
+                    tx.onerror = () => reject(tx.error);
+                });
+            } catch (e) {
+                console.error('IDB Put Error:', key, e);
+                return false;
+            }
+        }
+
+        async function _idbGet(key) {
+            try {
+                const db = await getDB();
+                return new Promise((resolve) => {
+                    const tx = db.transaction(STORE_NAME, 'readonly');
+                    const req = tx.objectStore(STORE_NAME).get(key);
+                    req.onsuccess = () => resolve(req.result || null);
+                    req.onerror = () => resolve(null);
+                });
+            } catch (e) {
+                return null;
+            }
+        }
+
+        async function _idbDelete(key) {
+            try {
+                const db = await getDB();
+                return new Promise((resolve) => {
+                    const tx = db.transaction(STORE_NAME, 'readwrite');
+                    tx.objectStore(STORE_NAME).delete(key);
+                    tx.oncomplete = () => resolve(true);
+                    tx.onerror = () => resolve(false);
+                });
+            } catch (e) {
+                return false;
+            }
+        }
+
+        async function _flushStateToStorageNow() {
             try {
                 checkAndSaveWeeklyAutoSnapshot(false);
                 const state = { items: ITEMS, lockedFolders: Array.from(LOCKED_FOLDERS), themeMode, viewMode, sortMode, fontScale };
-                const db = await getDB();
-                const tx = db.transaction(STORE_NAME, 'readwrite');
-                tx.objectStore(STORE_NAME).put(state, 'app_state');
+                await _idbPut('app_state', state);
             } catch (e) {
                 console.error('IDB Save Error:', e);
             }
         }
 
+        function saveStateToStorage(immediate = false) {
+            if (_saveStateTimer) {
+                clearTimeout(_saveStateTimer);
+                _saveStateTimer = null;
+            }
+            if (immediate) {
+                return _flushStateToStorageNow();
+            }
+            _saveStateTimer = setTimeout(() => {
+                _saveStateTimer = null;
+                _flushStateToStorageNow();
+            }, 120);
+        }
+
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'hidden' && _saveStateTimer) {
+                clearTimeout(_saveStateTimer);
+                _saveStateTimer = null;
+                _flushStateToStorageNow();
+            }
+        });
+
         async function loadStateFromStorage() {
             try {
-                const db = await getDB();
-                return new Promise((resolve) => {
-                    const tx = db.transaction(STORE_NAME, 'readonly');
-                    const request = tx.objectStore(STORE_NAME).get('app_state');
-                    
-                    request.onsuccess = () => {
-                        const parsed = request.result;
-                        if (!parsed) {
-                            // Міграція зі старого localStorage, якщо файл оновлено
-                            const rawOld = localStorage.getItem(STORAGE_KEY) || localStorage.getItem('linkbox_android_v2');
-                            if (rawOld) {
-                                try {
-                                    const oldParsed = JSON.parse(rawOld);
-                                    _applyState(oldParsed);
-                                    saveStateToStorage(); // Зберігаємо в нову базу
-                                    return resolve(true);
-                                } catch(e) {}
-                            }
-                            ITEMS = structuredClone(DEFAULT_ITEMS);
-                            resolve(false);
-                            return;
+                _cachedAutoSnap = await _idbGet('auto_snap');
+                if (!_cachedAutoSnap) {
+                    try {
+                        const rawSnap = localStorage.getItem(AUTO_SNAP_KEY);
+                        if (rawSnap) {
+                            _cachedAutoSnap = JSON.parse(rawSnap);
+                            await _idbPut('auto_snap', _cachedAutoSnap);
+                            localStorage.removeItem(AUTO_SNAP_KEY);
                         }
-                        _applyState(parsed);
-                        resolve(true);
-                    };
-                    request.onerror = () => {
-                        ITEMS = structuredClone(DEFAULT_ITEMS);
-                        resolve(false);
-                    };
-                });
+                    } catch (e) {}
+                } else {
+                    try { localStorage.removeItem(AUTO_SNAP_KEY); } catch (e) {}
+                }
+
+                _cachedResortUndo = await _idbGet('resort_undo');
+                if (!_cachedResortUndo) {
+                    try {
+                        const rawUndo = localStorage.getItem('linkbox_resort_undo_v1');
+                        if (rawUndo) {
+                            _cachedResortUndo = JSON.parse(rawUndo);
+                            await _idbPut('resort_undo', _cachedResortUndo);
+                            localStorage.removeItem('linkbox_resort_undo_v1');
+                        }
+                    } catch (e) {}
+                } else {
+                    try { localStorage.removeItem('linkbox_resort_undo_v1'); } catch (e) {}
+                }
+
+                const parsed = await _idbGet('app_state');
+                if (!parsed) {
+                    const rawOld = localStorage.getItem(STORAGE_KEY) || localStorage.getItem('linkbox_android_v2');
+                    if (rawOld) {
+                        try {
+                            const oldParsed = JSON.parse(rawOld);
+                            _applyState(oldParsed);
+                            await saveStateToStorage(true);
+                            try { localStorage.removeItem(STORAGE_KEY); localStorage.removeItem('linkbox_android_v2'); } catch (e) {}
+                            return true;
+                        } catch(e) {}
+                    }
+                    ITEMS = structuredClone(DEFAULT_ITEMS);
+                    return false;
+                }
+                _applyState(parsed);
+                return true;
             } catch (e) {
                 ITEMS = structuredClone(DEFAULT_ITEMS);
                 return false;
@@ -1423,7 +1574,7 @@
             if (Array.isArray(parsed.items)) {
                 ITEMS = parsed.items.map(it => {
                     const normCats = getItemCats(it);
-                    return { ...it, url: cleanRawUrl(it.url), color: sanitizeColor(it.color), cat: normCats[0], cats: normCats, pinned: Boolean(it.pinned), folderPriority: Boolean(it.folderPriority), pendingOffline: Boolean(it.pendingOffline), lockedOverride: typeof it.lockedOverride === 'boolean' ? it.lockedOverride : null, isRead: it.isRead !== false };
+                    return { ...it, url: cleanRawUrl(it.url), color: sanitizeColor(it.color), cat: normCats[0], cats: normCats, pinned: Boolean(it.pinned), folderPriority: Boolean(it.folderPriority), pendingOffline: Boolean(it.pendingOffline), lockedOverride: typeof it.lockedOverride === 'boolean' ? it.lockedOverride : null, isRead: it.isRead !== false, autoCat: it.autoCat !== false, userEdited: Boolean(it.userEdited) };
                 });
             } else { ITEMS = structuredClone(DEFAULT_ITEMS); }
             if (Array.isArray(parsed.lockedFolders)) LOCKED_FOLDERS = new Set(parsed.lockedFolders);
@@ -1461,15 +1612,24 @@
             }
         }
 
+        let _navLockTimer = null;
+        function _lockNavEvents(ms = 120) {
+            _ignoreNextNavEvent = true;
+            if (_navLockTimer) clearTimeout(_navLockTimer);
+            _navLockTimer = setTimeout(() => {
+                _ignoreNextNavEvent = false;
+                _navLockTimer = null;
+            }, ms);
+        }
+
         function _restoreGuardHash() {
             try {
-                _ignoreNextNavEvent = true;
+                _lockNavEvents(90);
                 if (isAnyModalOpen()) {
                     if (location.hash !== '#modal') history.pushState({ id: 'modal' }, '', '#modal');
                 } else {
-                    if (location.hash !== '#home') history.pushState({ appGuard: true }, '', '#home');
+                    if (location.hash !== '#home') history.replaceState({ appGuard: true }, '', '#home');
                 }
-                setTimeout(() => { _ignoreNextNavEvent = false; }, 60);
             } catch (e) {
                 _ignoreNextNavEvent = false;
             }
@@ -1488,6 +1648,11 @@
             }
             if (document.getElementById('bulk-edit-sheet-modal')?.classList.contains('open')) {
                 viaHistory ? _hideBulkEditSheet() : closeBulkEditSheet();
+                if (viaHistory) _restoreGuardHash();
+                return true;
+            }
+            if (document.getElementById('domain-links-sheet-modal')?.classList.contains('open')) {
+                viaHistory ? _hideDomainLinksSheet() : closeDomainLinksSheet();
                 if (viaHistory) _restoreGuardHash();
                 return true;
             }
@@ -1620,9 +1785,8 @@
             try {
                 _armHistoryTrapOnInteraction();
                 if (location.hash !== '#modal') {
-                    _ignoreNextNavEvent = true;
+                    _lockNavEvents(80);
                     history.pushState({ id: 'modal' }, '', '#modal');
-                    setTimeout(() => { _ignoreNextNavEvent = false; }, 50);
                 }
             } catch (e) {
                 _ignoreNextNavEvent = false;
@@ -1633,9 +1797,8 @@
             hideFn();
             try {
                 if (!isAnyModalOpen() && location.hash === '#modal') {
-                    _ignoreNextNavEvent = true;
-                    history.back();
-                    setTimeout(() => { _ignoreNextNavEvent = false; }, 260);
+                    _lockNavEvents(140);
+                    history.replaceState({ appGuard: true }, '', '#home');
                 }
             } catch (e) {
                 _ignoreNextNavEvent = false;
@@ -1713,7 +1876,7 @@
         }
 
         function _forceCloseAllUI() {
-            _hideSidebar(); _hideCatsSheet(); _hideTagsSheet(); _hideSettingsSheet(); _hideAboutSheet(); _hideCalendarSheet(); _hideEditSheet(); _hideBulkEditSheet(); _hideQRModal(); _hideConfirmModal();
+            _hideSidebar(); _hideCatsSheet(); _hideTagsSheet(); _hideSettingsSheet(); _hideAboutSheet(); _hideCalendarSheet(); _hideEditSheet(); _hideDomainLinksSheet(); _hideBulkEditSheet(); _hideQRModal(); _hideConfirmModal();
         }
 
         function openMobileSidebar() {
@@ -1879,11 +2042,7 @@
             const first = `https://www.google.com/s2/favicons?domain=${encodeURIComponent(cleanDom)}&sz=64`;
             const rest = [`https://${cleanDom}/favicon.ico`, `https://icons.duckduckgo.com/ip3/${cleanDom}.ico`].join('|');
             
-            const fallbackSvg = `
-                <svg viewBox="0 0 2048 2048" class="w-full h-full opacity-50" xmlns="http://www.w3.org/2000/svg">
-                    <path fill="currentColor" d="M 820.745 774.484 C 843.943 773.99 873.918 775.257 896.837 776.679 C 976.15 781.6 1061.49 792.356 1128.78 838.041 C 1194.53 882.69 1242.68 950.654 1257.85 1029.03 C 1208.06 1030.81 1114.09 1032.21 1070.34 1012.39 C 1057.54 1006.59 1048.04 997.356 1037.19 988.759 C 1026.23 980.074 1014.43 972.7 1001.26 967.858 C 926.976 940.551 772.06 945.932 690.612 955.345 C 544.138 972.273 403.224 1022 309.048 1140.88 C 237.059 1230.09 204.079 1344.56 217.568 1458.39 C 231.435 1569.88 289.137 1671.25 377.917 1740.09 C 465.695 1809.18 578.939 1849.08 690.998 1834.81 C 903.421 1807.77 1039.63 1638.79 1082.95 1438.5 C 1088.66 1412.8 1092.59 1386.74 1094.72 1360.5 C 1095.11 1355.7 1095.66 1338.72 1097.53 1336.33 L 1102 1335.91 C 1122.33 1336.33 1146.1 1338.33 1167.22 1339.02 C 1201.81 1339.88 1236.42 1340.02 1271.01 1339.43 C 1266.42 1377.03 1265.41 1411.49 1258.02 1450.12 C 1230.46 1594.11 1175.15 1722.01 1073.17 1828.16 C 964.32 1939.53 816.106 2003.75 660.404 2006.98 C 493.262 2010.27 337.212 1952.99 216.275 1837.64 C -28.8002 1603.91 -23.8879 1230.94 211.223 991.613 C 372.412 827.536 598.052 777.654 820.745 774.484 z"/>
-                </svg>
-            `;
+            const fallbackSvg = `<svg viewBox="0 0 2048 2048" class="w-full h-full opacity-50"><use href="#lb-logo-fallback"/></svg>`;
 
             return `
                 <span class="${sizeClass} rounded-lg flex items-center justify-center overflow-hidden shrink-0 bg-white/95 border border-black/10 shadow-2xs relative">
@@ -1900,19 +2059,29 @@
             document.body.appendChild(a); a.click(); setTimeout(() => { if (a.parentNode) a.parentNode.removeChild(a); }, 150);
         }
 
+        let _searchDebounceTimer = null;
+        let _renderLimit = 40;
+        let _lastFilterSignature = '';
+
         function onSearchInput() {
             const input = document.getElementById('search-input'); const clearBtn = document.getElementById('clear-search-btn');
             if (input && clearBtn) {
                 if (input.value.trim().length > 0) { clearBtn.classList.remove('hidden'); clearBtn.classList.add('flex'); }
                 else { clearBtn.classList.add('hidden'); clearBtn.classList.remove('flex'); }
             }
-            renderApp();
+            if (_searchDebounceTimer) clearTimeout(_searchDebounceTimer);
+            _searchDebounceTimer = setTimeout(() => {
+                _renderLimit = 40;
+                renderApp();
+            }, 180);
         }
 
         function clearSearchInput() {
+            if (_searchDebounceTimer) { clearTimeout(_searchDebounceTimer); _searchDebounceTimer = null; }
             const input = document.getElementById('search-input'); const clearBtn = document.getElementById('clear-search-btn');
             if (input) input.value = '';
             if (clearBtn) { clearBtn.classList.add('hidden'); clearBtn.classList.remove('flex'); }
+            _renderLimit = 40;
             renderApp();
         }
 
@@ -1944,7 +2113,7 @@
         function toggleCardSelect(id, e) {
             if (e) e.stopPropagation();
             if (selectedIds.has(id)) selectedIds.delete(id); else selectedIds.add(id);
-            updateBulkBarUI(); renderApp();
+            updateBulkBarUI(); renderApp(true);
         }
 
         function getFilteredItems() {
@@ -2178,6 +2347,7 @@
         function syncSettingsSheetUI() {
             setImportDupMode(importDuplicateMode || 'skip');
             syncAutoSnapButtonUI();
+            syncBackupAndPersistenceUI();
             const aiSub = document.getElementById('settings-ai-status-sub');
             if (aiSub) {
                 const cfg = getAiConfig();
@@ -2214,60 +2384,65 @@
 
         function renderAboutContent() {
             const container = document.getElementById('about-sheet-body'); if (!container) return;
+            const chip = (txt, hot) => `<span class="px-2.5 py-1 rounded-md text-sm font-mono-code font-bold ${hot ? 'bg-accent/15 text-accent' : 'theme-input'}">${txt}</span>`;
+            const row = (title, text, extra = '', first = false) => `<div class="${first ? '' : 'pt-3 border-t'} space-y-2.5" style="border-color: var(--border-main)"><p class="text-base leading-relaxed" style="color: var(--text-main)"><b class="font-extrabold">${title}</b> ${text}</p>${extra}</div>`;
+            const group = (open, num, title, sub, rows) => `<details ${open ? 'open' : ''} class="about-acc theme-card border rounded-xl overflow-hidden"><summary class="flex items-center gap-3 px-4 py-3.5 cursor-pointer select-none"><span class="text-sm font-mono-code font-black text-accent shrink-0">${num}</span><span class="min-w-0 flex-1"><span class="block font-black text-lg uppercase tracking-tight leading-tight">${title}</span><span class="block text-sm theme-muted truncate mt-0.5">${sub}</span></span><span class="about-chev text-accent text-lg leading-none shrink-0 transition-transform">›</span></summary><div class="px-4 pt-3 space-y-3 border-t" style="border-color: var(--border-main); padding-bottom: 1rem">${rows}</div></details>`;
+
+            const scheme = `<div class="flex items-center gap-1.5 flex-wrap">${chip('натискання')}<span class="opacity-50">→</span>${chip('нагору', true)}<span class="opacity-50">→</span>${chip('ще раз')}<span class="opacity-50">→</span>${chip('усі лінки', true)}</div>`;
+
             container.innerHTML = `
-                <div class="theme-card border rounded-xl p-3.5 space-y-1.5">
-                    <div class="font-extrabold text-sm text-accent">Анти-цвинтар для твоїх закладок 🪦✨</div>
-                    <p class="text-xs sm:text-sm theme-muted leading-relaxed">Знайома ситуація: 347 відкритих вкладок у браузері «обов’язково прочитаю в суботу», які висять там із 2019 року? <b>LinkBox</b> створений, щоб навести лад, розкласти все по поличках і не дати загубити жодного лінка.</p>
+                <div class="space-y-2.5">
+                    ${group(true, '01', 'Головний екран', 'шапка, пошук, Pin-бар, вигляд',
+                        row('Шапка.', 'Натискання по ній піднімає стрічку на верх поточного фільтра. Повторне, коли вже нагорі, скидає всі фільтри й повертає повний список. Працює як ліфт: спершу на верхній поверх, потім у вестибюль.', scheme, true) +
+                        row('Пошук.', 'Одночасно перебирає назву, домен, заголовок, папки, нотатку та #теги. Пам’ять тепер у телефоні, а голова вільна для чогось корисного.') +
+                        row('Рандом.', 'Відкриває випадкове посилання з бази, закриті замком пропускає. Лотерея, де програти неможливо.') +
+                        row('Pin-бар.', 'Закріплені сайти лежать у горизонтальній стрічці над списком: іконка, назва, один дотик. VIP-зона для тих, кого відкривають щодня.') +
+                        row('Вигляд.', 'Картки малі, великі або списком. Сортування: нові, старі, А–Я. Тема: світла, темна чи OLED (чорний буде по-справжньому чорним). Розмір тексту: A-, A, A+.') +
+                        row('Жести.', 'Свайп від лівого краю відкриває меню, свайп вправо по шторці закриває її. Протягування стрічки вниз оновлює заголовки, описи та іконки сайтів. Кнопка «Назад» закриває шторки, а не весь додаток.')
+                    )}
+                    ${group(false, '02', 'Додавання', 'вставити й забути',
+                        row('Поле вводу.', 'Приймає один лінк, добірку лінків або шматок тексту з адресами всередині. Адреси знаходяться самі, а utm-мітки, зайві коми й дужки зрізаються. Копіпаст із месенджера теж вважається вхідними даними.', '', true) +
+                        row('Поділитися.', 'У встановленій PWA-версії LinkBox з’являється в системному меню «Поділитися»: лінк із браузера летить сюди без копіювання.') +
+                        row('Підтвердження.', 'Після додавання видно, у яку папку потрапило посилання і якою мовою сайт.') +
+                        row('Дублікати.', 'Повторне додавання блокується, а стара картка підсвічується. Зберігати те саме двічі — це вже колекціонування.') +
+                        row('NEW.', 'Мітка тримається до першого відкриття. Усі непрочитані зібрані в папці «Непрочитані (NEW)» — чесний лічильник відкладеного «на потім».') +
+                        row('Офлайн-черга.', 'Без мережі лінк чекає в папці «Очікують мережі», а бейдж у шапці показує їх кількість. З’явилося з’єднання — оновлення стрічки дообробляє чергу. Інтернет може піти по хліб, лінки почекають.')
+                    )}
+                    ${group(false, '03', 'Порядок', 'папки, теги, ШІ',
+                        row('Категорії й теги.', 'У меню лежать найпопулярніші, а повні списки відкриваються окремими шторками з пошуком і сортуванням: популярні, А–Я, Я–А.', '', true) +
+                        row('Мульти-папки.', 'Один сайт може жити в кількох папках: вони вписуються через кому. Плашки папок і #теги на картках натискаються й одразу фільтрують стрічку.') +
+                        row('Автопілот.', 'Без ключа працюють вбудовані правила: тема визначається за сайтом і змістом, а на виправленнях вони вчаться. Налаштувань нуль.') +
+                        row('Нейромережа.', 'Підключається через Gemini, Groq чи Mistral (є безкоштовні варіанти) або власний Base URL. До ШІ йдуть тільки заголовок, опис і домен. Якщо ШІ недоступний, запасні правила вмикаються самі.') +
+                        row('Перерозпізнавання.', 'Застосовує поточний режим до вже збереженого: лише до «Веб-ресурсів» або до всієї бази. Закриті та 18+ не чіпає. Передумати можна: є «Скасувати».') +
+                        row('Скріпка й зірочка.', 'Скріпка закріплює лінк у Pin-барі над усіма папками. Зірочка ★ піднімає його нагору, але лише у своїх папках.')
+                    )}
+                    ${group(false, '04', 'Картка', 'редагування та дрібні фішки',
+                        row('Редагування.', 'Натискання по тілу картки відкриває шторку: URL, назва, нотатка, папки, #теги. Сірі підказки поруч додають суміжні категорії одним дотиком.', '', true) +
+                        row('Переписати.', 'Підтягує свіжий опис із сайту або формує нову нотатку, якщо стара набридла.') +
+                        row('QR-код.', 'Малюється без мережі й з логотипом. Поруч «Копіювати URL» та «Поділитися». Телефон у ролі візитівки.') +
+                        row('Інші посилання з сайту.', 'Окрема шторка зі всім, що вже збережено з цього ж домену. Якщо один сайт займає пів бази, тут видно, наскільки пів.') +
+                        row('Видалення.', 'Тільки через підтвердження, тож випадкове торкання не знищить закладку.')
+                    )}
+                    ${group(false, '05', 'Безпека', 'замки, 18+, захист бази',
+                        row('Замок.', 'Вішається на папку або на окрему картку. Прямий перехід блокується, а копіювання URL лишається. Нарада, маршрутка й сторонні погляди більше не проблема.', '', true) +
+                        row('Полуничка 18+.', 'Контент для дорослих автоматично потрапляє в окрему папку під замок. Коментарі зайві.') +
+                        row('Захист пам’яті.', 'Додаток просить систему не чистити його дані автоматично, а в налаштуваннях показує статус захисту.') +
+                        row('Нагадування.', 'Якщо копію у файл давно не зберігали (понад два тижні), з’являється попередження.')
+                    )}
+                    ${group(false, '06', 'Масові дії й календар', 'порядок у великих обсягах',
+                        row('Мульти-вибір.', 'Вмикається кнопкою внизу меню. Можна вибрати все видиме, масово змінити папки й теги (додати до наявних або замінити; порожні поля нічого не чіпають), поділитися списком чи видалити вибране.', '', true) +
+                        row('Календар.', 'Історія збережень по днях. Натискання на день розкриває список за цю дату: відкрити, скопіювати, редагувати. Хронологія для питання «а коли це взагалі було?».')
+                    )}
+                    ${group(false, '07', 'Дані', 'імпорт, експорт, зліпки',
+                        row('Імпорт.', 'Приймає .HTML і .JSON. Режим «Без дублів» лишає наявне недоторканим, «Оновлювати» перезаписує старі картки. Після завершення звіт: скільки нових і скільки дублікатів.', '', true) +
+                        row('Експорт.', '.HTML відкривається в будь-якому браузері, .JSON — повний бекап з усіма папками, тегами й замками.') +
+                        row('Авто-зліпок.', 'Раз на тиждень, або коли база помітно виросла, створюється локальна копія. Відновлення — однією кнопкою в налаштуваннях. Три рівні страховки: паранойя тут називається плануванням.')
+                    )}
                 </div>
-                <div class="space-y-2.5 text-xs sm:text-sm">
-                    <div class="theme-card border rounded-xl p-3.5 space-y-1">
-                        <div class="font-bold">1. Шапка-телепорт та кнопка скидання</div>
-                        <p class="theme-muted">Закопався внизу довгого списку? Тапни по <b>верхній шапці</b> — миттєво полетиш нагору. Заблукав у фільтрах, тегах чи пошуку? Тапни на логотип <b>LinkBox</b> — і ти знову бачиш усі свої посилання.</p>
-                    </div>
-                    <div class="theme-card border rounded-xl p-3.5 space-y-1">
-                        <div class="font-bold">2. Всеїдний ввід, детектор клонів та плашка NEW</div>
-                        <p class="theme-muted">Кидай у поле вводу хоч одне посилання, хоч ціле простирадло тексту з купою адрес. Кнопка <b>«+ Додати»</b> сама вичистить сміття (<code>utm</code>-мітки, зайві коми й дужки), зловить дублікат (і підсвітить стару картку!), а на свіжі лінки повісить бейдж <b>NEW</b>, доки ти їх реально не відкриєш.</p>
-                    </div>
-                    <div class="theme-card border rounded-xl p-3.5 space-y-1">
-                        <div class="font-bold">3. Розумні папки: Автопілот vs Нейромережа (✨)</div>
-                        <p class="theme-muted">Без жодних налаштувань працює вбудований мозок, який сам розпізнає тему й навчається на твоїх правках. Хочеш турбо-магії? У меню натисни <b>✨</b>, встав безкоштовний API-ключ (Gemini, Groq, Mistral тощо) — і нейромережа розкладе по папках хоч усю стару базу в один клік (є кнопка <b>«Скасувати»</b>, якщо ШІ раптом перемудрив).</p>
-                    </div>
-                    <div class="theme-card border rounded-xl p-3.5 space-y-1">
-                        <div class="font-bold">4. Офлайн-черга ⏳ та «Потягни-онови»</div>
-                        <p class="theme-muted">Немає світла чи інтернету? Додавай лінки спокійно — вони почекають у папці <b>«⏳ Очікують мережі»</b>. Коли зв’язок з’явиться, просто <b>потягни головну стрічку вниз</b> (кружечок зверху підтягне живі заголовки, описи та кольорові фавіконки). Тільки не смикай кружечок без мережі десять разів підряд — він уміє огризатися!</p>
-                    </div>
-                    <div class="theme-card border rounded-xl p-3.5 space-y-1">
-                        <div class="font-bold">5. Скріпка (Pin-бар) vs Зірочка ★ (Топ у папці)</div>
-                        <p class="theme-muted">Два рівні крутості для важливих сайтів:</p>
-                        <ul class="list-disc list-inside space-y-1 theme-muted pt-0.5">
-                            <li><b>Скріпка на картці:</b> прибиває сайт у верхній горизонтальний Pin-бар на головній (завжди під рукою над усіма папками).</li>
-                            <li><b>Зірочка ★ (всередині картки):</b> тихо піднімає лінк на самий верх лише всередині його папок.</li>
-                        </ul>
-                    </div>
-                    <div class="theme-card border rounded-xl p-3.5 space-y-1">
-                        <div class="font-bold">6. Мульти-папки, #теги та сірі підказки</div>
-                        <p class="theme-muted">Один сайт може жити хоч у трьох папках одночасно (просто пиши їх через кому). Кольорові плашки папок і <code>#теги</code> на картках клікабельні, а у вікні редагування система підкидає <b>сірі AI-підказки</b> суміжних категорій в один тап.</p>
-                    </div>
-                    <div class="theme-card border rounded-xl p-3.5 space-y-1">
-                        <div class="font-bold">7. Режим «Сейф» 🔒 та Полуничка 18+</div>
-                        <p class="theme-muted">Пікантний контент (18+) автоматично летить у папку <b>«Полуничка 18+»</b> і закривається на замок. Такий замок можна повісити на будь-яку папку чи окрему картку: прямий клік блокується (щоб випадково не відкрити щось у маршрутці чи на нараді), але скопіювати URL кнопкою поруч можна завжди.</p>
-                    </div>
-                    <div class="theme-card border rounded-xl p-3.5 space-y-1">
-                        <div class="font-bold">8. Миттєвий QR-код (100% офлайн) та «Переписати»</div>
-                        <p class="theme-muted">У налаштуваннях кожної картки є генератор <b>QR-коду</b> з фірмовим логотипом (працює за 0 мс навіть у глибокому бункері без мережі) та кнопка <b>«Переписати»</b>, яка витягує свіжий опис прямо з сайту або генерує новий варіант нотатки.</p>
-                    </div>
-                    <div class="theme-card border rounded-xl p-3.5 space-y-1">
-                        <div class="font-bold">9. Підвал меню: Мульти-вибір, Календар та Налаштування</div>
-                        <p class="theme-muted">Унизу бокового меню живуть 3 головні кнопки: <b>Галочка мульти-вибору</b> (групова зміна папок/тегів, шерінг списком, видалення), <b>Календар активності</b> (історія збережень по днях) та вікно <b>«Налаштування»</b>, де зібрано 3 теми (Світла, Темна, OLED), 3 формати карток, сортування і розмір тексту (<b>A- / A / A+</b>).</p>
-                    </div>
-                    <div class="theme-card border rounded-xl p-3.5 space-y-1">
-                        <div class="font-bold">10. Фільтр NEW, Імпорт/Експорт, Авто-зліпок та Жести</div>
-                        <p class="theme-muted">Непрочитані лінки автоматично збираються у швидку папку <b>«🔥 Непрочитані (NEW)»</b>. У <b>Налаштуваннях</b> можна імпортувати закладки (з вибором: без дублів чи оновлювати старі), зробити експорт у <code>.HTML</code> / <code>.JSON</code> або відновити тижневий <b>авто-зліпок бази</b>. Свайп зліва відкриває меню, справа — закриває вікна (подвійний свайп — вихід).</p>
-                    </div>
-                </div>
+
                 <div class="theme-card border border-accent/40 rounded-xl p-4 text-center space-y-2 mt-3">
-                    <div class="font-black text-sm sm:text-base tracking-tight">Shans</div>
-                    <div class="flex items-center justify-center gap-2 font-extrabold text-sm">
+                    <div class="font-black text-base tracking-tight">Shans</div>
+                    <div class="flex items-center justify-center gap-2 font-extrabold text-base">
                         <span>Слава Україні!</span>
                         <svg viewBox="0 0 24 16" class="w-6 h-4 rounded-xs shadow-2xs shrink-0" style="border: 1px solid rgba(0,0,0,0.08);" title="Україна" xmlns="http://www.w3.org/2000/svg">
                             <rect width="24" height="8" y="0" fill="#0057B7"/>
@@ -2293,8 +2468,8 @@
             const previewEl = document.getElementById('sidebar-tags-preview'); if (!previewEl) return;
             const topTags = getTagMapSorted('popular').slice(0, 15);
             previewEl.innerHTML = topTags.map(tObj => {
-                const isAct = selectedTag && selectedTag.toLowerCase() === tObj.label.toLowerCase(); const safeTag = escJsAttr(tObj.label);
-                return `<button data-action="select-tag" data-tag="${esc(tObj.label)}" class="key-press px-2 py-1 rounded-md text-[11px] font-mono-code font-bold flex items-center gap-1 transition ${isAct ? 'bg-accent text-onaccent' : 'theme-input opacity-85 hover:opacity-100'}"><span>${esc(tObj.label)}</span><span class="text-[9px] opacity-70">${tObj.count}</span></button>`;
+                const isAct = selectedTag && selectedTag.toLowerCase() === tObj.label.toLowerCase();
+                return `<button data-action="select-tag" data-tag="${esc(tObj.label)}" class="key-press px-3 py-2 rounded-lg text-xs sm:text-sm font-bold flex items-center gap-1.5 transition ${isAct ? 'bg-accent text-onaccent' : 'theme-input'}"><span>${esc(tObj.label)}</span><span class="text-xs font-mono-code font-bold opacity-75">${tObj.count}</span></button>`;
             }).join('');
         }
 
@@ -2426,6 +2601,58 @@
             showToast(toastMsg);
         }
 
+        const LAST_FILE_BACKUP_KEY = 'linkbox_last_file_backup_v1';
+        let _isStoragePersisted = false;
+
+        async function initPersistentStorageShield() {
+            try {
+                if (navigator.storage && typeof navigator.storage.persist === 'function') {
+                    const already = await navigator.storage.persisted();
+                    _isStoragePersisted = already ? true : await navigator.storage.persist();
+                }
+            } catch (e) {}
+        }
+
+        function recordFileBackupDone(count) {
+            try {
+                localStorage.setItem(LAST_FILE_BACKUP_KEY, JSON.stringify({ at: Date.now(), count: count || ITEMS.length }));
+            } catch (e) {}
+        }
+
+        function syncBackupAndPersistenceUI() {
+            const badge = document.getElementById('storage-persist-badge');
+            if (badge) {
+                if (_isStoragePersisted) {
+                    badge.textContent = '🛡️ Захищено від авто-очищення';
+                    badge.className = 'text-[10px] font-mono-code font-bold px-2 py-0.5 rounded-md ai-state-ok';
+                } else {
+                    badge.textContent = `База: ${ITEMS.length} шт.`;
+                    badge.className = 'text-[10px] font-mono-code font-bold px-2 py-0.5 rounded-md theme-input theme-muted';
+                }
+            }
+            const banner = document.getElementById('backup-reminder-banner');
+            const bannerTxt = document.getElementById('backup-reminder-text');
+            if (!banner || !bannerTxt) return;
+            try {
+                const raw = localStorage.getItem(LAST_FILE_BACKUP_KEY);
+                const info = raw ? JSON.parse(raw) : null;
+                const now = Date.now();
+                const TWO_WEEKS = 14 * 24 * 60 * 60 * 1000;
+                const unsavedNew = info ? (ITEMS.length - (info.count || 0)) : ITEMS.length;
+                const tooOld = !info || !info.at || (now - info.at) > TWO_WEEKS;
+                if (ITEMS.length >= 25 && (unsavedNew >= 25 || (tooOld && unsavedNew >= 5))) {
+                    bannerTxt.textContent = !info
+                        ? `⚠️ У базі вже ${ITEMS.length} посилань — збережіть копію у файл`
+                        : `⚠️ +${Math.max(0, unsavedNew)} нових посилань без файлового бекапу`;
+                    banner.classList.remove('hidden');
+                } else {
+                    banner.classList.add('hidden');
+                }
+            } catch (e) {
+                banner.classList.add('hidden');
+            }
+        }
+
         function exportBrowserBookmarks() {
             const foldersMap = {};
             ITEMS.forEach(item => { getItemCats(item).forEach(catName => { if (!foldersMap[catName]) foldersMap[catName] = []; foldersMap[catName].push(item); }); });
@@ -2438,12 +2665,14 @@
             });
             html += `</DL><p>\n`;
             const dateTag = new Date().toISOString().slice(0, 10);
+            recordFileBackupDone(ITEMS.length);
             _exportFileAndroidAndShare(`linkbox_bookmarks_${dateTag}.html`, html, 'text/html', t('exported'));
         }
 
         function exportFullJsonBackup() {
             const backup = { app: 'LinkBox', version: 2, exportedAt: new Date().toISOString(), items: ITEMS, lockedFolders: Array.from(LOCKED_FOLDERS), themeMode, viewMode, sortMode, fontScale };
             const dateTag = new Date().toISOString().slice(0, 10);
+            recordFileBackupDone(ITEMS.length);
             _exportFileAndroidAndShare(`linkbox_backup_${dateTag}.json`, JSON.stringify(backup, null, 2), 'application/json', t('exportedJson'));
         }
 
@@ -2462,20 +2691,37 @@
             return item.isRead === false ? `<span class="unread-badge font-mono-code" title="Нове посилання">NEW</span>` : '';
         }
 
-        function renderApp() {
-            document.getElementById('total-count-pill').textContent = `${ITEMS.length}`;
-            const mobPill = document.getElementById('mobile-count-pill'); if (mobPill) mobPill.textContent = `${ITEMS.length}`;
-            const offlineCount = ITEMS.filter(i => i.pendingOffline).length;
+        let _lastScopeSig = null;
+        function renderApp(keepLimit = false) {
+            const totPill = document.getElementById('total-count-pill'); if (totPill) totPill.textContent = `${ITEMS.length}`;
+                        const offlineCount = ITEMS.filter(i => i.pendingOffline).length;
             const offlinePill = document.getElementById('offline-queue-pill'); const offlineCountEl = document.getElementById('offline-queue-count');
             if (offlinePill && offlineCountEl) {
                 if (offlineCount > 0) { offlineCountEl.textContent = `${offlineCount}`; offlinePill.classList.remove('hidden'); offlinePill.classList.add('inline-flex'); }
                 else { offlinePill.classList.add('hidden'); offlinePill.classList.remove('inline-flex'); }
             }
 
-
             renderFoldersInMenu(); renderSidebarTagsPreview(); renderPinnedBar();
-            const filtered = getFilteredItems(); const cardsEl = document.getElementById('cards-container');
-            if (filtered.length === 0) { cardsEl.className = ''; cardsEl.innerHTML = `<div class="py-12 text-center text-sm theme-muted font-mono-code">Порожньо</div>`; return; }
+            const qSig = (document.getElementById('search-input')?.value || '').trim().toLowerCase();
+            const filterSig = `${selectedFolder}|${selectedTag || ''}|${sortMode}|${viewMode}|${qSig}`;
+            const scopeSig = `${selectedFolder}|${selectedTag || ''}`;
+            if (typeof _lastScopeSig !== 'undefined' && scopeSig !== _lastScopeSig) {
+                window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+                document.documentElement.scrollTop = 0; document.body.scrollTop = 0;
+            }
+            _lastScopeSig = scopeSig;
+            if (!keepLimit && filterSig !== _lastFilterSignature) {
+                _renderLimit = 40;
+                _lastFilterSignature = filterSig;
+            }
+
+            const allFiltered = getFilteredItems(); const cardsEl = document.getElementById('cards-container');
+            if (allFiltered.length === 0) { cardsEl.className = ''; cardsEl.innerHTML = `<div class="py-12 text-center text-sm theme-muted font-mono-code">Порожньо</div>`; return; }
+            if (highlightedDuplicateId) {
+                const dupIdx = allFiltered.findIndex(x => x.id === highlightedDuplicateId);
+                if (dupIdx >= _renderLimit) _renderLimit = dupIdx + 10;
+            }
+            const filtered = allFiltered.slice(0, _renderLimit);
 
             
 
@@ -2513,6 +2759,21 @@
                     return `<div id="card-${s.id}" ${clickActionAttr} class="rounded-xl p-3 theme-card border flex items-center justify-between gap-3 cursor-pointer hover:border-accent transition ${isDup || isSelected ? 'ring-2 ring-accent border-accent' : ''}"><div class="flex items-center gap-2.5 min-w-0 flex-1">${isSelectMode ? `<span class="w-6 h-6 rounded-md border flex items-center justify-center shrink-0 ${isSelected ? 'bg-accent border-accent text-white' : 'theme-input'}">${isSelected ? '✓' : ''}</span>` : ''}<div class="relative">${getSiteFaviconHtml(s, 'w-8 h-8', 'w-5 h-5')}</div><div class="min-w-0 flex-1"><div class="flex items-center gap-1.5 min-w-0"><div class="font-bold text-sm truncate">${esc(s.title)}</div>${renderUnreadDot(s)}</div><div class="flex items-center justify-end flex-wrap gap-1 mt-1">${renderCatBadges(s)}</div><div class="text-xs theme-muted truncate">${esc(s.note)}</div></div></div><div class="flex items-center gap-1.5 shrink-0"><button data-action="toggle-pin" data-id="${s.id}" data-stop="1" title="${t('pinBtn')}" class="key-press w-8 h-8 rounded-lg flex items-center justify-center transition ${s.pinned ? 'text-accent bg-accent/15' : 'theme-input opacity-55 hover:opacity-100'}">${s.pinned ? LINE_ICONS.pinFilled : LINE_ICONS.pin}</button>${renderPrioStar(s, 'w-8 h-8')}<button data-action="open-item" data-id="${s.id}" data-stop="1" ${locked ? 'disabled' : ''} class="w-9 h-9 rounded-lg flex items-center justify-center transition ${locked ? 'theme-input opacity-45 cursor-not-allowed' : 'key-press bg-accent text-onaccent'}">${locked ? LINE_ICONS.lock : LINE_ICONS.extArrow}</button><button data-action="copy-url" data-url="${esc(s.url)}" data-stop="1" class="key-press w-9 h-9 rounded-lg theme-input flex items-center justify-center"><svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="1"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div></div>`;
                 }).join('');
             }
+        }
+
+        function attachLazyScrollObserver() {
+            const sentinel = document.getElementById('cards-scroll-sentinel');
+            if (!sentinel || !('IntersectionObserver' in window)) return;
+            const obs = new IntersectionObserver((entries) => {
+                if (entries[0] && entries[0].isIntersecting) {
+                    const total = getFilteredItems().length;
+                    if (_renderLimit < total) {
+                        _renderLimit += 40;
+                        renderApp(true);
+                    }
+                }
+            }, { rootMargin: '320px 0px' });
+            obs.observe(sentinel);
         }
 
         function normalizeUrlForCompare(raw) {
@@ -2952,18 +3213,24 @@
             let lastErr = null;
             for (let i = 0; i < candidates.length; i++) {
                 const m = candidates[i];
-                try {
-                    const out = await _callSingleLLM(cfg, m, system, user);
-                    cfg.activeModel = m;
-                    return out;
-                } catch (e) {
-                    lastErr = e;
-                    // Якщо помилка 404 або 400 (модель недоступна для цього ключа), пробуємо наступну модель із запасу
-                    if (e && (e.httpStatus === 404 || e.httpStatus === 400) && i < candidates.length - 1) {
-                        continue;
+                for (let attempt = 0; attempt < 2; attempt++) {
+                    try {
+                        const out = await _callSingleLLM(cfg, m, system, user);
+                        cfg.activeModel = m;
+                        return out;
+                    } catch (e) {
+                        lastErr = e;
+                        if (e && e.httpStatus === 429 && attempt === 0) {
+                            await new Promise(r => setTimeout(r, 3500));
+                            continue;
+                        }
+                        break;
                     }
-                    throw e;
                 }
+                if (lastErr && (lastErr.httpStatus === 404 || lastErr.httpStatus === 400 || lastErr.httpStatus === 429) && i < candidates.length - 1) {
+                    continue;
+                }
+                throw lastErr;
             }
             throw lastErr || new Error('не вдалося виконати запит');
         }
@@ -3148,18 +3415,24 @@
             const low = n.toLowerCase(); if (CAT_DEFS.some(d => low.indexOf(d.name.toLowerCase()) !== -1)) return '';
             return n;
         }
+        function _isManuallyEditedItem(it) {
+            return Boolean(it.userEdited || it.autoCat === false);
+        }
         function _resortTargets(mode) {
             return ITEMS.filter(it => {
                 if (it.pendingOffline || it.lockedOverride === true) return false;
                 const cats = getItemCats(it); if (cats.some(c => /18\+/.test(c))) return false;
-                return mode === 'all' ? true : (cats.length === 1 && cats[0] === WEB_DEF.name);
+                if (mode === 'all') return true;
+                if (_isManuallyEditedItem(it)) return false;
+                return cats.length === 1 && cats[0] === WEB_DEF.name;
             });
         }
-        function _hasResortUndo() { try { const u = JSON.parse(localStorage.getItem(RESORT_UNDO_KEY) || 'null'); return u && Array.isArray(u.items) ? u.items.length : 0; } catch (e) { return 0; } }
+        function _hasResortUndo() { return _cachedResortUndo && Array.isArray(_cachedResortUndo.items) ? _cachedResortUndo.items.length : 0; }
         function renderResortCard() {
             if (!_aiEl('resort-card')) return;
             const nWeb = _resortTargets('web').length, nAll = _resortTargets('all').length;
             const n = _resortMode === 'all' ? nAll : nWeb;
+            const manualInTarget = _resortTargets(_resortMode).filter(_isManuallyEditedItem).length;
             _aiEl('resort-count').textContent = `${nWeb} / ${nAll}`;
             ['web', 'all'].forEach(m => {
                 const b = _aiEl('resort-mode-' + m); if (!b) return;
@@ -3167,8 +3440,8 @@
             });
             const run = _aiEl('resort-run');
             if (run) {
-                run.textContent = _resortRunning ? 'Стоп' : (_resortArmed ? `Підтвердити: перезапис ${n}` : 'Перерозпізнати');
-                run.className = 'key-press flex-1 py-3 rounded-lg text-xs font-black ' + (_resortArmed || _resortRunning ? 'bg-accent text-onaccent' : 'bg-accent text-onaccent');
+                run.textContent = _resortRunning ? 'Стоп' : (_resortArmed ? (manualInTarget > 0 ? `Підтвердити (ручних: ${manualInTarget})` : `Підтвердити: перезапис ${n}`) : 'Перерозпізнати');
+                run.className = 'key-press flex-1 py-3 rounded-lg text-xs font-black bg-accent text-onaccent';
                 run.style.opacity = (!_resortRunning && n === 0) ? '0.45' : '1';
             }
             const u = _hasResortUndo(); const ub = _aiEl('resort-undo');
@@ -3177,7 +3450,10 @@
         function setResortMode(m) {
             if (_resortRunning) return;
             _resortMode = m === 'all' ? 'all' : 'web'; _resortArmed = false; clearTimeout(_resortArmTimer);
-            _aiEl('resort-status').textContent = _resortMode === 'all' ? 'Усі посилання: ручні папки теж будуть перезаписані. Це можна скасувати.' : 'Лише ті, що зараз у «Веб-ресурси». Безпечно.';
+            const manualCount = _resortTargets('all').filter(_isManuallyEditedItem).length;
+            _aiEl('resort-status').textContent = _resortMode === 'all'
+                ? (manualCount > 0 ? `⚠️ Увага: серед усіх посилань є ${manualCount} відредагованих вручну! Їхні папки теж перезапишуться (нотатки та назви збережуться).` : 'Усі посилання будуть перерозпізнані. Це можна скасувати.')
+                : 'Лише нерозібрані («Веб-ресурси»). Картки з ручними правками захищені і не чіпаються.';
             renderResortCard();
         }
         async function runResort() {
@@ -3190,26 +3466,36 @@
             }
             _resortArmed = false; clearTimeout(_resortArmTimer);
             const snapshot = targets.map(it => ({ id: it.id, cats: getItemCats(it).slice(), cat: it.cat, color: it.color, svg: it.svg, tags: (it.tags || []).slice() }));
-            try { localStorage.setItem(RESORT_UNDO_KEY, JSON.stringify({ items: snapshot, at: Date.now() })); } catch (e) {}
+            _cachedResortUndo = { items: snapshot, at: Date.now() };
+            _idbPut('resort_undo', _cachedResortUndo);
             _resortRunning = true; _resortAbort = false; renderResortCard();
             const bar = _aiEl('resort-bar'), wrap = _aiEl('resort-progress'); if (wrap) wrap.style.display = 'block';
             const cfg = getAiConfig(); let aiDead = false, aiErr = '', changed = 0, done = 0; const queue = targets.slice();
+            let aiConsecutiveErrors = 0;
             async function worker() {
                 while (queue.length && !_resortAbort) {
                     const it = queue.shift(); const before = getItemCats(it).join('|'); let res = null;
                     const title = _usableTitle(it), desc = _usableDesc(it);
                     if (cfg && !aiDead && (title || desc)) {
-                        try { res = await aiClassifyRaw(cfg, it.domain, title, desc); } catch (e) { aiDead = true; aiErr = (e && e.message) || String(e); }
+                        try {
+                            res = await aiClassifyRaw(cfg, it.domain, title, desc);
+                            aiConsecutiveErrors = 0;
+                            if (queue.length && !_resortAbort) await new Promise(r => setTimeout(r, 1200));
+                        } catch (e) {
+                            aiConsecutiveErrors++;
+                            aiErr = (e && e.message) || String(e);
+                            if (aiConsecutiveErrors >= 3) aiDead = true;
+                        }
                     }
                     if (res) _applyCats(it, res.folders, res.tags);
                     else { const sm = buildSmartAIItem(it.url, title, desc); _applyCats(it, sm.cats, null); it.color = sm.color; it.svg = sm.svg; }
                     if (getItemCats(it).join('|') !== before) changed++;
                     done++;
-                    if (done % 10 === 0 || done === targets.length) { if (bar) bar.style.width = Math.round(done / targets.length * 100) + '%'; st.textContent = `${done} / ${targets.length}`; }
-                    if (done % 25 === 0) { saveStateToStorage(); await new Promise(r => setTimeout(r, 0)); }
+                    if (done % 5 === 0 || done === targets.length) { if (bar) bar.style.width = Math.round(done / targets.length * 100) + '%'; st.textContent = `${done} / ${targets.length}`; }
+                    if (done % 20 === 0) { saveStateToStorage(); await new Promise(r => setTimeout(r, 0)); }
                 }
             }
-            try { await Promise.all(Array.from({ length: cfg ? 2 : 1 }, () => worker())); }
+            try { await Promise.all(Array.from({ length: 1 }, () => worker())); }
             finally {
                 _resortRunning = false; saveStateToStorage(); renderFoldersInMenu(); renderApp();
                 if (wrap) wrap.style.display = 'none'; if (bar) bar.style.width = '0%';
@@ -3218,12 +3504,13 @@
             }
         }
         function undoResort() {
-            let u; try { u = JSON.parse(localStorage.getItem(RESORT_UNDO_KEY) || 'null'); } catch (e) { u = null; }
+            const u = _cachedResortUndo;
             if (!u || !Array.isArray(u.items) || _resortRunning) return;
             const byId = new Map(ITEMS.map(it => [it.id, it])); let n = 0;
             u.items.forEach(s => { const it = byId.get(s.id); if (!it) return; it.cats = s.cats.slice(); it.cat = s.cat; it.color = s.color; it.svg = s.svg; it.tags = s.tags.slice(); n++; });
-            try { localStorage.removeItem(RESORT_UNDO_KEY); } catch (e) {}
-            saveStateToStorage(); renderFoldersInMenu(); renderApp();
+            _cachedResortUndo = null;
+            _idbDelete('resort_undo');
+            saveStateToStorage(true); renderFoldersInMenu(); renderApp();
             _aiEl('resort-status').textContent = `Скасовано: повернуто ${n}.`; renderResortCard();
         }
 
@@ -3416,15 +3703,21 @@
             const offlineCountEl = document.getElementById('offline-queue-count');
             if (offlineCountEl) offlineCountEl.textContent = `${pending.length}`;
 
-            const CONCURRENCY = 4;
+            const hasActiveAI = Boolean(getAiConfig());
+            const CONCURRENCY = hasActiveAI ? 1 : 4;
             let idx = 0;
             async function worker() {
                 while (idx < pending.length) {
                     const item = pending[idx++];
                     const meta = await fetchRealTitleAndDesc(item.url);
-                    if (meta) {
+                    if (meta && !item.userEdited && item.autoCat !== false) {
                         if (meta.title && meta.title.length > 2) item.title = meta.title.slice(0, 120);
-                        if (item.autoCat === true) { try { await reclassifyItem(item, meta); } catch (e) {} }
+                        if (item.autoCat === true) {
+                            try { await reclassifyItem(item, meta); } catch (e) {}
+                            if (hasActiveAI && idx < pending.length) {
+                                await new Promise(r => setTimeout(r, 1200));
+                            }
+                        }
                         if (!isUkrainianText(item.note) || !meta.desc || !isUkrainianText(meta.desc)) {
                             item.note = buildUkrainianNoteForItem(item, item.title, meta.desc);
                         } else if (meta.desc && meta.desc.length > 5 && isUkrainianText(meta.desc)) {
@@ -3436,7 +3729,7 @@
                     processedCount++;
                     if (processedCount % 5 === 0 || processedCount === pending.length) {
                         saveStateToStorage();
-                        renderApp();
+                        renderApp(true);
                     }
                 }
             }
@@ -3639,15 +3932,13 @@
         function checkAndSaveWeeklyAutoSnapshot(force = false) {
             try {
                 if (!Array.isArray(ITEMS) || ITEMS.length === 0) return;
-                const raw = localStorage.getItem(AUTO_SNAP_KEY);
                 const now = Date.now();
                 const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
                 let shouldSnap = force;
-                if (!raw) {
+                if (!_cachedAutoSnap) {
                     shouldSnap = true;
                 } else {
-                    const parsed = JSON.parse(raw);
-                    if (!parsed.savedAt || (now - parsed.savedAt) >= WEEK_MS || (ITEMS.length > (parsed.count || 0) + 10)) {
+                    if (!_cachedAutoSnap.savedAt || (now - _cachedAutoSnap.savedAt) >= WEEK_MS || (ITEMS.length > (_cachedAutoSnap.count || 0) + 10)) {
                         shouldSnap = true;
                     }
                 }
@@ -3656,10 +3947,17 @@
                         savedAt: now,
                         dateLabel: new Date(now).toLocaleDateString('uk-UA'),
                         count: ITEMS.length,
-                        items: ITEMS,
+                        items: structuredClone(ITEMS),
                         lockedFolders: Array.from(LOCKED_FOLDERS)
                     };
-                    localStorage.setItem(AUTO_SNAP_KEY, JSON.stringify(snap));
+                    _cachedAutoSnap = snap;
+                    _idbPut('auto_snap', snap);
+                    if (window.LinkBoxNative && typeof window.LinkBoxNative.saveSilentBackup === 'function') {
+                        try {
+                            window.LinkBoxNative.saveSilentBackup('linkbox_autosnap.json', JSON.stringify(snap));
+                            recordFileBackupDone(ITEMS.length);
+                        } catch (e) {}
+                    }
                 }
             } catch (e) {}
         }
@@ -3669,9 +3967,7 @@
             const meta = document.getElementById('autosnap-meta-label');
             if (!wrap) return;
             try {
-                const raw = localStorage.getItem(AUTO_SNAP_KEY);
-                if (!raw) { wrap.classList.add('hidden'); return; }
-                const snap = JSON.parse(raw);
+                const snap = _cachedAutoSnap;
                 if (snap && Array.isArray(snap.items) && snap.items.length > 0) {
                     if (meta) meta.textContent = `${snap.items.length} шт. • ${snap.dateLabel || ''}`;
                     wrap.classList.remove('hidden');
@@ -3685,10 +3981,8 @@
 
         function restoreFromAutoSnapshot() {
             try {
-                const raw = localStorage.getItem(AUTO_SNAP_KEY);
-                if (!raw) { showToast('Авто-зліпок ще не створено'); return; }
-                const snap = JSON.parse(raw);
-                if (!snap || !Array.isArray(snap.items)) return;
+                const snap = _cachedAutoSnap;
+                if (!snap || !Array.isArray(snap.items)) { showToast('Авто-зліпок ще не створено'); return; }
                 let added = 0, updated = 0;
                 snap.items.forEach(it => {
                     const existing = findDuplicateItem(it.url);
@@ -3702,7 +3996,7 @@
                     }
                 });
                 if (Array.isArray(snap.lockedFolders)) snap.lockedFolders.forEach(f => LOCKED_FOLDERS.add(f));
-                saveStateToStorage();
+                saveStateToStorage(true);
                 renderFoldersInMenu();
                 renderApp();
                 closeSettingsSheet(); closeMobileSidebar();
@@ -3738,97 +4032,201 @@
             if (fileInput) { fileInput.value = ''; fileInput.click(); }
         }
 
+        function _setImportOverlay(visible, title = 'Імпорт закладок...', sub = '', pct = 0) {
+            const ov = document.getElementById('import-progress-overlay');
+            if (!ov) return;
+            if (!visible) {
+                ov.classList.add('hidden');
+                ov.classList.remove('flex');
+                return;
+            }
+            ov.classList.remove('hidden');
+            ov.classList.add('flex');
+            const tEl = document.getElementById('import-progress-title');
+            const sEl = document.getElementById('import-progress-sub');
+            const bEl = document.getElementById('import-progress-bar');
+            if (tEl) tEl.textContent = title;
+            if (sEl) sEl.textContent = sub;
+            if (bEl) bEl.style.width = `${Math.max(0, Math.min(100, Math.round(pct)))}%`;
+        }
+
         function handleAIFileImport(event) {
             const file = event.target.files?.[0]; if (!file) return;
+            _setImportOverlay(true, 'Читання файлу...', file.name || '', 5);
             const reader = new FileReader();
-            reader.onload = (e) => {
-                const content = String(e.target?.result || '');
-                const shouldUpdateDups = importDuplicateMode === 'update';
+            reader.onerror = () => {
+                _setImportOverlay(false);
+                showToast('Помилка читання файлу');
+            };
+            reader.onload = async (e) => {
                 try {
-                    const maybeJson = JSON.parse(content);
+                    const content = String(e.target?.result || '');
+                    const shouldUpdateDups = importDuplicateMode === 'update';
+                    await new Promise(r => setTimeout(r, 25));
+
+                    // Миттєвий індекс дублікатів O(1), щоб не гальмувати на тисячах закладок
+                    const existingMap = new Map();
+                    ITEMS.forEach(item => {
+                        const key = normalizeUrlForCompare(item.url);
+                        if (key && !existingMap.has(key)) existingMap.set(key, item);
+                    });
+
+                    let maybeJson = null;
+                    if (content.trim().startsWith('{')) {
+                        try { maybeJson = JSON.parse(content); } catch (err) {}
+                    }
+
                     if (maybeJson && Array.isArray(maybeJson.items)) {
+                        const list = maybeJson.items;
+                        const total = list.length;
                         let added = 0, dups = 0, updated = 0;
-                        maybeJson.items.forEach(it => {
-                            const existing = findDuplicateItem(it.url);
-                            if (existing) {
-                                dups++;
-                                if (shouldUpdateDups) {
+                        const CHUNK = 200;
+                        for (let i = 0; i < total; i += CHUNK) {
+                            const slice = list.slice(i, i + CHUNK);
+                            slice.forEach(it => {
+                                const key = normalizeUrlForCompare(it.url);
+                                if (!key) return;
+                                const existing = existingMap.get(key);
+                                if (existing) {
+                                    dups++;
+                                    if (shouldUpdateDups && !_isManuallyEditedItem(existing)) {
+                                        const normCats = getItemCats(it);
+                                        Object.assign(existing, {
+                                            name: it.name || existing.name,
+                                            title: it.title || existing.title,
+                                            note: it.note || existing.note,
+                                            cat: normCats[0],
+                                            cats: normCats,
+                                            color: sanitizeColor(it.color || existing.color),
+                                            tags: Array.isArray(it.tags) && it.tags.length ? it.tags : existing.tags,
+                                            pinned: Boolean(it.pinned ?? existing.pinned),
+                                            folderPriority: Boolean(it.folderPriority ?? existing.folderPriority)
+                                        });
+                                        updated++;
+                                    }
+                                } else {
                                     const normCats = getItemCats(it);
-                                    Object.assign(existing, {
-                                        name: it.name || existing.name,
-                                        title: it.title || existing.title,
-                                        note: it.note || existing.note,
-                                        cat: normCats[0],
-                                        cats: normCats,
-                                        color: sanitizeColor(it.color || existing.color),
-                                        tags: Array.isArray(it.tags) && it.tags.length ? it.tags : existing.tags,
-                                        pinned: Boolean(it.pinned ?? existing.pinned),
-                                        folderPriority: Boolean(it.folderPriority ?? existing.folderPriority)
-                                    });
-                                    updated++;
+                                    const newItem = { ...it, url: cleanRawUrl(it.url), color: sanitizeColor(it.color), cat: normCats[0], cats: normCats, pinned: Boolean(it.pinned), folderPriority: Boolean(it.folderPriority), pendingOffline: Boolean(it.pendingOffline), lockedOverride: typeof it.lockedOverride === 'boolean' ? it.lockedOverride : null, isRead: it.isRead !== false };
+                                    ITEMS.push(newItem);
+                                    existingMap.set(key, newItem);
+                                    added++;
                                 }
-                            } else {
-                                const normCats = getItemCats(it);
-                                ITEMS.push({ ...it, url: cleanRawUrl(it.url), color: sanitizeColor(it.color), cat: normCats[0], cats: normCats, pinned: Boolean(it.pinned), folderPriority: Boolean(it.folderPriority), pendingOffline: Boolean(it.pendingOffline), lockedOverride: typeof it.lockedOverride === 'boolean' ? it.lockedOverride : null, isRead: it.isRead !== false });
-                                added++;
+                            });
+                            if (total > CHUNK) {
+                                const done = Math.min(total, i + CHUNK);
+                                _setImportOverlay(true, 'Відновлення з бекапу...', `${done} / ${total}`, (done / total) * 100);
+                                await new Promise(r => setTimeout(r, 0));
                             }
-                        });
+                        }
                         if (Array.isArray(maybeJson.lockedFolders)) maybeJson.lockedFolders.forEach(f => LOCKED_FOLDERS.add(f));
-                        saveStateToStorage(); checkAndSaveWeeklyAutoSnapshot(true); renderFoldersInMenu(); renderApp(); closeSettingsSheet(); closeMobileSidebar();
+                        await saveStateToStorage(true);
+                        checkAndSaveWeeklyAutoSnapshot(true);
+                        recordFileBackupDone(ITEMS.length);
+                        _setImportOverlay(false);
+                        renderFoldersInMenu(); renderApp(); closeSettingsSheet(); closeMobileSidebar();
                         showToast(shouldUpdateDups ? `${t('restoredJson')}+${added} нових, оновлено ${updated} ✓` : `${t('restoredJson')}+${added} (пропущено дублів: ${dups})`, 4500);
                         return;
                     }
-                } catch (err) {}
 
-                const parser = new DOMParser(); const doc = parser.parseFromString(content, 'text/html'); const anchors = Array.from(doc.querySelectorAll('a[href]'));
-                let added = 0, dups = 0, updated = 0; const isOfflineNow = !navigator.onLine;
+                    _setImportOverlay(true, 'Аналіз посилань...', 'Розбір структури файлу…', 12);
+                    await new Promise(r => setTimeout(r, 20));
 
-                if (anchors.length > 0) {
-                    anchors.forEach(a => {
-                        const href = cleanRawUrl(a.getAttribute('href') || ''); if (!/^https?:\/\//i.test(href)) return;
-                        const textTitle = (a.textContent || '').trim();
-                        const existing = findDuplicateItem(href);
-                        if (existing) {
-                            dups++;
-                            if (shouldUpdateDups) {
-                                const fresh = buildSmartAIItem(href, textTitle);
-                                existing.title = fresh.title || existing.title;
-                                existing.note = fresh.note || existing.note;
-                                existing.cats = Array.from(new Set([...getItemCats(existing), ...fresh.cats]));
-                                existing.cat = existing.cats[0];
-                                existing.tags = Array.from(new Set([...(existing.tags || []), ...(fresh.tags || [])]));
-                                existing.pendingOffline = true;
-                                updated++;
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(content, 'text/html');
+                    const anchors = Array.from(doc.querySelectorAll('a[href]'));
+                    let added = 0, dups = 0, updated = 0;
+                    const isOfflineNow = !navigator.onLine;
+                    const newItemsBuffer = [];
+                    const CHUNK = 80;
+
+                    if (anchors.length > 0) {
+                        const total = anchors.length;
+                        for (let i = 0; i < total; i += CHUNK) {
+                            const slice = anchors.slice(i, i + CHUNK);
+                            slice.forEach(a => {
+                                const href = cleanRawUrl(a.getAttribute('href') || '');
+                                if (!/^https?:\/\//i.test(href)) return;
+                                const key = normalizeUrlForCompare(href);
+                                if (!key) return;
+                                const textTitle = (a.textContent || '').trim();
+                                const existing = existingMap.get(key);
+                                if (existing) {
+                                    dups++;
+                                    if (shouldUpdateDups && !_isManuallyEditedItem(existing)) {
+                                        const fresh = buildSmartAIItem(href, textTitle);
+                                        existing.title = fresh.title || existing.title;
+                                        existing.note = fresh.note || existing.note;
+                                        existing.cats = Array.from(new Set([...getItemCats(existing), ...fresh.cats]));
+                                        existing.cat = existing.cats[0];
+                                        existing.tags = Array.from(new Set([...(existing.tags || []), ...(fresh.tags || [])]));
+                                        existing.pendingOffline = true;
+                                        updated++;
+                                    }
+                                } else {
+                                    const created = buildSmartAIItem(href, textTitle);
+                                    created.pendingOffline = true;
+                                    newItemsBuffer.push(created);
+                                    existingMap.set(key, created);
+                                    added++;
+                                }
+                            });
+                            if (total > CHUNK) {
+                                const done = Math.min(total, i + CHUNK);
+                                _setImportOverlay(true, 'Імпорт закладок...', `Оброблено ${done} з ${total}`, 15 + (done / total) * 80);
+                                await new Promise(r => setTimeout(r, 0));
                             }
-                        } else {
-                            const created = buildSmartAIItem(href, textTitle); created.pendingOffline = true; ITEMS.unshift(created); added++;
                         }
-                    });
-                } else {
-                    const rawMatches = content.match(/(?:https?:\/\/|www\.)[^\s"'<>]+/gi) || [];
-                    rawMatches.forEach(rawU => {
-                        const cleanU = cleanRawUrl(rawU); if (!cleanU) return;
-                        const existing = findDuplicateItem(cleanU);
-                        if (existing) {
-                            dups++;
-                            if (shouldUpdateDups) {
-                                existing.pendingOffline = true;
-                                updated++;
+                    } else {
+                        const rawMatches = content.match(/(?:https?:\/\/|www\.)[^\s"'<>]+/gi) || [];
+                        const total = rawMatches.length;
+                        for (let i = 0; i < total; i += CHUNK) {
+                            const slice = rawMatches.slice(i, i + CHUNK);
+                            slice.forEach(rawU => {
+                                const cleanU = cleanRawUrl(rawU); if (!cleanU) return;
+                                const key = normalizeUrlForCompare(cleanU); if (!key) return;
+                                const existing = existingMap.get(key);
+                                if (existing) {
+                                    dups++;
+                                    if (shouldUpdateDups && !_isManuallyEditedItem(existing)) {
+                                        existing.pendingOffline = true;
+                                        updated++;
+                                    }
+                                } else {
+                                    const created = buildSmartAIItem(cleanU);
+                                    created.pendingOffline = true;
+                                    newItemsBuffer.push(created);
+                                    existingMap.set(key, created);
+                                    added++;
+                                }
+                            });
+                            if (total > CHUNK) {
+                                const done = Math.min(total, i + CHUNK);
+                                _setImportOverlay(true, 'Імпорт посилань...', `Оброблено ${done} з ${total}`, 15 + (done / total) * 80);
+                                await new Promise(r => setTimeout(r, 0));
                             }
-                        } else {
-                            const created = buildSmartAIItem(cleanU); created.pendingOffline = true; ITEMS.unshift(created); added++;
                         }
-                    });
+                    }
+
+                    if (newItemsBuffer.length > 0) {
+                        ITEMS.unshift(...newItemsBuffer.reverse());
+                    }
+
+                    await saveStateToStorage(true);
+                    checkAndSaveWeeklyAutoSnapshot(true);
+                    _setImportOverlay(false);
+                    renderFoldersInMenu(); renderApp(); closeSettingsSheet(); closeMobileSidebar();
+                    if (isOfflineNow) {
+                        showToast(t('aiAddedOffline'), 4500);
+                    } else if (shouldUpdateDups && updated > 0) {
+                        showToast(`Імпорт: +${added} нових, оновлено ${updated} дублікатів ✓`, 4500);
+                    } else {
+                        showToast(t('aiImportReport').replace('{added}', added).replace('{dups}', dups), 4500);
+                    }
+                    if (!isOfflineNow && (added > 0 || updated > 0)) processOfflineQueue(false);
+                } catch (err) {
+                    _setImportOverlay(false);
+                    showToast('Помилка під час імпорту файлу');
                 }
-                saveStateToStorage(); checkAndSaveWeeklyAutoSnapshot(true); renderFoldersInMenu(); renderApp(); closeSettingsSheet(); closeMobileSidebar();
-                if (isOfflineNow) {
-                    showToast(t('aiAddedOffline'), 4500);
-                } else if (shouldUpdateDups && updated > 0) {
-                    showToast(`Імпорт: +${added} нових, оновлено ${updated} дублікатів ✓`, 4500);
-                } else {
-                    showToast(t('aiImportReport').replace('{added}', added).replace('{dups}', dups), 4500);
-                }
-                if (!isOfflineNow && (added > 0 || updated > 0)) processOfflineQueue(false);
             };
             reader.readAsText(file);
         }
@@ -3887,6 +4285,90 @@
             inputEl.value = cats.join(', '); renderCategorySuggestions();
         }
 
+        function _normDomainHost(domOrUrl) {
+            const s = String(domOrUrl || '').trim().toLowerCase().replace(/^https?:\/\//, '').split('/')[0].replace(/^(?:www|m|mobile)\./, '');
+            return s;
+        }
+
+        function getSameDomainItems(baseItem) {
+            if (!baseItem) return [];
+            const targetDom = _normDomainHost(baseItem.domain || baseItem.url);
+            if (!targetDom) return [];
+            return ITEMS.filter(x => x.id !== baseItem.id && _normDomainHost(x.domain || x.url) === targetDom);
+        }
+
+        function syncSameDomainRowInSheet(item) {
+            const wrap = document.getElementById('sheet-same-domain-wrap');
+            const countEl = document.getElementById('sheet-same-domain-count');
+            if (!wrap || !countEl) return;
+            const others = getSameDomainItems(item);
+            if (others.length > 0) {
+                countEl.textContent = `${others.length}`;
+                wrap.classList.remove('hidden');
+            } else {
+                wrap.classList.add('hidden');
+            }
+        }
+
+        let _currentDomainSheetItemId = null;
+
+        function openDomainLinksSheet() {
+            const baseItem = ITEMS.find(x => x.id === (editingId || _currentDomainSheetItemId));
+            if (!baseItem) return;
+            const others = getSameDomainItems(baseItem);
+            if (others.length === 0) return;
+            _currentDomainSheetItemId = baseItem.id;
+            _hideEditSheet();
+            _pushModalState();
+
+            const fav = document.getElementById('domain-sheet-favicon');
+            if (fav) fav.innerHTML = getSiteFaviconHtml(baseItem, 'w-9 h-9', 'w-5 h-5');
+            const sub = document.getElementById('domain-sheet-sub');
+            if (sub) sub.textContent = baseItem.domain || _normDomainHost(baseItem.url);
+            const cnt = document.getElementById('domain-sheet-count');
+            if (cnt) cnt.textContent = `${others.length}`;
+
+            const list = document.getElementById('domain-sheet-list');
+            if (list) {
+                list.innerHTML = others.map((s, idx) => {
+                    const locked = isItemLocked(s);
+                    const catsStr = getItemCats(s).join(', ');
+                    return `<div data-action="domain-open-edit" data-id="${s.id}" class="rounded-xl p-4 theme-card border flex flex-col gap-3 cursor-pointer hover:border-accent transition opacity-0 shadow-2xs" style="animation: fadeIn 0.25s ease forwards ${Math.min(idx * 0.03, 0.3)}s;">
+                        <div class="flex items-start gap-3 min-w-0">
+                            <div class="shrink-0 mt-0.5"><div class="relative">${getSiteFaviconHtml(s, 'w-9 h-9', 'w-5 h-5')}</div></div>
+                            <div class="min-w-0 flex-1 space-y-1">
+                                <div class="flex items-center gap-1.5 min-w-0"><div class="font-bold text-sm sm:text-base leading-snug line-clamp-2">${esc(s.title || s.name)}</div>${renderUnreadDot(s)}</div>
+                                <div class="text-[11px] font-mono-code theme-muted truncate">${esc(s.domain)} • ${esc(catsStr)}</div>
+                            </div>
+                        </div>
+                        ${s.note ? `<p class="text-xs sm:text-sm theme-muted leading-relaxed line-clamp-2">${esc(s.note)}</p>` : ''}
+                        <div class="flex items-stretch gap-2 pt-3 border-t" style="border-color: var(--border-main)">
+                            <button data-action="domain-open-item" data-id="${s.id}" ${locked ? 'disabled' : ''} class="flex-1 h-10 rounded-lg flex items-center justify-center gap-1.5 transition ${locked ? 'theme-input opacity-45 cursor-not-allowed' : 'key-press bg-accent/15 text-accent font-extrabold text-xs sm:text-sm'}"><span>Відкрити</span>${locked ? LINE_ICONS.lock : LINE_ICONS.extArrow}</button>
+                            <button data-action="copy-url" data-url="${esc(s.url)}" data-stop="1" class="key-press w-11 h-10 rounded-lg theme-input flex items-center justify-center shrink-0" title="Копіювати URL"><svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="1"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+                        </div>
+                    </div>`;
+                }).join('');
+            }
+
+            const modal = document.getElementById('domain-links-sheet-modal');
+            const panel = document.getElementById('domain-links-sheet-panel');
+            if (!modal || !panel) return;
+            panel.style.transform = '';
+            modal.classList.remove('hidden');
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('open'), 10);
+        }
+
+        function closeDomainLinksSheet() { safeCloseModal(_hideDomainLinksSheet); }
+        function _hideDomainLinksSheet() {
+            const modal = document.getElementById('domain-links-sheet-modal');
+            const panel = document.getElementById('domain-links-sheet-panel');
+            if (!modal || !panel) return;
+            panel.style.transform = '';
+            modal.classList.remove('open');
+            setTimeout(() => { modal.classList.add('hidden'); modal.style.display = 'none'; }, 340);
+        }
+
         function openEditSheet(id) {
             markAsRead(id);
             _pushModalState(); const item = ITEMS.find(x => x.id === id); if (!item) return; editingId = id;
@@ -3895,7 +4377,7 @@
             document.getElementById('sheet-domain').textContent = item.domain; document.getElementById('sheet-date').textContent = item.date;
             document.getElementById('sheet-url').value = cleanRawUrl(item.url); document.getElementById('sheet-title').value = item.title;
             document.getElementById('sheet-note').value = item.note; document.getElementById('sheet-cat').value = getItemCats(item).join(', '); document.getElementById('sheet-tags').value = (item.tags || []).join(' ');
-            syncSheetLockUI(); syncSheetPriorityUI(); renderCategorySuggestions();
+            syncSheetLockUI(); syncSheetPriorityUI(); renderCategorySuggestions(); syncSameDomainRowInSheet(item);
             const modal = document.getElementById('edit-sheet-modal'); const panel = document.getElementById('edit-sheet-panel');
             panel.style.transform = ''; modal.classList.remove('hidden'); modal.style.display = 'flex'; setTimeout(() => modal.classList.add('open'), 10);
         }
@@ -3971,6 +4453,7 @@
             const _prevCats = getItemCats(item).slice();
             if (parsedCats.length > 0) { item.cats = Array.from(new Set(parsedCats)); item.cat = item.cats[0]; }
             item.autoCat = false;
+            item.userEdited = true;
             try { if (parsedCats.length > 0 && _prevCats.join('|') !== item.cats.join('|')) learnFromItem(item, _prevCats); } catch (e) {}
             const rawTags = document.getElementById('sheet-tags').value.trim();
             item.tags = rawTags ? rawTags.split(/\s+/).filter(Boolean).map(tg => tg.startsWith('#') ? tg : `#${tg}`) : [];
@@ -4140,7 +4623,7 @@
             const list = document.getElementById('dash-items-list');
             list.innerHTML = items.map((s, idx) => {
                 const locked = isItemLocked(s);
-                return `<div class="rounded-xl p-3 theme-card border flex flex-col gap-2.5 hover:border-accent transition opacity-0" style="animation: fadeIn 0.3s ease forwards ${idx * 0.04}s;">
+                return `<div data-action="cal-open-edit" data-id="${s.id}" class="rounded-xl p-3 theme-card border flex flex-col gap-2.5 cursor-pointer hover:border-accent transition opacity-0" style="animation: fadeIn 0.3s ease forwards ${idx * 0.04}s;">
                     <div class="flex items-center gap-2.5 min-w-0">
                         <div class="shrink-0"><div class="relative">${getSiteFaviconHtml(s, 'w-9 h-9', 'w-5 h-5')}</div></div>
                         <div class="min-w-0 flex-1">
@@ -4151,8 +4634,6 @@
                     <div class="flex items-stretch gap-1.5 pt-2.5 border-t" style="border-color: var(--border-main)">
                         <button data-action="cal-open-item" data-id="${s.id}" ${locked ? 'disabled' : ''} class="flex-1 h-9 rounded-lg flex items-center justify-center gap-1.5 transition ${locked ? 'theme-input opacity-45 cursor-not-allowed' : 'key-press bg-accent/15 text-accent font-extrabold text-xs'}"><span>Відкрити</span>${locked ? LINE_ICONS.lock : LINE_ICONS.extArrow}</button>
                         <button data-action="copy-url" data-url="${esc(s.url)}" data-stop="1" class="key-press w-11 h-9 rounded-lg theme-input flex items-center justify-center shrink-0" title="Копіювати URL"><svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="1"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
-                        <button data-action="cal-show-qr" data-id="${s.id}" class="key-press w-11 h-9 rounded-lg theme-input flex items-center justify-center text-accent hover:bg-accent/15 transition shrink-0" title="Показати QR"><svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M7 7h.01M18 7h.01M18 18h.01M7 18h.01"/></svg></button>
-<button data-action="cal-open-edit" data-id="${s.id}" class="key-press w-11 h-9 rounded-lg theme-input flex items-center justify-center text-[10px] opacity-70 hover:opacity-100 shrink-0" title="Налаштування">•••</button>
                     </div>
                 </div>`;
             }).join('');
@@ -4243,7 +4724,8 @@
 
             ITEMS.forEach(it => {
                 if (!selectedIds.has(it.id)) return;
-                
+                it.autoCat = false;
+                it.userEdited = true;
                 if (newCats.length > 0) {
                     if (mode === 'replace') { it.cats = [...newCats]; it.cat = it.cats[0]; }
                     else { 
@@ -4350,24 +4832,37 @@
             }
 
             let found = false;
-            for (let v = 1; v <= 40; v++) {
-                const b = getBlocks(v, ecOffset);
-                const totalData = b.reduce((s, x) => s + x.dataCount, 0);
-                const lenBits = v < 10 ? 8 : 16;
-                if (4 + lenBits + bytes.length * 8 <= totalData * 8) {
-                    version = v; rsBlocks = b; found = true; break;
-                }
-            }
-            if (!found) {
-                ecLevel = 0; ecOffset = 1; // Fallback to M if URL is huge
+            function tryFindVersion(bytesArr, off) {
                 for (let v = 1; v <= 40; v++) {
-                    const b = getBlocks(v, ecOffset);
+                    const b = getBlocks(v, off);
                     const totalData = b.reduce((s, x) => s + x.dataCount, 0);
                     const lenBits = v < 10 ? 8 : 16;
-                    if (4 + lenBits + bytes.length * 8 <= totalData * 8) {
-                        version = v; rsBlocks = b; found = true; break;
+                    if (4 + lenBits + bytesArr.length * 8 <= totalData * 8) {
+                        version = v; rsBlocks = b; return true;
                     }
                 }
+                return false;
+            }
+            found = tryFindVersion(bytes, ecOffset);
+            if (!found) {
+                ecLevel = 0; ecOffset = 1; // Fallback to M
+                found = tryFindVersion(bytes, ecOffset);
+            }
+            if (!found) {
+                ecLevel = 1; ecOffset = 0; // Fallback to L (up to 2953 bytes)
+                found = tryFindVersion(bytes, ecOffset);
+            }
+            if (!found) {
+                let shortText = text;
+                try {
+                    const u = new URL(text);
+                    shortText = u.origin + u.pathname;
+                } catch (e) {}
+                let shortBytes = Array.from(new TextEncoder().encode(shortText));
+                if (shortBytes.length > 2600) shortBytes = shortBytes.slice(0, 2600);
+                bytes.length = 0;
+                bytes.push(...shortBytes);
+                found = tryFindVersion(bytes, ecOffset);
             }
 
             const buf = []; let bitLen = 0;
@@ -4645,6 +5140,7 @@
                     else if (bdAction === 'close-settings-sheet') closeSettingsSheet();
                     else if (bdAction === 'close-ai-sheet') closeAiSheet();
                     else if (bdAction === 'close-edit-sheet') closeEditSheet();
+                    else if (bdAction === 'close-domain-links-sheet') closeDomainLinksSheet();
                     return;
                 }
 
@@ -4710,7 +5206,12 @@
                     case 'import-with-mode': triggerAIFileImport(actionEl.dataset.mode); break;
                     case 'restore-auto-snapshot': restoreFromAutoSnapshot(); break;
                     case 'toggle-export-bar': toggleExportChoiceBar(); break;
-                    case 'scroll-top': window.scrollTo({ top: 0, behavior: 'smooth' }); break;
+                    case 'scroll-top': {
+                        const y = window.scrollY || document.documentElement.scrollTop || 0;
+                        if (y > 8) window.scrollTo({ top: 0, behavior: 'smooth' });
+                        else resetToAllLinks();
+                        break;
+                    }
                     case 'process-offline': processOfflineQueue(true); break;
                     case 'toggle-select-mode': toggleSelectMode(); break;
                     case 'add-link': addLinkByAI(); break;
@@ -4767,12 +5268,33 @@
                         setTimeout(() => openEditSheet(id), 100);
                         break;
                     }
+                    case 'open-domain-links-sheet': openDomainLinksSheet(); break;
+                    case 'close-domain-links-sheet': closeDomainLinksSheet(); break;
+                    case 'domain-open-item': {
+                        const id = Number(actionEl.dataset.id);
+                        closeDomainLinksSheet();
+                        setTimeout(() => openItemById(id), 100);
+                        break;
+                    }
+                    case 'domain-show-qr': {
+                        const id = Number(actionEl.dataset.id);
+                        closeDomainLinksSheet();
+                        setTimeout(() => showQRCode(id), 100);
+                        break;
+                    }
+                    case 'domain-open-edit': {
+                        const id = Number(actionEl.dataset.id);
+                        closeDomainLinksSheet();
+                        setTimeout(() => openEditSheet(id), 100);
+                        break;
+                    }
                 }
             });
         }
 
         window.addEventListener('load', async () => {
             setupPrivateEventListeners();
+            initPersistentStorageShield();
             const hadSaved = await loadStateFromStorage();
             
             const params = new URLSearchParams(window.location.search);
@@ -4798,11 +5320,13 @@
             attachSheetDrag('about-drag-handle', 'about-sheet-panel', closeAboutSheet);
             attachSheetDrag('ai-drag-handle', 'ai-sheet-panel', closeAiSheet);
             attachSheetDrag('edit-drag-handle', 'edit-sheet-panel', closeEditSheet);
+            attachSheetDrag('domain-links-drag-handle', 'domain-links-sheet-panel', closeDomainLinksSheet);
             attachSheetDrag('calendar-drag-handle', 'calendar-sheet-panel', closeCalendarSheet);
             attachSheetDrag('bulk-edit-drag-handle', 'bulk-edit-sheet-panel', closeBulkEditSheet);
             attachSheetDrag('qr-drag-handle', 'qr-panel', closeQRModal);
             initToastSwipe();
             attachPullToRefresh();
+            attachLazyScrollObserver();
             _ensureBaseHistoryGuard();
             attachEdgeBackGesture();
             if (navigator.onLine) { processOfflineQueue(false); }
