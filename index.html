@@ -2440,82 +2440,49 @@
             const container = document.getElementById('about-sheet-body');
             if (!container) return;
 
-            const item = (label, copy) => `
-                <div class="about-guide-item">
-                    <span class="about-guide-label">${label}</span>
-                    <p class="about-guide-copy">${copy}</p>
-                </div>`;
-
-            const section = (num, title, hint, content, open = false) => `
-                <details class="about-guide-group" ${open ? 'open' : ''}>
-                    <summary class="list-none flex items-center gap-3 cursor-pointer select-none">
-                        <span class="about-guide-number">${num}</span>
-                        <span class="min-w-0 flex-1">
-                            <span class="block text-[16px] font-extrabold leading-snug" style="color:var(--text-main)">${title}</span>
-                            <span class="block text-[12px] theme-muted mt-0.5 leading-snug">${hint}</span>
-                        </span>
-                        <span class="about-guide-chevron text-xl leading-none shrink-0" aria-hidden="true">⌄</span>
-                    </summary>
-                    <div class="about-guide-content">${content}</div>
-                </details>`;
-
             container.innerHTML = `
                 <div class="about-guide-hero p-4 mb-3.5">
                     <div class="flex items-center justify-between gap-3 mb-2">
                         <span class="text-[10px] font-black tracking-[.16em] uppercase" style="color:rgb(var(--accent-rgb))">LINKBOX / БЕЗ БАРДАКУ</span>
-                        <span class="text-[10px] font-mono-code font-bold theme-muted">7 РОЗДІЛІВ</span>
+                        <span class="text-[10px] font-mono-code font-bold theme-muted">CORE</span>
                     </div>
                     <div class="text-[19px] leading-tight font-black tracking-tight" style="color:var(--text-main)">Посилання під контролем.<br>Пам’ять — у відпустці.</div>
                     <p class="text-[13px] leading-relaxed theme-muted mt-2">Зберігати все підряд — талант. Знайти потрібне через місяць — уже мистецтво. LinkBox трохи допомагає з другим.</p>
                 </div>
 
-                <div class="space-y-2.5">
-                    ${section('01', 'Стрічка й навігація', 'Знайти потрібне, не розкопуючи весь інтернет',
-                        item('Пошук', 'Шукає за назвою, доменом, заголовком сторінки, нотаткою, папкою й тегами. Навіть якщо запит у голові звучить як «той синій сайт, ну ти зрозумів».') +
-                        item('Pin-бар', 'Закріплені сайти живуть окремою стрічкою над списком. Улюблені — ближче, решта хай не штовхається.') +
-                        item('Вигляд', 'Малі картки, великі або список. Сортування — нові, старі, А–Я. Три теми: світла, темна й OLED; три розміри тексту.') +
-                        item('Жести', 'Свайп від лівого краю відкриває меню. Потягнути стрічку вниз — оновити заголовки, описи й фавікони. Шапка повертає до початку фільтра, а повторне натискання зверху скидає фільтри.') +
-                        item('Випадковий вибір', 'Кнопка рандому дістає випадкове незамкнене посилання. Коли «почитати потім» уже схоже на архів національного масштабу — нехай вирішує жереб.'), true)}
+                <div class="theme-card rounded-2xl p-4 space-y-4 shadow-xs mb-3.5" style="border:1px solid var(--border-main)">
+                    <!-- 1 ЗАХОПЛЕННЯ -->
+                    <div class="flex items-start gap-3">
+                        <span class="inline-flex items-center justify-center w-9 h-9 rounded-full shrink-0 font-mono-code font-black text-sm text-accent border" style="background:var(--bg-input);border-color:rgb(var(--accent-rgb)/.3)">1</span>
+                        <div class="min-w-0 flex-1 pt-0.5">
+                            <div class="text-[10px] font-mono-code font-black tracking-wider text-accent mb-0.5">ЗАХОПЛЕННЯ</div>
+                            <div class="text-[15px] font-extrabold leading-snug mb-1" style="color:var(--text-main)">Поле · Share Target · імпорт</div>
+                            <p class="text-[13px] leading-relaxed theme-muted">Встав URL у верхнє поле або надішли через системний Share з будь-якого додатку. Можна кілька посилань одразу. Підтримується імпорт HTML-закладок браузера та повного JSON-бекапу LinkBox. Без мережі посилання потрапляють в офлайн-чергу й дочекаються зв’язку. Дублікати визначаються автоматично — їх можна пропустити або оновити.</p>
+                        </div>
+                    </div>
 
-                    ${section('02', 'Додавання посилань', 'Кидай адресу. Решту розберемо.',
-                        item('Поле вводу', 'Приймає одну адресу, кілька URL або цілий шматок тексту з посиланнями всередині. Зайві розділові знаки й UTM-хвости прибирає.') +
-                        item('Меню Android «Поділитися»', 'У встановленій PWA-версії LinkBox можна вибрати прямо в системному меню поширення. Без копіювання, пересилання самому собі й інших народних обрядів.') +
-                        item('Дублікати', 'Повторну адресу не додає — підсвічує вже наявну картку. Двічі зберегти те саме? Це не колекція марок.') +
-                        item('NEW та офлайн', 'Непрочитані отримують NEW і власну папку. Без мережі нові адреси стають у чергу й дочекаються обробки. Інтернет зник? Ну, він і раніше не вирізнявся пунктуальністю.') +
-                        item('Після додавання', 'LinkBox показує, куди поклав ресурс і яку мову визначив. Щоб потім не шукати його в папці «А де воно?»'))}
+                    <!-- 2 СТРУКТУРА -->
+                    <div class="flex items-start gap-3">
+                        <span class="inline-flex items-center justify-center w-9 h-9 rounded-full shrink-0 font-mono-code font-black text-sm text-accent border" style="background:var(--bg-input);border-color:rgb(var(--accent-rgb)/.3)">2</span>
+                        <div class="min-w-0 flex-1 pt-0.5">
+                            <div class="text-[10px] font-mono-code font-black tracking-wider text-accent mb-0.5">СТРУКТУРА</div>
+                            <div class="text-[15px] font-extrabold leading-snug mb-1" style="color:var(--text-main)">Локальні правила + опційний AI</div>
+                            <p class="text-[13px] leading-relaxed theme-muted">Вбудовані правила працюють завжди, без ключа: визначають домен, пропонують категорію, базові теги й короткий опис. Опційний AI (якщо додаси ключ) підвищує точність — природніші описи, точніші папки, визначення мови сторінки. Усе можна змінити вручну в картці. Система враховує твої правки. Картка отримує фавікон, назву, нотатку, теги й швидкі дії.</p>
+                        </div>
+                    </div>
 
-                    ${section('03', 'Папки, теги й ШІ', 'Автоматизація без магічного мислення',
-                        item('Кілька папок', 'Один ресурс може лежати в кількох категоріях. Натискання на папку або #тег одразу фільтрує стрічку.') +
-                        item('Пошук у списках', 'Папки й теги мають окремі списки з пошуком та сортуванням: популярні, А–Я і Я–А.') +
-                        item('Автокатегоризація', 'Вбудовані правила дивляться на домен і зміст сторінки. Ручні виправлення враховуються — так, навіть алгоритм може засвоїти, що знову поніс дурню.') +
-                        item('Зовнішній ШІ', 'Можна підключити Gemini, Groq, Mistral, Cerebras, OpenRouter, GitHub Models, DeepSeek, Grok, Claude, OpenAI або сумісний сервер. Передаються домен, заголовок, опис і назви папок — не вся база. Якщо ШІ недоступний, працюють вбудовані правила.') +
-                        item('Перерозпізнавання', 'Можна заново розкласти вибрані ресурси або всю базу. Є скасування; замкнені й 18+ записи пропускаються.') +
-                        item('Скріпка й ★', 'Скріпка виносить сайт у Pin-бар. Зірочка піднімає картку лише всередині її папок. Дві кнопки — дві різні роботи. Не плутати, вони й так зайняті.'))}
-
-                    ${section('04', 'Картка посилання', 'У картки є життя поза кнопкою «Відкрити»',
-                        item('Редагування', 'Змінюй URL, назву, нотатку, папки й теги. Підказки суміжних категорій допомагають розкласти все без археологічних розкопок.') +
-                        item('Опис', 'Оновлює опис зі сторінки або створює нову нотатку. Бо «збережено» — це ще не відповідь на запитання «навіщо?»') +
-                        item('QR і поширення', 'QR-код створюється локально, без інтернету. Адресу можна скопіювати або поширити.') +
-                        item('Інші посилання з домену', 'Показує все збережене з того самого сайту. Корисно, коли один домен непомітно захопив пів колекції.') +
-                        item('Видалення', 'Перед видаленням є підтвердження. Один випадковий дотик — не привід починати життя з чистого аркуша.'))}
-
-                    ${section('05', 'Замки й приватність', 'Що саме захищено — без казок',
-                        item('Замок', 'Закриває окрему картку або папку від відкриття через LinkBox. URL усе ще можна скопіювати. Це заслін від випадкового погляду, а не шифрування й не банківське сховище.') +
-                        item('18+', 'Такі ресурси автоматично потрапляють в окрему категорію під замком.') +
-                        item('Де лежать дані', 'Посилання зберігаються локально в IndexedDB браузера. LinkBox просить систему не очищати сховище, але остаточне рішення — за браузером та Android.') +
-                        item('Нагадування про копію', 'Якщо давно не було файлової резервної копії, LinkBox нагадає. Бо відновлювати сотні посилань із пам’яті — це вже не функція, а покарання.'))}
-
-                    ${section('06', 'Масові дії й календар', 'Коли «тут усього кілька посилань» уже не смішно',
-                        item('Масовий вибір', 'Вибирай усі видимі картки або потрібні вручну. Можна масово змінити папки й теги, скопіювати чи поширити список або видалити вибране. Категорії додаються до наявних або замінюються.') +
-                        item('Календар', 'Показує, що й коли було збережено. Обираєш день — отримуєш список із діями відкрити, скопіювати й редагувати. Нарешті дата, яка щось пам’ятає.'))}
-
-                    ${section('07', 'Імпорт, експорт і копії', 'Нехай посилання переживуть навіть генеральне прибирання',
-                        item('Імпорт', 'Підтримуються HTML і JSON. Дублікати можна пропустити або оновити. Після імпорту LinkBox покаже, скільки додав і скільки зустрів старих знайомих.') +
-                        item('Експорт', 'HTML відкривається в браузері. JSON зберігає повну структуру: папки, теги й замки.') +
-                        item('Автокопії', 'Локальні знімки створюються періодично та після помітного збільшення бази. Відновлення — з налаштувань. Резервна копія не для панікерів. Вона для тих, хто вже бачив, як зникає «та там нічого важливого».'))}
+                    <!-- 3 ДОСТУП -->
+                    <div class="flex items-start gap-3">
+                        <span class="inline-flex items-center justify-center w-9 h-9 rounded-full shrink-0 font-mono-code font-black text-sm text-accent border" style="background:var(--bg-input);border-color:rgb(var(--accent-rgb)/.3)">3</span>
+                        <div class="min-w-0 flex-1 pt-0.5">
+                            <div class="text-[10px] font-mono-code font-black tracking-wider text-accent mb-0.5">ДОСТУП</div>
+                            <div class="text-[15px] font-extrabold leading-snug mb-1" style="color:var(--text-main)">Папки · #теги · пошук · календар · QR</div>
+                            <p class="text-[13px] leading-relaxed theme-muted">Фільтруй за папками та хештегами, шукай по назві, домену й нотатках, відкривай випадкове посилання. Календар показує, що зберігав по днях. Є піни, QR-коди, масове редагування й видалення, експорт у HTML (для браузера) і повний JSON-бекап. Локальні авто-зліпки страхують дані. Усе лежить в IndexedDB на твоєму пристрої — LinkBox просить систему не очищати сховище.</p>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="about-guide-footer mt-4 p-4 text-center">
+                <div class="about-guide-footer mt-1 p-4 text-center">
                     <div class="text-[10px] font-black tracking-[.18em] uppercase theme-muted">Менше хаосу. Більше знайденого.</div>
                     <div class="text-[20px] font-black tracking-tight mt-1" style="color:var(--text-main)">Shans</div>
                     <div class="flex items-center justify-center gap-2 text-[13px] font-bold mt-1" style="color:rgb(var(--accent-rgb))"><svg viewBox="0 0 24 16" class="w-5 h-3.5 rounded-[2px]" aria-label="Прапор України"><rect width="24" height="8" fill="#0057B7"/><rect y="8" width="24" height="8" fill="#FFD700"/></svg><span>Слава Україні!</span></div>
