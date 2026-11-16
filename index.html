@@ -366,6 +366,7 @@
             --on-accent: #FFFFFF;
             --ink: #0F1115;
             --on-ink: #FFFFFF;
+            --about-shadow: 0 8px 24px rgba(22, 28, 38, 0.055);
         }
         body[data-theme="dim"] {
             --bg-body: #444852;
@@ -381,6 +382,7 @@
             --on-accent: #FFFFFF;
             --ink: #F8F9FA;
             --on-ink: #444852;
+            --about-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
         }
         body[data-theme="oled"] {
             --bg-body: #000000;
@@ -396,6 +398,7 @@
             --on-accent: #FFFFFF;
             --ink: #F1F2F6;
             --on-ink: #000000;
+            --about-shadow: 0 8px 26px rgba(0, 0, 0, 0.42);
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -548,7 +551,59 @@
             -webkit-line-clamp: 3;
             overflow: hidden;
         }
-    </style>
+    
+
+        .about-guide-hero {
+            border: 1px solid var(--border-main);
+            border-radius: 18px;
+            background: linear-gradient(135deg, var(--bg-card), var(--bg-input));
+            box-shadow: var(--about-shadow);
+        }
+        .about-guide-group {
+            background: var(--bg-card);
+            border: 1px solid var(--border-main);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--about-shadow);
+            transition: border-color .18s ease, box-shadow .18s ease;
+        }
+        .about-guide-group[open] { border-color: rgb(var(--accent-rgb) / .42); }
+        .about-guide-group > summary::-webkit-details-marker { display: none; }
+        .about-guide-group > summary::marker { content: ""; }
+        .about-guide-group > summary { padding: 14px 15px; min-height: 66px; }
+        .about-guide-group[open] > summary {
+            background: var(--bg-input);
+            border-bottom: 1px solid var(--border-main);
+        }
+        .about-guide-number {
+            width: 32px; height: 32px; border-radius: 10px;
+            display: inline-flex; align-items: center; justify-content: center;
+            flex: 0 0 auto; background: var(--bg-input);
+            color: rgb(var(--accent-rgb));
+            font: 800 11px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+        }
+        .about-guide-chevron { color: rgb(var(--accent-rgb)); transition: transform .18s ease; }
+        .about-guide-group[open] > summary .about-guide-chevron { transform: rotate(180deg); }
+        .about-guide-content { padding: 2px 15px 7px; }
+        .about-guide-item { padding: 12px 0 13px; border-bottom: 1px solid var(--border-main); }
+        .about-guide-item:last-child { border-bottom: 0; }
+        .about-guide-label {
+            display: block; margin-bottom: 3px;
+            color: rgb(var(--accent-rgb));
+            font-size: 11px; line-height: 1.25; font-weight: 900;
+            letter-spacing: .055em; text-transform: uppercase;
+        }
+        .about-guide-copy { color: var(--text-main); font-size: 15px; line-height: 1.48; }
+        .about-guide-footer {
+            border: 1px solid var(--border-main); border-radius: 18px;
+            background: var(--bg-input); box-shadow: var(--about-shadow);
+        }
+        #about-sheet-body { scrollbar-width: thin; scrollbar-color: var(--border-main) transparent; }
+        #about-sheet-body::-webkit-scrollbar { width: 4px; }
+        #about-sheet-body::-webkit-scrollbar-thumb { background: var(--border-main); border-radius: 8px; }
+
+
+</style>
 </head>
 <body class="min-h-screen flex flex-col">
     <svg class="hidden" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
@@ -1096,23 +1151,17 @@
     </div>
 
     <div id="about-sheet-modal" data-backdrop="close-about-sheet" class="sheet-backdrop fixed inset-0 bg-black/60 z-50 hidden items-end sm:items-center justify-center p-0 sm:p-4">
-        <div id="about-sheet-panel" class="sheet-panel theme-surface w-full max-w-md rounded-t-2xl sm:rounded-xl p-5 border-t sm:border space-y-4 max-h-[88vh] overflow-y-auto">
-            <div id="about-drag-handle" class="w-12 h-2 bg-stone-400/50 rounded-full mx-auto -mt-1 cursor-grab active:cursor-grabbing touch-none sm:hidden"></div>
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2.5">
-                    <div class="w-8 h-8 flex items-center justify-center shrink-0">
-                        <svg viewBox="0 0 2048 2048" class="w-full h-full drop-shadow-xs text-ink" xmlns="http://www.w3.org/2000/svg">
-                            <path fill="currentColor" d="M 820.745 774.484 C 843.943 773.99 873.918 775.257 896.837 776.679 C 976.15 781.6 1061.49 792.356 1128.78 838.041 C 1194.53 882.69 1242.68 950.654 1257.85 1029.03 C 1208.06 1030.81 1114.09 1032.21 1070.34 1012.39 C 1057.54 1006.59 1048.04 997.356 1037.19 988.759 C 1026.23 980.074 1014.43 972.7 1001.26 967.858 C 926.976 940.551 772.06 945.932 690.612 955.345 C 544.138 972.273 403.224 1022 309.048 1140.88 C 237.059 1230.09 204.079 1344.56 217.568 1458.39 C 231.435 1569.88 289.137 1671.25 377.917 1740.09 C 465.695 1809.18 578.939 1849.08 690.998 1834.81 C 903.421 1807.77 1039.63 1638.79 1082.95 1438.5 C 1088.66 1412.8 1092.59 1386.74 1094.72 1360.5 C 1095.11 1355.7 1095.66 1338.72 1097.53 1336.33 L 1102 1335.91 C 1122.33 1336.33 1146.1 1338.33 1167.22 1339.02 C 1201.81 1339.88 1236.42 1340.02 1271.01 1339.43 C 1266.42 1377.03 1265.41 1411.49 1258.02 1450.12 C 1230.46 1594.11 1175.15 1722.01 1073.17 1828.16 C 964.32 1939.53 816.106 2003.75 660.404 2006.98 C 493.262 2010.27 337.212 1952.99 216.275 1837.64 C -28.8002 1603.91 -23.8879 1230.94 211.223 991.613 C 372.412 827.536 598.052 777.654 820.745 774.484 z"/>
-                            <path fill="#DF6D27" d="M 1396.31 39.4755 C 1512.61 37.6317 1629.32 66.1793 1727.77 129.345 C 1864.71 218.317 1960.59 358.153 1994.23 517.959 C 2028.26 673.494 1996.72 832.794 1909.46 968.647 C 1732.09 1244.52 1388.18 1291.96 1087.03 1264.59 C 1048.66 1261.11 1009.23 1251.21 973.5 1236.71 C 886.848 1201.56 809.795 1113.6 790.003 1021.45 C 832.844 1021.23 946.663 1019.89 981.612 1037.17 C 998.635 1045.58 1010.96 1060.85 1027.08 1070.83 C 1056.87 1089.28 1097.11 1093.28 1131.48 1096.35 C 1235.42 1105.62 1351.69 1098.17 1453.25 1074.63 C 1620.82 1041.23 1770.82 924.626 1816.58 756.08 C 1854.48 616.481 1821.61 459.393 1726.31 349.829 C 1654.8 266.642 1552.75 215.815 1443.27 208.849 C 1329.89 200.394 1217.92 238.271 1132.96 313.824 C 1017.91 415.124 972.93 564.552 963.56 712.937 C 951.318 713.323 939.91 712.409 927.711 712.049 L 856.285 710.134 C 833.991 709.611 807.256 711.231 786.079 709.852 L 786.001 708.387 C 784.917 684.003 793.699 644.934 797.397 620.219 C 844.945 302.493 1060.97 53.5881 1396.31 39.4755 z"/>
-                            <path fill="#DF6D27" d="M 629.683 1234.44 C 728.899 1227.18 815.058 1302.08 821.686 1401.34 C 828.315 1500.6 752.879 1586.29 653.58 1592.29 C 555.159 1598.24 470.396 1523.62 463.826 1425.24 C 457.257 1326.85 531.345 1241.62 629.683 1234.44 z"/>
-                            <path fill="currentColor" d="M 1389.32 459.332 C 1486.96 448.395 1574.96 518.749 1585.79 616.408 C 1596.61 714.067 1526.16 801.986 1428.49 812.698 C 1330.98 823.393 1243.23 753.077 1232.42 655.577 C 1221.62 558.078 1291.83 470.252 1389.32 459.332 z"/>
-                        </svg>
-                    </div>
-                    <span class="font-black text-base uppercase tracking-tight" id="about-sheet-title">Як усе влаштовано</span>
+        <div id="about-sheet-panel" class="sheet-panel theme-surface w-full max-w-md rounded-t-2xl sm:rounded-xl border-t sm:border flex flex-col max-h-[88vh] overflow-hidden">
+            <div id="about-drag-handle" class="w-12 h-1.5 bg-stone-400/50 rounded-full mx-auto mt-3 mb-1 cursor-grab active:cursor-grabbing touch-none shrink-0 sm:hidden"></div>
+            <div class="flex items-center justify-between gap-3 px-5 py-3 shrink-0">
+                <div class="min-w-0">
+                    <div class="font-black text-base uppercase tracking-tight" id="about-sheet-title">Що вміє LinkBox</div>
+                    <div class="text-xs theme-muted mt-0.5">Усе, що треба. Без лекції й корпоративного бубніння.</div>
                 </div>
-                <button data-action="close-about-sheet" class="key-press w-9 h-9 rounded-lg theme-input flex items-center justify-center"><svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+                <button data-action="close-about-sheet" aria-label="Закрити" class="key-press w-9 h-9 rounded-lg theme-input flex items-center justify-center shrink-0"><svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
             </div>
-            <div id="about-sheet-body" class="space-y-3 text-sm leading-relaxed pb-3"></div>
+            <div class="h-px shrink-0" style="background:var(--border-main)"></div>
+            <div id="about-sheet-body" class="flex-1 min-h-0 overflow-y-auto overscroll-contain px-5 pt-2 pb-6 text-[16px] leading-relaxed" style="-webkit-overflow-scrolling:touch;touch-action:pan-y"></div>
         </div>
     </div>
 
@@ -2373,8 +2422,13 @@
 
         function openAboutSheet() {
             _pushModalState(); _hideSidebar(); _hideSettingsSheet(); renderAboutContent();
-            const modal = document.getElementById('about-sheet-modal'); const panel = document.getElementById('about-sheet-panel');
-            panel.style.transform = ''; panel.scrollTop = 0; modal.classList.remove('hidden'); modal.style.display = 'flex'; setTimeout(() => modal.classList.add('open'), 10);
+            const modal = document.getElementById('about-sheet-modal');
+            const panel = document.getElementById('about-sheet-panel');
+            const body = document.getElementById('about-sheet-body');
+            panel.style.transform = '';
+            if (body) body.scrollTop = 0;
+            modal.classList.remove('hidden'); modal.style.display = 'flex';
+            requestAnimationFrame(() => { if (body) body.scrollTop = 0; modal.classList.add('open'); });
         }
         function closeAboutSheet() { safeCloseModal(_hideAboutSheet); }
         function _hideAboutSheet() {
@@ -2383,72 +2437,89 @@
         }
 
         function renderAboutContent() {
-            const container = document.getElementById('about-sheet-body'); if (!container) return;
-            const chip = (txt, hot) => `<span class="px-2.5 py-1 rounded-md text-sm font-mono-code font-bold ${hot ? 'bg-accent/15 text-accent' : 'theme-input'}">${txt}</span>`;
-            const row = (title, text, extra = '', first = false) => `<div class="${first ? '' : 'pt-3 border-t'} space-y-2.5" style="border-color: var(--border-main)"><p class="text-base leading-relaxed" style="color: var(--text-main)"><b class="font-extrabold">${title}</b> ${text}</p>${extra}</div>`;
-            const group = (open, num, title, sub, rows) => `<details ${open ? 'open' : ''} class="about-acc theme-card border rounded-xl overflow-hidden"><summary class="flex items-center gap-3 px-4 py-3.5 cursor-pointer select-none"><span class="text-sm font-mono-code font-black text-accent shrink-0">${num}</span><span class="min-w-0 flex-1"><span class="block font-black text-lg uppercase tracking-tight leading-tight">${title}</span><span class="block text-sm theme-muted truncate mt-0.5">${sub}</span></span><span class="about-chev text-accent text-lg leading-none shrink-0 transition-transform">›</span></summary><div class="px-4 pt-3 space-y-3 border-t" style="border-color: var(--border-main); padding-bottom: 1rem">${rows}</div></details>`;
+            const container = document.getElementById('about-sheet-body');
+            if (!container) return;
 
-            const scheme = `<div class="flex items-center gap-1.5 flex-wrap">${chip('натискання')}<span class="opacity-50">→</span>${chip('нагору', true)}<span class="opacity-50">→</span>${chip('ще раз')}<span class="opacity-50">→</span>${chip('усі лінки', true)}</div>`;
+            const item = (label, copy) => `
+                <div class="about-guide-item">
+                    <span class="about-guide-label">${label}</span>
+                    <p class="about-guide-copy">${copy}</p>
+                </div>`;
+
+            const section = (num, title, hint, content, open = false) => `
+                <details class="about-guide-group" ${open ? 'open' : ''}>
+                    <summary class="list-none flex items-center gap-3 cursor-pointer select-none">
+                        <span class="about-guide-number">${num}</span>
+                        <span class="min-w-0 flex-1">
+                            <span class="block text-[16px] font-extrabold leading-snug" style="color:var(--text-main)">${title}</span>
+                            <span class="block text-[12px] theme-muted mt-0.5 leading-snug">${hint}</span>
+                        </span>
+                        <span class="about-guide-chevron text-xl leading-none shrink-0" aria-hidden="true">⌄</span>
+                    </summary>
+                    <div class="about-guide-content">${content}</div>
+                </details>`;
 
             container.innerHTML = `
-                <div class="space-y-2.5">
-                    ${group(true, '01', 'Головний екран', 'шапка, пошук, Pin-бар, вигляд',
-                        row('Шапка.', 'Натискання по ній піднімає стрічку на верх поточного фільтра. Повторне, коли вже нагорі, скидає всі фільтри й повертає повний список. Працює як ліфт: спершу на верхній поверх, потім у вестибюль.', scheme, true) +
-                        row('Пошук.', 'Одночасно перебирає назву, домен, заголовок, папки, нотатку та #теги. Пам’ять тепер у телефоні, а голова вільна для чогось корисного.') +
-                        row('Рандом.', 'Відкриває випадкове посилання з бази, закриті замком пропускає. Лотерея, де програти неможливо.') +
-                        row('Pin-бар.', 'Закріплені сайти лежать у горизонтальній стрічці над списком: іконка, назва, один дотик. VIP-зона для тих, кого відкривають щодня.') +
-                        row('Вигляд.', 'Картки малі, великі або списком. Сортування: нові, старі, А–Я. Тема: світла, темна чи OLED (чорний буде по-справжньому чорним). Розмір тексту: A-, A, A+.') +
-                        row('Жести.', 'Свайп від лівого краю відкриває меню, свайп вправо по шторці закриває її. Протягування стрічки вниз оновлює заголовки, описи та іконки сайтів. Кнопка «Назад» закриває шторки, а не весь додаток.')
-                    )}
-                    ${group(false, '02', 'Додавання', 'вставити й забути',
-                        row('Поле вводу.', 'Приймає один лінк, добірку лінків або шматок тексту з адресами всередині. Адреси знаходяться самі, а utm-мітки, зайві коми й дужки зрізаються. Копіпаст із месенджера теж вважається вхідними даними.', '', true) +
-                        row('Поділитися.', 'У встановленій PWA-версії LinkBox з’являється в системному меню «Поділитися»: лінк із браузера летить сюди без копіювання.') +
-                        row('Підтвердження.', 'Після додавання видно, у яку папку потрапило посилання і якою мовою сайт.') +
-                        row('Дублікати.', 'Повторне додавання блокується, а стара картка підсвічується. Зберігати те саме двічі — це вже колекціонування.') +
-                        row('NEW.', 'Мітка тримається до першого відкриття. Усі непрочитані зібрані в папці «Непрочитані (NEW)» — чесний лічильник відкладеного «на потім».') +
-                        row('Офлайн-черга.', 'Без мережі лінк чекає в папці «Очікують мережі», а бейдж у шапці показує їх кількість. З’явилося з’єднання — оновлення стрічки дообробляє чергу. Інтернет може піти по хліб, лінки почекають.')
-                    )}
-                    ${group(false, '03', 'Порядок', 'папки, теги, ШІ',
-                        row('Категорії й теги.', 'У меню лежать найпопулярніші, а повні списки відкриваються окремими шторками з пошуком і сортуванням: популярні, А–Я, Я–А.', '', true) +
-                        row('Мульти-папки.', 'Один сайт може жити в кількох папках: вони вписуються через кому. Плашки папок і #теги на картках натискаються й одразу фільтрують стрічку.') +
-                        row('Автопілот.', 'Без ключа працюють вбудовані правила: тема визначається за сайтом і змістом, а на виправленнях вони вчаться. Налаштувань нуль.') +
-                        row('Нейромережа.', 'Підключається через Gemini, Groq чи Mistral (є безкоштовні варіанти) або власний Base URL. До ШІ йдуть тільки заголовок, опис і домен. Якщо ШІ недоступний, запасні правила вмикаються самі.') +
-                        row('Перерозпізнавання.', 'Застосовує поточний режим до вже збереженого: лише до «Веб-ресурсів» або до всієї бази. Закриті та 18+ не чіпає. Передумати можна: є «Скасувати».') +
-                        row('Скріпка й зірочка.', 'Скріпка закріплює лінк у Pin-барі над усіма папками. Зірочка ★ піднімає його нагору, але лише у своїх папках.')
-                    )}
-                    ${group(false, '04', 'Картка', 'редагування та дрібні фішки',
-                        row('Редагування.', 'Натискання по тілу картки відкриває шторку: URL, назва, нотатка, папки, #теги. Сірі підказки поруч додають суміжні категорії одним дотиком.', '', true) +
-                        row('Переписати.', 'Підтягує свіжий опис із сайту або формує нову нотатку, якщо стара набридла.') +
-                        row('QR-код.', 'Малюється без мережі й з логотипом. Поруч «Копіювати URL» та «Поділитися». Телефон у ролі візитівки.') +
-                        row('Інші посилання з сайту.', 'Окрема шторка зі всім, що вже збережено з цього ж домену. Якщо один сайт займає пів бази, тут видно, наскільки пів.') +
-                        row('Видалення.', 'Тільки через підтвердження, тож випадкове торкання не знищить закладку.')
-                    )}
-                    ${group(false, '05', 'Безпека', 'замки, 18+, захист бази',
-                        row('Замок.', 'Вішається на папку або на окрему картку. Прямий перехід блокується, а копіювання URL лишається. Нарада, маршрутка й сторонні погляди більше не проблема.', '', true) +
-                        row('Полуничка 18+.', 'Контент для дорослих автоматично потрапляє в окрему папку під замок. Коментарі зайві.') +
-                        row('Захист пам’яті.', 'Додаток просить систему не чистити його дані автоматично, а в налаштуваннях показує статус захисту.') +
-                        row('Нагадування.', 'Якщо копію у файл давно не зберігали (понад два тижні), з’являється попередження.')
-                    )}
-                    ${group(false, '06', 'Масові дії й календар', 'порядок у великих обсягах',
-                        row('Мульти-вибір.', 'Вмикається кнопкою внизу меню. Можна вибрати все видиме, масово змінити папки й теги (додати до наявних або замінити; порожні поля нічого не чіпають), поділитися списком чи видалити вибране.', '', true) +
-                        row('Календар.', 'Історія збережень по днях. Натискання на день розкриває список за цю дату: відкрити, скопіювати, редагувати. Хронологія для питання «а коли це взагалі було?».')
-                    )}
-                    ${group(false, '07', 'Дані', 'імпорт, експорт, зліпки',
-                        row('Імпорт.', 'Приймає .HTML і .JSON. Режим «Без дублів» лишає наявне недоторканим, «Оновлювати» перезаписує старі картки. Після завершення звіт: скільки нових і скільки дублікатів.', '', true) +
-                        row('Експорт.', '.HTML відкривається в будь-якому браузері, .JSON — повний бекап з усіма папками, тегами й замками.') +
-                        row('Авто-зліпок.', 'Раз на тиждень, або коли база помітно виросла, створюється локальна копія. Відновлення — однією кнопкою в налаштуваннях. Три рівні страховки: паранойя тут називається плануванням.')
-                    )}
+                <div class="about-guide-hero p-4 mb-3.5">
+                    <div class="flex items-center justify-between gap-3 mb-2">
+                        <span class="text-[10px] font-black tracking-[.16em] uppercase" style="color:rgb(var(--accent-rgb))">LINKBOX / БЕЗ БАРДАКУ</span>
+                        <span class="text-[10px] font-mono-code font-bold theme-muted">7 РОЗДІЛІВ</span>
+                    </div>
+                    <div class="text-[19px] leading-tight font-black tracking-tight" style="color:var(--text-main)">Посилання під контролем.<br>Пам’ять — у відпустці.</div>
+                    <p class="text-[13px] leading-relaxed theme-muted mt-2">Зберігати все підряд — талант. Знайти потрібне через місяць — уже мистецтво. LinkBox трохи допомагає з другим.</p>
                 </div>
 
-                <div class="theme-card border border-accent/40 rounded-xl p-4 text-center space-y-2 mt-3">
-                    <div class="font-black text-base tracking-tight">Shans</div>
-                    <div class="flex items-center justify-center gap-2 font-extrabold text-base">
-                        <span>Слава Україні!</span>
-                        <svg viewBox="0 0 24 16" class="w-6 h-4 rounded-xs shadow-2xs shrink-0" style="border: 1px solid rgba(0,0,0,0.08);" title="Україна" xmlns="http://www.w3.org/2000/svg">
-                            <rect width="24" height="8" y="0" fill="#0057B7"/>
-                            <rect width="24" height="8" y="8" fill="#FFD700"/>
-                        </svg>
-                    </div>
+                <div class="space-y-2.5">
+                    ${section('01', 'Стрічка й навігація', 'Знайти потрібне, не розкопуючи весь інтернет',
+                        item('Пошук', 'Шукає за назвою, доменом, заголовком сторінки, нотаткою, папкою й тегами. Навіть якщо запит у голові звучить як «той синій сайт, ну ти зрозумів».') +
+                        item('Pin-бар', 'Закріплені сайти живуть окремою стрічкою над списком. Улюблені — ближче, решта хай не штовхається.') +
+                        item('Вигляд', 'Малі картки, великі або список. Сортування — нові, старі, А–Я. Три теми: світла, темна й OLED; три розміри тексту.') +
+                        item('Жести', 'Свайп від лівого краю відкриває меню. Потягнути стрічку вниз — оновити заголовки, описи й фавікони. Шапка повертає до початку фільтра, а повторне натискання зверху скидає фільтри.') +
+                        item('Випадковий вибір', 'Кнопка рандому дістає випадкове незамкнене посилання. Коли «почитати потім» уже схоже на архів національного масштабу — нехай вирішує жереб.'), true)}
+
+                    ${section('02', 'Додавання посилань', 'Кидай адресу. Решту розберемо.',
+                        item('Поле вводу', 'Приймає одну адресу, кілька URL або цілий шматок тексту з посиланнями всередині. Зайві розділові знаки й UTM-хвости прибирає.') +
+                        item('Меню Android «Поділитися»', 'У встановленій PWA-версії LinkBox можна вибрати прямо в системному меню поширення. Без копіювання, пересилання самому собі й інших народних обрядів.') +
+                        item('Дублікати', 'Повторну адресу не додає — підсвічує вже наявну картку. Двічі зберегти те саме? Це не колекція марок.') +
+                        item('NEW та офлайн', 'Непрочитані отримують NEW і власну папку. Без мережі нові адреси стають у чергу й дочекаються обробки. Інтернет зник? Ну, він і раніше не вирізнявся пунктуальністю.') +
+                        item('Після додавання', 'LinkBox показує, куди поклав ресурс і яку мову визначив. Щоб потім не шукати його в папці «А де воно?»'))}
+
+                    ${section('03', 'Папки, теги й ШІ', 'Автоматизація без магічного мислення',
+                        item('Кілька папок', 'Один ресурс може лежати в кількох категоріях. Натискання на папку або #тег одразу фільтрує стрічку.') +
+                        item('Пошук у списках', 'Папки й теги мають окремі списки з пошуком та сортуванням: популярні, А–Я і Я–А.') +
+                        item('Автокатегоризація', 'Вбудовані правила дивляться на домен і зміст сторінки. Ручні виправлення враховуються — так, навіть алгоритм може засвоїти, що знову поніс дурню.') +
+                        item('Зовнішній ШІ', 'Можна підключити Gemini, Groq, Mistral, Cerebras, OpenRouter, GitHub Models, DeepSeek, Grok, Claude, OpenAI або сумісний сервер. Передаються домен, заголовок, опис і назви папок — не вся база. Якщо ШІ недоступний, працюють вбудовані правила.') +
+                        item('Перерозпізнавання', 'Можна заново розкласти вибрані ресурси або всю базу. Є скасування; замкнені й 18+ записи пропускаються.') +
+                        item('Скріпка й ★', 'Скріпка виносить сайт у Pin-бар. Зірочка піднімає картку лише всередині її папок. Дві кнопки — дві різні роботи. Не плутати, вони й так зайняті.'))}
+
+                    ${section('04', 'Картка посилання', 'У картки є життя поза кнопкою «Відкрити»',
+                        item('Редагування', 'Змінюй URL, назву, нотатку, папки й теги. Підказки суміжних категорій допомагають розкласти все без археологічних розкопок.') +
+                        item('Опис', 'Оновлює опис зі сторінки або створює нову нотатку. Бо «збережено» — це ще не відповідь на запитання «навіщо?»') +
+                        item('QR і поширення', 'QR-код створюється локально, без інтернету. Адресу можна скопіювати або поширити.') +
+                        item('Інші посилання з домену', 'Показує все збережене з того самого сайту. Корисно, коли один домен непомітно захопив пів колекції.') +
+                        item('Видалення', 'Перед видаленням є підтвердження. Один випадковий дотик — не привід починати життя з чистого аркуша.'))}
+
+                    ${section('05', 'Замки й приватність', 'Що саме захищено — без казок',
+                        item('Замок', 'Закриває окрему картку або папку від відкриття через LinkBox. URL усе ще можна скопіювати. Це заслін від випадкового погляду, а не шифрування й не банківське сховище.') +
+                        item('18+', 'Такі ресурси автоматично потрапляють в окрему категорію під замком.') +
+                        item('Де лежать дані', 'Посилання зберігаються локально в IndexedDB браузера. LinkBox просить систему не очищати сховище, але остаточне рішення — за браузером та Android.') +
+                        item('Нагадування про копію', 'Якщо давно не було файлової резервної копії, LinkBox нагадає. Бо відновлювати сотні посилань із пам’яті — це вже не функція, а покарання.'))}
+
+                    ${section('06', 'Масові дії й календар', 'Коли «тут усього кілька посилань» уже не смішно',
+                        item('Масовий вибір', 'Вибирай усі видимі картки або потрібні вручну. Можна масово змінити папки й теги, скопіювати чи поширити список або видалити вибране. Категорії додаються до наявних або замінюються.') +
+                        item('Календар', 'Показує, що й коли було збережено. Обираєш день — отримуєш список із діями відкрити, скопіювати й редагувати. Нарешті дата, яка щось пам’ятає.'))}
+
+                    ${section('07', 'Імпорт, експорт і копії', 'Нехай посилання переживуть навіть генеральне прибирання',
+                        item('Імпорт', 'Підтримуються HTML і JSON. Дублікати можна пропустити або оновити. Після імпорту LinkBox покаже, скільки додав і скільки зустрів старих знайомих.') +
+                        item('Експорт', 'HTML відкривається в браузері. JSON зберігає повну структуру: папки, теги й замки.') +
+                        item('Автокопії', 'Локальні знімки створюються періодично та після помітного збільшення бази. Відновлення — з налаштувань. Резервна копія не для панікерів. Вона для тих, хто вже бачив, як зникає «та там нічого важливого».'))}
+                </div>
+
+                <div class="about-guide-footer mt-4 p-4 text-center">
+                    <div class="text-[10px] font-black tracking-[.18em] uppercase theme-muted">Менше хаосу. Більше знайденого.</div>
+                    <div class="text-[20px] font-black tracking-tight mt-1" style="color:var(--text-main)">Shans</div>
+                    <div class="flex items-center justify-center gap-2 text-[13px] font-bold mt-1" style="color:rgb(var(--accent-rgb))"><svg viewBox="0 0 24 16" class="w-5 h-3.5 rounded-[2px]" aria-label="Прапор України"><rect width="24" height="8" fill="#0057B7"/><rect y="8" width="24" height="8" fill="#FFD700"/></svg><span>Слава Україні!</span></div>
+                    <div class="text-[12px] theme-muted mt-1">Героям слава.</div>
                 </div>
             `;
         }
@@ -4461,7 +4532,7 @@
             saveStateToStorage(); closeEditSheet(); renderApp(); showToast(t('saved'));
         }
 
-        function attachSheetDrag(handleId, panelId, closeFn) {
+        function attachSheetDrag(handleId, panelId, closeFn, handleOnly = false) {
             const handle = document.getElementById(handleId); 
             const panel = document.getElementById(panelId); 
             if (!handle || !panel) return;
@@ -4495,8 +4566,9 @@
             }
             
             function onStart(e) {
-                // Разрешаем тянуть окно вниз только если мы в самом верху списка, 
-                // либо если тапнули чётко по серому ползунку
+                // Для довідки жест закрытия доступен только за ручку.
+                // Прокрутка текста никогда не должна превращаться в перетаскивание шторки.
+                if (handleOnly && e.target !== handle && !handle.contains(e.target)) return;
                 if (panel.scrollTop > 0 && e.target !== handle && !handle.contains(e.target)) return;
 
                 dragging = true;
@@ -5317,7 +5389,7 @@
             attachSheetDrag('cats-drag-handle', 'cats-sheet-panel', closeCategoriesSheet);
             attachSheetDrag('tags-drag-handle', 'tags-sheet-panel', closeTagsSheet);
             attachSheetDrag('settings-drag-handle', 'settings-sheet-panel', closeSettingsSheet);
-            attachSheetDrag('about-drag-handle', 'about-sheet-panel', closeAboutSheet);
+            attachSheetDrag('about-drag-handle', 'about-sheet-panel', closeAboutSheet, true);
             attachSheetDrag('ai-drag-handle', 'ai-sheet-panel', closeAiSheet);
             attachSheetDrag('edit-drag-handle', 'edit-sheet-panel', closeEditSheet);
             attachSheetDrag('domain-links-drag-handle', 'domain-links-sheet-panel', closeDomainLinksSheet);
