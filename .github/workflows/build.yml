@@ -1,12 +1,19 @@
 name: Build APK
 on:
   push:
+    branches: [main]
   workflow_dispatch:
 permissions:
   contents: write
+concurrency:
+  group: build
+  cancel-in-progress: true
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      APK: LinkBox-v1.${{ github.run_number }}.apk
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -16,6 +23,14 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+            ~/.npm
+          key: deps-${{ runner.os }}-${{ hashFiles('.github/workflows/build.yml') }}
+          restore-keys: deps-${{ runner.os }}-
       - name: Signing key
         run: |
           if [ ! -s debug.keystore ]; then
@@ -48,6 +63,7 @@ jobs:
           p = 'www/index.html'
           s = open(p, encoding='utf-8').read()
           js = '''<script>
+          window.__LINKBOX_BUILD__ = "v1.${{ github.run_number }}";
           window.addEventListener("load", function () { setTimeout(function () { window.__shareReady = true; }, 800); });
           window.receiveShared = function (t) {
             try {
@@ -360,15 +376,43 @@ jobs:
         run: |
           cd android
           chmod +x gradlew
-          ./gradlew assembleDebug
+          for i in 1 2 3; do ./gradlew assembleDebug && break || sleep 15; done
+          ls app/build/outputs/apk/debug/app-debug.apk
       - name: Sign APK
         run: |
           BT=$ANDROID_HOME/build-tools/$(ls $ANDROID_HOME/build-tools | sort -V | tail -1)
-          $BT/apksigner sign --ks debug.keystore --ks-pass pass:android --key-pass pass:android --ks-key-alias androiddebugkey --v4-signing-enabled false --out LinkBox.apk android/app/build/outputs/apk/debug/app-debug.apk
-          $BT/apksigner verify --print-certs LinkBox.apk | grep "SHA-256"
-          $BT/aapt2 dump badging LinkBox.apk | head -1
+          $BT/apksigner sign --ks debug.keystore --ks-pass pass:android --key-pass pass:android --ks-key-alias androiddebugkey --v4-signing-enabled false --out "$APK" android/app/build/outputs/apk/debug/app-debug.apk
+          $BT/apksigner verify --print-certs "$APK" | grep "SHA-256"
+          $BT/aapt2 dump badging "$APK" | head -1
+      - name: Release
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "v1.${{ github.run_number }}" "$APK" --title "LinkBox v1.${{ github.run_number }}" --notes "Збірка #${{ github.run_number }}" --latest --target "${{ github.sha }}"
+          gh release list --limit 200 --json tagName -q '.[10:][].tagName' | while read t; do gh release delete "$t" --cleanup-tag -y; done
+      - name: Telegram
+        continue-on-error: true
+        env:
+          TG_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
+          TG_CHAT: ${{ secrets.TG_CHAT_ID }}
+        run: |
+          if [ -n "$TG_TOKEN" ] && [ -n "$TG_CHAT" ]; then
+            curl -sS -F chat_id="$TG_CHAT" -F caption="LinkBox v1.${{ github.run_number }}" -F document=@"$APK" "https://api.telegram.org/bot$TG_TOKEN/sendDocument"
+          else
+            echo "Telegram не налаштовано, пропуск"
+          fi
       - uses: actions/upload-artifact@v4
         with:
-          name: LinkBox
-          path: LinkBox.apk
-          
+          name: LinkBox-v1.${{ github.run_number }}
+          path: ${{ env.APK }}
+      - name: Telegram error
+        if: failure()
+        continue-on-error: true
+        env:
+          TG_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
+          TG_CHAT: ${{ secrets.TG_CHAT_ID }}
+        run: |
+          if [ -n "$TG_TOKEN" ] && [ -n "$TG_CHAT" ]; then
+            curl -sS -d chat_id="$TG_CHAT" --data-urlencode text="LinkBox: збірка #${{ github.run_number }} впала. ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" "https://api.telegram.org/bot$TG_TOKEN/sendMessage"
+          fi
