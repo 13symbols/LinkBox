@@ -399,7 +399,7 @@ jobs:
           TG_CHANNEL: ${{ secrets.TG_CHANNEL_ID }}
           TG_THREAD: ${{ secrets.TG_THREAD_ID }}
         run: |
-          send() { curl -sS -F chat_id="$1" ${2:+-F message_thread_id="$2"} -F caption="LinkBox v1.${{ github.run_number }}" -F document=@"$APK" "https://api.telegram.org/bot$TG_TOKEN/sendDocument"; echo; }
+          send() { curl -sS --form-string chat_id="$1" ${2:+--form-string message_thread_id="$2"} --form-string caption="LinkBox v1.${{ github.run_number }}" -F document=@"$APK" "https://api.telegram.org/bot$TG_TOKEN/sendDocument"; echo; }
           if [ -z "$TG_TOKEN" ]; then echo "Telegram не налаштовано, пропуск"; exit 0; fi
           if [ -n "$TG_CHAT" ]; then send "$TG_CHAT"; fi
           if [ -n "$TG_CHANNEL" ]; then send "$TG_CHANNEL" "$TG_THREAD"; fi
