@@ -391,6 +391,18 @@ jobs:
         run: |
           gh release create "v1.${{ github.run_number }}" "$APK" --title "LinkBox v1.${{ github.run_number }}" --notes "Збірка #${{ github.run_number }}" --latest --target "${{ github.sha }}"
           gh release list --limit 200 --json tagName -q '.[10:][].tagName' | while read t; do gh release delete "$t" --cleanup-tag -y; done
+      - name: Save zip to releases folder
+        continue-on-error: true
+        run: |
+          mkdir -p releases
+          zip -j "releases/LinkBox-v1.${{ github.run_number }}.zip" "$APK"
+          ls -1t releases/LinkBox-v1.*.zip | tail -n +6 | xargs -r git rm -f --quiet
+          git config user.name "build"
+          git config user.email "build@example.com"
+          git add releases
+          git commit -m "LinkBox v1.${{ github.run_number }}"
+          git pull --rebase
+          git push
       - name: Telegram
         continue-on-error: true
         env:
