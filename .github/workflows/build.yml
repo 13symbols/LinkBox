@@ -396,12 +396,13 @@ jobs:
         env:
           TG_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
           TG_CHAT: ${{ secrets.TG_CHAT_ID }}
+          TG_CHANNEL: ${{ secrets.TG_CHANNEL_ID }}
+          TG_THREAD: ${{ secrets.TG_THREAD_ID }}
         run: |
-          if [ -n "$TG_TOKEN" ] && [ -n "$TG_CHAT" ]; then
-            curl -sS -F chat_id="$TG_CHAT" -F caption="LinkBox v1.${{ github.run_number }}" -F document=@"$APK" "https://api.telegram.org/bot$TG_TOKEN/sendDocument"
-          else
-            echo "Telegram не налаштовано, пропуск"
-          fi
+          send() { curl -sS -F chat_id="$1" ${2:+-F message_thread_id="$2"} -F caption="LinkBox v1.${{ github.run_number }}" -F document=@"$APK" "https://api.telegram.org/bot$TG_TOKEN/sendDocument"; echo; }
+          if [ -z "$TG_TOKEN" ]; then echo "Telegram не налаштовано, пропуск"; exit 0; fi
+          if [ -n "$TG_CHAT" ]; then send "$TG_CHAT"; fi
+          if [ -n "$TG_CHANNEL" ]; then send "$TG_CHANNEL" "$TG_THREAD"; fi
       - uses: actions/upload-artifact@v4
         with:
           name: LinkBox-v1.${{ github.run_number }}
