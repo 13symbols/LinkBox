@@ -76,6 +76,7 @@
         .grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
         .grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
         .grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        .grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
         .grid-cols-12 { grid-template-columns: repeat(12, minmax(0, 1fr)); }
         .col-span-5 { grid-column: span 5 / span 5; }
         .col-span-7 { grid-column: span 7 / span 7; }
@@ -398,10 +399,10 @@
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        html { scrollbar-gutter: stable; overflow-x: clip; font-size: 17px; transition: font-size 0.15s ease; }
-        html[data-font-scale="sm"] { font-size: 15.5px; }
-        html[data-font-scale="md"] { font-size: 17px; }
-        html[data-font-scale="lg"] { font-size: 18.5px; }
+        html { scrollbar-gutter: stable; overflow-x: clip; font-size: 16.5px; transition: font-size 0.15s ease; }
+        html[data-font-scale="sm"] { font-size: 16.5px; }
+        html[data-font-scale="md"] { font-size: 18px; }
+        html[data-font-scale="lg"] { font-size: 19.5px; }
         html[data-font-scale="lg"] header h1 { font-size: 1.05rem; }
         html[data-font-scale="lg"] #cards-container p { line-height: 1.38; }
         
@@ -726,6 +727,7 @@
                         </div>
                     </div>
                 </div>
+                <span id="total-count-pill" title="Усього посилань у базі" class="text-xs font-mono-code font-black px-2.5 py-1 rounded-lg theme-input theme-muted shrink-0">0</span>
             </div>
         </header>
 
@@ -1035,10 +1037,11 @@
 
                         <div class="space-y-2 pt-3 border-t" style="border-color: var(--border-main);">
                             <div class="text-xs font-extrabold">Сортування посилань</div>
-                            <div class="grid grid-cols-3 gap-1.5 p-1 rounded-xl theme-input">
+                            <div class="grid grid-cols-4 gap-1.5 p-1 rounded-xl theme-input">
                                 <button data-action="set-sort" data-mode="newest" id="sort-newest-btn" class="key-press py-2.5 rounded-lg text-xs font-bold transition">↓ Нові</button>
                                 <button data-action="set-sort" data-mode="oldest" id="sort-oldest-btn" class="key-press py-2.5 rounded-lg text-xs font-bold transition">↑ Старі</button>
                                 <button data-action="set-sort" data-mode="az" id="sort-az-btn" class="key-press py-2.5 rounded-lg text-xs font-bold transition">А–Я</button>
+                                <button data-action="set-sort" data-mode="za" id="sort-za-btn" class="key-press py-2.5 rounded-lg text-xs font-bold transition">Я–А</button>
                             </div>
                         </div>
 
@@ -1063,69 +1066,85 @@
                             </span>
                             <div class="min-w-0 space-y-0.5 ml-1">
                                 <div class="text-sm font-extrabold truncate">Розумні папки та ШІ</div>
-                                <div id="settings-ai-status-sub" class="text-xs theme-muted truncate">Вбудовані правила (без ключа)</div>
+                                <div id="settings-ai-status-sub" class="text-xs theme-muted truncate">Автосортування (без ключа)</div>
                             </div>
                         </div>
                         <span class="text-accent font-mono-code text-lg font-black shrink-0">›</span>
                     </button>
                 </div>
 
-                <!-- СЕКЦІЯ 3: ДАНІ ТА РЕЗЕРВНІ КОПІЇ -->
+                <!-- СЕКЦІЯ 3: РЕЗЕРВНІ КОПІЇ ТА ПЕРЕНОС -->
                 <div class="space-y-2 mt-6">
-                    <div class="text-[11px] font-mono-code font-bold uppercase theme-muted px-1">Дані та резервні копії</div>
-                    <div class="theme-card border rounded-2xl p-4 space-y-4 shadow-xs">
-                        <!-- Імпорт -->
-                        <div class="space-y-2.5">
-                            <div class="text-xs font-extrabold">Імпорт закладок (.HTML / .JSON)</div>
-                            <div class="grid grid-cols-2 gap-1.5 p-1 rounded-xl theme-input">
-                                <button type="button" data-action="set-import-dup-mode" data-mode="skip" id="imp-mode-skip-btn" class="key-press py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition">
-                                    <span class="font-mono-code text-accent font-black">⏭</span>
-                                    <span>Без дублів</span>
-                                </button>
-                                <button type="button" data-action="set-import-dup-mode" data-mode="update" id="imp-mode-update-btn" class="key-press py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition">
-                                    <span class="font-mono-code text-accent font-black">↻</span>
-                                    <span>Оновлювати</span>
-                                </button>
-                            </div>
-                            <button type="button" data-action="trigger-import-file" class="key-press w-full py-3 px-4 rounded-xl bg-accent text-onaccent text-xs font-black flex items-center justify-center gap-2 shadow-xs">
-                                <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/><line x1="12" y1="10" x2="12" y2="16"/><polyline points="9 13 12 16 15 13"/></svg>
-                                <span id="btn-import-ai">Вибрати файл для імпорту</span>
+                    <div class="text-[11px] font-mono-code font-bold uppercase theme-muted px-1">Резервні копії та перенос</div>
+                    <div class="theme-card border rounded-2xl p-4 space-y-3 shadow-xs">
+                        <div id="backup-reminder-banner" class="hidden rounded-xl p-2.5 bg-amber-500/15 border border-amber-500/40 text-amber-600 text-[11px] font-bold flex items-center justify-between gap-2">
+                            <span id="backup-reminder-text">⚠️ Ви давно не зберігали копію у файл</span>
+                            <button type="button" data-action="export-json" class="key-press px-2.5 py-1 rounded-lg bg-amber-500 text-white font-black text-[10px] uppercase shrink-0">Зберегти</button>
+                        </div>
+
+                        <div class="space-y-2">
+                            <button type="button" data-action="export-json" class="key-press w-full py-3 px-4 rounded-xl bg-accent text-onaccent text-xs font-black flex items-center justify-center gap-2 shadow-xs">
+                                <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                                <span>Зберегти копію бази</span>
+                            </button>
+                            <button type="button" data-action="trigger-import-file" class="key-press w-full py-3 px-4 rounded-xl theme-input text-xs font-bold flex items-center justify-center gap-2 hover:text-accent transition border">
+                                <svg class="w-4 h-4 shrink-0 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/><line x1="12" y1="10" x2="12" y2="16"/><polyline points="9 13 12 16 15 13"/></svg>
+                                <span>Завантажити з файлу</span>
                             </button>
                         </div>
 
-                        <!-- Експорт -->
-                        <div class="space-y-2.5 pt-3.5 border-t" style="border-color: var(--border-main);">
-                            <div class="flex items-center justify-between gap-2">
-                                <div class="text-xs font-extrabold" id="btn-export-html">Експорт бази</div>
-                                <span id="storage-persist-badge" class="text-[10px] font-mono-code font-bold px-2 py-0.5 rounded-md theme-input theme-muted">Пам’ять: перевірка…</span>
-                            </div>
-                            <div id="backup-reminder-banner" class="hidden rounded-xl p-2.5 bg-amber-500/15 border border-amber-500/40 text-amber-600 text-[11px] font-bold flex items-center justify-between gap-2">
-                                <span id="backup-reminder-text">⚠️ Ви давно не зберігали копію у файл</span>
-                                <button type="button" data-action="export-json" class="key-press px-2.5 py-1 rounded-lg bg-amber-500 text-white font-black text-[10px] uppercase shrink-0">Зберегти</button>
-                            </div>
-                            <div class="grid grid-cols-2 gap-2">
-                                <button type="button" data-action="export-html" class="key-press py-3 px-3 rounded-xl theme-input text-xs font-bold flex items-center justify-center gap-1.5 hover:text-accent transition border">
-                                    <span class="font-mono-code text-accent font-black">.HTML</span>
-                                    <span id="lbl-exp-html">Для браузера</span>
-                                </button>
-                                <button type="button" data-action="export-json" class="key-press py-3 px-3 rounded-xl theme-input text-xs font-bold flex items-center justify-center gap-1.5 hover:text-accent transition border">
-                                    <span class="font-mono-code text-accent font-black">.JSON</span>
-                                    <span id="lbl-exp-json">Повний бекап</span>
-                                </button>
-                            </div>
-                        </div>
+                        <details class="about-acc pt-2.5 border-t" style="border-color: var(--border-main);">
+                            <summary class="flex items-center justify-between gap-2 py-1 cursor-pointer select-none text-xs font-bold theme-muted hover:text-accent transition">
+                                <span>Додаткові параметри</span>
+                                <span class="about-chev text-accent font-mono-code text-base leading-none transition-transform">›</span>
+                            </summary>
 
-                        <!-- Авто-зліпок -->
-                        <div id="autosnap-section-wrap" class="hidden pt-3.5 border-t space-y-2" style="border-color: var(--border-main);">
-                            <div class="flex items-center justify-between text-xs px-0.5">
-                                <span class="font-bold theme-muted">Локальний авто-зліпок</span>
-                                <span id="autosnap-meta-label" class="font-mono-code text-xs text-accent font-black"></span>
+                            <div class="pt-3 space-y-4">
+                                <!-- Режим дублікатів при завантаженні -->
+                                <div class="space-y-1.5">
+                                    <div class="text-xs font-extrabold">При завантаженні з файлу</div>
+                                    <div class="grid grid-cols-2 gap-1.5 p-1 rounded-xl theme-input">
+                                        <button type="button" data-action="set-import-dup-mode" data-mode="skip" id="imp-mode-skip-btn" class="key-press py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition">
+                                            <span class="font-mono-code text-accent font-black">⏭</span>
+                                            <span>Пропускати повтори</span>
+                                        </button>
+                                        <button type="button" data-action="set-import-dup-mode" data-mode="update" id="imp-mode-update-btn" class="key-press py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition">
+                                            <span class="font-mono-code text-accent font-black">↻</span>
+                                            <span>Оновлювати існуючі</span>
+                                        </button>
+                                    </div>
+                                    <div class="text-[11px] theme-muted px-0.5">Твої ручні правки не зачепить.</div>
+                                </div>
+
+                                <!-- Експорт для браузера -->
+                                <div class="space-y-1.5 pt-3 border-t" style="border-color: var(--border-main);">
+                                    <div class="text-xs font-extrabold">Експорт для браузера</div>
+                                    <button type="button" data-action="export-html" class="key-press w-full py-2.5 px-3 rounded-xl theme-input text-xs font-bold flex items-center justify-center gap-2 hover:text-accent transition border">
+                                        <span class="font-mono-code text-accent font-black">.HTML</span>
+                                        <span>Зберегти список для Chrome / ПК</span>
+                                    </button>
+                                </div>
+
+                                <!-- Автокопія в пам'яті телефону -->
+                                <div id="autosnap-section-wrap" class="hidden pt-3 border-t space-y-2" style="border-color: var(--border-main);">
+                                    <div class="flex items-center justify-between text-xs px-0.5">
+                                        <span class="font-extrabold">Автокопія в пам’яті телефону</span>
+                                        <span id="autosnap-meta-label" class="font-mono-code text-xs text-accent font-black"></span>
+                                    </div>
+                                    <button type="button" data-action="restore-auto-snapshot" id="btn-restore-autosnap" class="key-press w-full py-2.5 px-3 rounded-xl theme-input text-xs font-bold flex items-center justify-center gap-2 hover:text-accent transition border">
+                                        <span class="font-mono-code text-accent font-black text-base">↺</span>
+                                        <span id="autosnap-btn-text" class="truncate">Відновити з автокопії</span>
+                                    </button>
+                                    <div class="text-[11px] theme-muted px-0.5">Поточні посилання не пропадуть, повернуться лише відсутні.</div>
+                                </div>
+
+                                <!-- Статус пам'яті -->
+                                <div class="flex items-center justify-between gap-2 pt-3 border-t" style="border-color: var(--border-main);">
+                                    <span class="text-[11px] theme-muted font-bold">Сховище телефону</span>
+                                    <span id="storage-persist-badge" class="text-[10px] font-mono-code font-bold px-2 py-0.5 rounded-md theme-input theme-muted">Перевірка…</span>
+                                </div>
                             </div>
-                            <button type="button" data-action="restore-auto-snapshot" id="btn-restore-autosnap" class="key-press w-full py-2.5 px-3 rounded-xl theme-input text-xs font-bold flex items-center justify-center gap-2 hover:text-accent transition border">
-                                <span class="font-mono-code text-accent font-black text-base">↺</span>
-                                <span id="autosnap-btn-text" class="truncate">Відновити з авто-зліпка</span>
-                            </button>
-                        </div>
+                        </details>
                     </div>
                 </div>
 
@@ -1164,51 +1183,84 @@
     </div>
 
     <div id="ai-sheet-modal" data-backdrop="close-ai-sheet" class="sheet-backdrop fixed inset-0 bg-black/60 z-50 hidden items-end sm:items-center justify-center p-0 sm:p-4">
-        <div id="ai-sheet-panel" class="sheet-panel theme-surface w-full max-w-md rounded-t-2xl sm:rounded-xl p-5 border-t sm:border space-y-3 max-h-[90vh] overflow-y-auto">
+        <div id="ai-sheet-panel" class="sheet-panel theme-surface w-full max-w-md rounded-t-2xl sm:rounded-xl p-5 border-t sm:border space-y-4 max-h-[90vh] overflow-y-auto">
             <div id="ai-drag-handle" class="w-12 h-2 bg-stone-400/50 rounded-full mx-auto -mt-1 cursor-grab active:cursor-grabbing touch-none sm:hidden"></div>
             <div class="flex items-center justify-between">
-                <span class="font-black text-base uppercase tracking-tight">Розумні папки</span>
+                <span class="font-black text-base uppercase tracking-tight">Розумні папки та ШІ</span>
                 <button data-action="close-ai-sheet" class="key-press w-9 h-9 rounded-lg theme-input flex items-center justify-center"><svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
             </div>
-            <div id="ai-mode-badge" class="font-mono-code text-[11px] px-2.5 py-1.5 rounded-lg theme-input"></div>
-            <p class="text-xs theme-muted leading-relaxed">Без ключа працюють вбудовані правила: оцінка за сайтом і змістом, навчання на твоїх правках. З ключем папки визначає нейромережа, а вбудовані правила вимикаються. Якщо ШІ недоступний, правила вмикаються самі. У ШІ йдуть тільки заголовок, опис і домен.</p>
-            <div class="space-y-1"><label class="text-[11px] font-bold uppercase theme-muted">Провайдер</label>
-                <select id="ai-provider" class="theme-input w-full rounded-lg px-3 py-2.5 text-sm"></select></div>
-            <div id="ai-guide" class="theme-card border rounded-xl p-3"></div>
-            <div class="space-y-1"><label class="text-[11px] font-bold uppercase theme-muted">API-ключ</label>
-                <div class="flex items-center theme-input rounded-lg px-3 py-1.5 gap-2 border border-transparent focus-within:border-accent transition">
-                    <input id="ai-key" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Напр.: AIzaSyD-9x8Y7z6W5v4U3t2S1r0Q..." class="w-full bg-transparent py-1 text-sm font-mono-code outline-none min-w-0">
-                    <button type="button" data-action="toggle-ai-key-vis" title="Показати / приховати ключ" class="key-press w-7 h-7 rounded-md flex items-center justify-center opacity-60 hover:opacity-100 hover:text-accent transition shrink-0">
-                        <svg id="ai-key-eye-open" class="w-4 h-4 mono-icon" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                        <svg id="ai-key-eye-off" class="w-4 h-4 mono-icon hidden" viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
-                    </button>
+
+            <div class="theme-card border rounded-2xl p-3.5 space-y-2 shadow-2xs">
+                <div id="ai-mode-badge" class="text-xs font-extrabold text-accent"></div>
+                <p class="text-xs theme-muted leading-relaxed">LinkBox сам розкладає посилання по папках за назвою сайту і вчиться на твоїх виправленнях. Хочеш ще точніше — підключи безкоштовний ШІ (до нього йде лише заголовок сторінки, без особистих даних).</p>
+            </div>
+
+            <div class="theme-card border rounded-2xl p-4 space-y-3 shadow-2xs">
+                <div class="text-xs font-extrabold uppercase tracking-wider theme-muted">Підключення нейромережі</div>
+                <div class="space-y-1">
+                    <label class="text-[11px] font-bold theme-muted">1. Обери сервіс</label>
+                    <select id="ai-provider" class="theme-input w-full rounded-xl px-3 py-2.5 text-sm font-bold"></select>
+                </div>
+
+                <details class="about-acc rounded-xl theme-input px-3 py-2">
+                    <summary class="flex items-center justify-between gap-2 cursor-pointer select-none text-xs font-bold hover:text-accent transition">
+                        <span>Як отримати безкоштовний ключ?</span>
+                        <span class="about-chev text-accent font-mono-code text-base leading-none transition-transform">›</span>
+                    </summary>
+                    <div id="ai-guide" class="pt-2.5 pb-1"></div>
+                </details>
+
+                <div class="space-y-1">
+                    <label class="text-[11px] font-bold theme-muted">2. Встав ключ доступу</label>
+                    <div class="flex items-center theme-input rounded-xl px-3 py-1.5 gap-2 border border-transparent focus-within:border-accent transition">
+                        <input id="ai-key" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Напр.: AIzaSyD-9x8Y7z6W5v4U3t2S1r0Q..." class="w-full bg-transparent py-1 text-sm font-mono-code outline-none min-w-0">
+                        <button type="button" data-action="toggle-ai-key-vis" title="Показати / приховати ключ" class="key-press w-7 h-7 rounded-md flex items-center justify-center opacity-60 hover:opacity-100 hover:text-accent transition shrink-0">
+                            <svg id="ai-key-eye-open" class="w-4 h-4 mono-icon" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                            <svg id="ai-key-eye-off" class="w-4 h-4 mono-icon hidden" viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <details id="ai-advanced-details" class="about-acc pt-1">
+                    <summary class="flex items-center justify-between gap-2 py-1 cursor-pointer select-none text-xs font-bold theme-muted hover:text-accent transition">
+                        <span>Для просунутих (модель / сервер)</span>
+                        <span class="about-chev text-accent font-mono-code text-base leading-none transition-transform">›</span>
+                    </summary>
+                    <div class="pt-2.5 space-y-2.5">
+                        <div class="space-y-1">
+                            <label class="text-[11px] font-bold theme-muted">Модель (за замовчуванням підбереться сама)</label>
+                            <input id="ai-model" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" class="theme-input w-full rounded-xl px-3 py-2 text-xs font-mono-code">
+                        </div>
+                        <div id="ai-base-wrap" class="space-y-1" style="display:none">
+                            <label class="text-[11px] font-bold theme-muted">Адреса сервера (Base URL)</label>
+                            <input id="ai-base" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="https://host/v1" class="theme-input w-full rounded-xl px-3 py-2 text-xs font-mono-code">
+                        </div>
+                    </div>
+                </details>
+
+                <div id="ai-status" class="text-xs min-h-[1.25rem] break-words"></div>
+                <div class="flex gap-2 pt-0.5">
+                    <button data-action="ai-save" class="key-press flex-1 py-3 rounded-xl bg-accent text-onaccent text-xs font-black">Увімкнути</button>
+                    <button data-action="ai-test" class="key-press flex-1 py-3 rounded-xl theme-input text-xs font-bold">Перевірити</button>
+                    <button data-action="ai-clear" class="key-press px-3.5 py-3 rounded-xl theme-input text-xs font-bold" title="Вимкнути ШІ та видалити ключ">Вимкнути</button>
                 </div>
             </div>
-            <div class="space-y-1"><label class="text-[11px] font-bold uppercase theme-muted">Модель (необов'язково)</label>
-                <input id="ai-model" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" class="theme-input w-full rounded-lg px-3 py-2.5 text-sm font-mono-code"></div>
-            <div id="ai-base-wrap" class="space-y-1" style="display:none"><label class="text-[11px] font-bold uppercase theme-muted">Base URL</label>
-                <input id="ai-base" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="https://host/v1" class="theme-input w-full rounded-lg px-3 py-2.5 text-sm font-mono-code"></div>
-            <div id="ai-status" class="text-xs min-h-[1.25rem] break-words"></div>
-            <div class="flex gap-2">
-                <button data-action="ai-save" class="key-press flex-1 py-3 rounded-lg bg-accent text-onaccent text-xs font-black">Зберегти</button>
-                <button data-action="ai-test" class="key-press flex-1 py-3 rounded-lg theme-input text-xs font-bold">Перевірити</button>
-                <button data-action="ai-clear" class="key-press flex-1 py-3 rounded-lg theme-input text-xs font-bold">Стерти</button>
-            </div>
-            <div id="resort-card" class="theme-card border rounded-xl p-3.5 space-y-2.5 mt-1">
+
+            <div id="resort-card" class="theme-card border rounded-2xl p-4 space-y-3 shadow-2xs">
                 <div class="flex items-center justify-between gap-2">
-                    <span class="font-extrabold text-sm">Перерозпізнати папки</span>
-                    <span id="resort-count" class="font-mono-code text-[11px] theme-muted" title="Веб-ресурси / усі"></span>
+                    <span class="font-extrabold text-sm">Розкласти старі посилання</span>
+                    <span id="resort-count" class="font-mono-code text-[11px] font-bold px-2 py-0.5 rounded-md theme-input theme-muted" title="Нерозібрані / усі"></span>
                 </div>
-                <p class="text-xs theme-muted leading-relaxed">Застосовує поточний режим (правила або ШІ) до вже збережених посилань. Закриті та 18+ не чіпає.</p>
-                <div class="flex gap-1.5">
-                    <button id="resort-mode-web" data-action="resort-mode" data-mode="web" class="key-press flex-1 py-2 rounded-lg text-xs font-bold theme-input">Лише «Веб-ресурси»</button>
-                    <button id="resort-mode-all" data-action="resort-mode" data-mode="all" class="key-press flex-1 py-2 rounded-lg text-xs font-bold theme-input">Усі посилання</button>
+                <p class="text-xs theme-muted leading-relaxed">Наведе лад у вже збережених посиланнях. Закриті замком та 18+ не чіпає.</p>
+                <div class="grid grid-cols-2 gap-1.5 p-1 rounded-xl theme-input">
+                    <button id="resort-mode-web" data-action="resort-mode" data-mode="web" class="key-press py-2 rounded-lg text-xs font-bold transition">Тільки нерозібрані</button>
+                    <button id="resort-mode-all" data-action="resort-mode" data-mode="all" class="key-press py-2 rounded-lg text-xs font-bold transition">Усі посилання</button>
                 </div>
                 <div id="resort-progress" class="h-1.5 rounded-full bg-black/10 overflow-hidden" style="display:none"><div id="resort-bar" class="h-full bg-accent" style="width:0%"></div></div>
                 <div id="resort-status" class="text-xs theme-muted min-h-[1rem] break-words"></div>
                 <div class="flex gap-2">
-                    <button id="resort-run" data-action="resort-run" class="key-press flex-1 py-3 rounded-lg bg-accent text-onaccent text-xs font-black">Перерозпізнати</button>
-                    <button id="resort-undo" data-action="resort-undo" class="key-press px-4 py-3 rounded-lg theme-input text-xs font-bold" style="display:none">Скасувати</button>
+                    <button id="resort-run" data-action="resort-run" class="key-press flex-1 py-3 rounded-xl bg-accent text-onaccent text-xs font-black">Розкласти по папках</button>
+                    <button id="resort-undo" data-action="resort-undo" class="key-press px-4 py-3 rounded-xl theme-input text-xs font-bold" style="display:none">Скасувати</button>
                 </div>
             </div>
         </div>
@@ -1359,7 +1411,7 @@
         let tagsSortMode = 'popular';
         let catsSortMode = 'popular';
         let themeMode = 'light';
-        let fontScale = 'md';
+        let fontScale = 'sm';
         let editingId = null;
         let _currentQRUrl = '';
         let sheetTempLocked = false;
@@ -2138,13 +2190,14 @@
 
             if (sortMode === 'oldest') filtered.reverse();
             else if (sortMode === 'az') filtered.sort((a, b) => (a.title || a.name).localeCompare(b.title || b.name, 'uk'));
+            else if (sortMode === 'za') filtered.sort((a, b) => (b.title || b.name).localeCompare(a.title || a.name, 'uk'));
             filtered.sort((a, b) => (b.folderPriority ? 1 : 0) - (a.folderPriority ? 1 : 0));
             return filtered;
         }
 
         function setSortMode(mode) {
             sortMode = mode;
-            ['newest', 'oldest', 'az'].forEach(m => {
+            ['newest', 'oldest', 'az', 'za'].forEach(m => {
                 const btn = document.getElementById(`sort-${m}-btn`);
                 if (btn) { btn.style.backgroundColor = (m === mode) ? 'var(--bg-card)' : 'transparent'; btn.style.boxShadow = (m === mode) ? '0 1px 2px rgba(0,0,0,0.12)' : 'none'; }
             });
@@ -2200,8 +2253,10 @@
             document.getElementById('lbl-folders-section').textContent = t('foldersSection'); document.getElementById('lbl-hashtags-section').textContent = t('hashtagsSection');
             document.getElementById('cats-sheet-title').textContent = t('catsSheetTitle'); document.getElementById('tags-sheet-title').textContent = t('tagsSheetTitle');
             document.getElementById('about-sheet-title').textContent = t('aboutSheetTitle'); document.getElementById('url-input').placeholder = t('urlPlaceholder');
-            document.getElementById('btn-import-ai').textContent = 'Вибрати файл для імпорту'; document.getElementById('btn-export-html').textContent = 'Експорт бази';
-            document.getElementById('lbl-exp-html').textContent = t('expHtmlSub'); document.getElementById('lbl-exp-json').textContent = t('expJsonSub');
+            const impAiEl = document.getElementById('btn-import-ai'); if (impAiEl) impAiEl.textContent = 'Завантажити з файлу';
+            const expHtmlEl = document.getElementById('btn-export-html'); if (expHtmlEl) expHtmlEl.textContent = 'Експорт бази';
+            const lblExpHtml = document.getElementById('lbl-exp-html'); if (lblExpHtml) lblExpHtml.textContent = t('expHtmlSub');
+            const lblExpJson = document.getElementById('lbl-exp-json'); if (lblExpJson) lblExpJson.textContent = t('expJsonSub');
             document.getElementById('btn-open').textContent = t('openBrowser'); document.getElementById('lbl-lock-link').textContent = t('lockToggleLabel');
             document.getElementById('lbl-card-title').textContent = t('titleLabel'); document.getElementById('lbl-note').textContent = t('noteLabel');
             document.getElementById('btn-regen').textContent = t('regenBtn'); document.getElementById('lbl-folder').textContent = t('folderLabel');
@@ -2215,7 +2270,7 @@
         }
 
         function setFontScale(scale) {
-            if (!['sm', 'md', 'lg'].includes(scale)) scale = 'md';
+            if (!['sm', 'md', 'lg'].includes(scale)) scale = 'sm';
             fontScale = scale;
             document.documentElement.setAttribute('data-font-scale', scale);
             ['sm', 'md', 'lg'].forEach(s => {
@@ -2360,7 +2415,7 @@
             const aiSub = document.getElementById('settings-ai-status-sub');
             if (aiSub) {
                 const cfg = getAiConfig();
-                aiSub.textContent = cfg ? ('Активний ШІ: ' + AI_PROVIDERS[cfg.provider].label.replace(/ \(.*/, '')) : 'Вбудовані правила (без ключа)';
+                aiSub.textContent = cfg ? ('✨ Працює ШІ: ' + AI_PROVIDERS[cfg.provider].label.replace(/ \(.*/, '')) : 'Автосортування (без ключа)';
             }
         }
 
@@ -2725,7 +2780,7 @@
             const badge = document.getElementById('storage-persist-badge');
             if (badge) {
                 if (_isStoragePersisted) {
-                    badge.textContent = '🛡️ Захищено від авто-очищення';
+                    badge.textContent = '🛡️ Пам’ять захищена';
                     badge.className = 'text-[10px] font-mono-code font-bold px-2 py-0.5 rounded-md ai-state-ok';
                 } else {
                     badge.textContent = `База: ${ITEMS.length} шт.`;
@@ -3419,9 +3474,12 @@
         }
         function renderAiGuide() {
             const pid = _aiEl('ai-provider').value; const p = AI_PROVIDERS[pid]; const box = _aiEl('ai-guide'); if (!box || !p) return;
-            const open = p.link ? `<button type="button" data-action="ai-open-guide" class="key-press mt-2 px-3 py-2 rounded-lg bg-accent text-onaccent text-xs font-black">Відкрити сторінку ключа</button>` : '';
-            box.innerHTML = `<div class="font-bold text-xs mb-1">Де взяти ключ</div><ol class="list-decimal pl-4 text-xs theme-muted space-y-0.5">${p.steps.map(x => `<li>${esc(x)}</li>`).join('')}</ol>${open}`;
-            _aiEl('ai-base-wrap').style.display = pid === 'custom' ? 'block' : 'none';
+            const open = p.link ? `<button type="button" data-action="ai-open-guide" class="key-press mt-2.5 px-3 py-2 rounded-lg bg-accent text-onaccent text-xs font-black">Отримати ключ на сайті ↗</button>` : '';
+            box.innerHTML = `<ol class="list-decimal pl-4 text-xs theme-muted space-y-1">${p.steps.map(x => `<li>${esc(x)}</li>`).join('')}</ol>${open}`;
+            const isCustom = pid === 'custom';
+            _aiEl('ai-base-wrap').style.display = isCustom ? 'block' : 'none';
+            const adv = _aiEl('ai-advanced-details');
+            if (adv && isCustom) adv.open = true;
             _aiEl('ai-model').placeholder = p.model || 'назва моделі';
             _aiEl('ai-key').placeholder = p.keyPlaceholder || 'Напр.: sk-1a2b3c4d5e6f...';
             _setAiStatusUI('idle', '');
@@ -3429,7 +3487,9 @@
         function onAiProviderChange() { _aiEl('ai-model').value = ''; renderAiGuide(); }
         function renderAiBadge() {
             const cfg = getAiConfig(); const b = _aiEl('ai-mode-badge'); if (!b) return;
-            b.textContent = cfg ? ('Режим: ШІ — ' + AI_PROVIDERS[cfg.provider].label.replace(/ \(.*/, '') + ' (вбудовані правила вимкнені)') : 'Режим: вбудовані правила (без ключа)';
+            b.textContent = cfg
+                ? ('✨ Активний ШІ: ' + AI_PROVIDERS[cfg.provider].label.replace(/ \(.*/, ''))
+                : '⚙️ Зараз працює: Автосортування (без ключа)';
         }
         function openAiSheet() {
             _pushModalState(); _hideSidebar(); _hideSettingsSheet();
@@ -3538,12 +3598,13 @@
             _aiEl('resort-count').textContent = `${nWeb} / ${nAll}`;
             ['web', 'all'].forEach(m => {
                 const b = _aiEl('resort-mode-' + m); if (!b) return;
-                b.className = 'key-press flex-1 py-2 rounded-lg text-xs font-bold ' + (_resortMode === m ? 'bg-accent text-onaccent' : 'theme-input');
+                b.style.backgroundColor = (_resortMode === m) ? 'var(--bg-card)' : 'transparent';
+                b.style.boxShadow = (_resortMode === m) ? '0 1px 2px rgba(0,0,0,0.12)' : 'none';
             });
             const run = _aiEl('resort-run');
             if (run) {
-                run.textContent = _resortRunning ? 'Стоп' : (_resortArmed ? (manualInTarget > 0 ? `Підтвердити (ручних: ${manualInTarget})` : `Підтвердити: перезапис ${n}`) : 'Перерозпізнати');
-                run.className = 'key-press flex-1 py-3 rounded-lg text-xs font-black bg-accent text-onaccent';
+                run.textContent = _resortRunning ? 'Зупинити' : (_resortArmed ? (manualInTarget > 0 ? `Підтвердити (ручних: ${manualInTarget})` : `Точно розкласти (${n} шт.)?`) : 'Розкласти по папках');
+                run.className = 'key-press flex-1 py-3 rounded-xl text-xs font-black bg-accent text-onaccent';
                 run.style.opacity = (!_resortRunning && n === 0) ? '0.45' : '1';
             }
             const u = _hasResortUndo(); const ub = _aiEl('resort-undo');
@@ -3554,8 +3615,8 @@
             _resortMode = m === 'all' ? 'all' : 'web'; _resortArmed = false; clearTimeout(_resortArmTimer);
             const manualCount = _resortTargets('all').filter(_isManuallyEditedItem).length;
             _aiEl('resort-status').textContent = _resortMode === 'all'
-                ? (manualCount > 0 ? `⚠️ Увага: серед усіх посилань є ${manualCount} відредагованих вручну! Їхні папки теж перезапишуться (нотатки та назви збережуться).` : 'Усі посилання будуть перерозпізнані. Це можна скасувати.')
-                : 'Лише нерозібрані («Веб-ресурси»). Картки з ручними правками захищені і не чіпаються.';
+                ? (manualCount > 0 ? `⚠️ Увага: серед усіх посилань є ${manualCount} змінених вручну — їхні папки теж оновляться.` : 'Розкладе заново всі посилання. Якщо що — можна скасувати.')
+                : 'Розбере лише ті, що лежать у «Веб-ресурсах». Твої ручні папки не зачепить.';
             renderResortCard();
         }
         async function runResort() {
@@ -5451,7 +5512,7 @@
             
             updateStaticTexts();
             setThemeMode(themeMode || 'light');
-            setFontScale(fontScale || 'md');
+            setFontScale(fontScale || 'sm');
             const initialMode = hadSaved ? viewMode : (window.innerWidth >= 1024 ? 'large' : 'small');
             setLayoutMode(initialMode); setSortMode(sortMode || 'newest');
             attachSidebarSwipe(); attachSidebarOpenSwipe();
