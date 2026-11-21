@@ -173,7 +173,12 @@
         .pt-1 { padding-top: 0.25rem; }
         .pt-2 { padding-top: 0.5rem; }
         .pt-3 { padding-top: 0.75rem; }
+        .pt-4 { padding-top: 1rem; }
         .pb-3 { padding-bottom: 0.75rem; }
+        .pb-4 { padding-bottom: 1rem; }
+        .pb-5 { padding-bottom: 1.25rem; }
+        .pl-4 { padding-left: 1rem; }
+        .list-decimal { list-style-type: decimal; }
         .pl-0\.5 { padding-left: 0.125rem; }
         .pr-1\.5 { padding-right: 0.375rem; }
 
@@ -1283,12 +1288,12 @@
             <div class="space-y-2">
                 <div class="text-[11px] font-mono-code font-bold uppercase theme-muted px-1">Підключення ШІ</div>
                 <div class="theme-card border rounded-2xl overflow-hidden shadow-xs">
-                    <div class="p-4 flex items-center justify-between gap-3">
-                        <div class="min-w-0 space-y-0.5">
+                    <div class="p-4 space-y-2.5">
+                        <div class="space-y-0.5">
                             <label for="ai-provider" class="text-sm font-extrabold block">Сервіс ШІ</label>
                             <div class="text-xs theme-muted leading-snug">Обери провайдер для автосортування</div>
                         </div>
-                        <select id="ai-provider" class="theme-input rounded-xl px-3 py-2 text-xs font-bold max-w-[180px] shrink-0 outline-none"></select>
+                        <select id="ai-provider" class="theme-input w-full rounded-xl px-3.5 py-2.5 text-sm font-bold outline-none"></select>
                     </div>
 
                     <details class="about-acc border-t" style="border-color: var(--border-main);">
@@ -1299,10 +1304,10 @@
                             </div>
                             <span class="about-chev text-accent font-mono-code text-lg font-black shrink-0 transition-transform">›</span>
                         </summary>
-                        <div id="ai-guide" class="px-4 pb-4 pt-1 border-t" style="border-color: var(--border-main);"></div>
+                        <div id="ai-guide" class="px-4 pt-3 pb-5 border-t" style="border-color: var(--border-main);"></div>
                     </details>
 
-                    <div class="p-4 border-t space-y-2" style="border-color: var(--border-main);">
+                    <div class="p-4 border-t space-y-2.5" style="border-color: var(--border-main);">
                         <label for="ai-key" class="text-sm font-extrabold block">API-ключ</label>
                         <div class="flex items-center theme-input rounded-xl px-3 py-1.5 gap-2 border border-transparent focus-within:border-accent transition">
                             <input id="ai-key" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Напр.: AIzaSyD-9x8Y7z6W5v4U3t2S1r0Q..." class="w-full bg-transparent py-1 text-sm font-mono-code outline-none min-w-0">
@@ -1321,20 +1326,20 @@
                             </div>
                             <span class="about-chev text-accent font-mono-code text-lg font-black shrink-0 transition-transform">›</span>
                         </summary>
-                        <div class="px-4 pb-4 pt-3 border-t space-y-3" style="border-color: var(--border-main);">
-                            <div class="space-y-1">
+                        <div class="px-4 pt-3 pb-5 border-t space-y-3" style="border-color: var(--border-main);">
+                            <div class="space-y-1.5">
                                 <label for="ai-model" class="text-xs font-bold theme-muted block">Модель (необов’язково)</label>
-                                <input id="ai-model" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" class="theme-input w-full rounded-xl px-3 py-2 text-xs font-mono-code outline-none">
+                                <input id="ai-model" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" class="theme-input w-full rounded-xl px-3 py-2.5 text-xs font-mono-code outline-none">
                             </div>
-                            <div id="ai-base-wrap" class="space-y-1" style="display:none">
+                            <div id="ai-base-wrap" class="space-y-1.5" style="display:none">
                                 <label for="ai-base" class="text-xs font-bold theme-muted block">Адреса сервера (Base URL)</label>
-                                <input id="ai-base" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="https://host/v1" class="theme-input w-full rounded-xl px-3 py-2 text-xs font-mono-code outline-none">
+                                <input id="ai-base" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="https://host/v1" class="theme-input w-full rounded-xl px-3 py-2.5 text-xs font-mono-code outline-none">
                             </div>
                         </div>
                     </details>
 
-                    <div class="p-4 border-t space-y-2.5" style="border-color: var(--border-main);">
-                        <div id="ai-status" class="text-xs min-h-[1.25rem] break-words"></div>
+                    <div class="p-4 border-t space-y-3" style="border-color: var(--border-main);">
+                        <div id="ai-status" class="text-xs break-words" style="display:none"></div>
                         <div class="flex gap-2">
                             <button data-action="ai-save" class="key-press flex-1 py-2.5 px-3 rounded-xl bg-accent text-onaccent text-xs font-black">Зберегти ключ</button>
                             <button data-action="ai-test" class="key-press flex-1 py-2.5 px-3 rounded-xl theme-input text-xs font-bold border">Перевірити</button>
@@ -1346,10 +1351,7 @@
 
             <!-- РОЗКЛАСТИ СТАРІ ПОСИЛАННЯ -->
             <div id="resort-card" class="space-y-2">
-                <div class="flex items-center justify-between px-1">
-                    <span class="text-[11px] font-mono-code font-bold uppercase theme-muted">Старі посилання</span>
-                    <span id="resort-count" class="text-[11px] font-mono-code font-bold theme-muted" title="Нерозібрані / усі"></span>
-                </div>
+                <div class="text-[11px] font-mono-code font-bold uppercase theme-muted px-1">Старі посилання</div>
                 <div class="theme-card border rounded-2xl overflow-hidden shadow-xs">
                     <div class="p-4 space-y-1.5">
                         <div class="text-sm font-extrabold">Розкласти по папках заново</div>
@@ -2634,7 +2636,7 @@
                         ['Мульти-папки', 'Один сайт може легально жити на кілька сімей: папки просто вписуються через кому. Плашки папок і #теги на картках натискаються й миттєво фільтрують стрічку.'],
                         ['Автопілот', 'Без жодних ключів працюють вбудовані правила: тема визначається за доменом і змістом, а на твоїх ручних правках система тихо вчиться. Налаштувань — нуль, користі — вагон.'],
                         ['Нейромережа', 'Підключається через Gemini, Groq, Mistral, Cerebras, OpenRouter, GitHub Models (є безкоштовні варіанти), DeepSeek, Claude, OpenAI або власний Base URL. До ШІ летять тільки заголовок, опис і домен — ніяких зайвих одкровень. Якщо ШІ втомився чи ліміт вичерпано, запасні правила підхоплюють роботу самі.'],
-                        ['Перерозпізнавання', 'Застосовує поточний режим до вже збережених скарбів: лише до нерозібраних «Веб-ресурсів» або до всієї бази. Закриті замком, 18+ та вручну відредаговані картки захищені. Навіть якщо натиснув не туди — є кнопка «Скасувати».'],
+                        ['Старі посилання', 'Розкладає по папках уже збережені посилання: лише нерозібрані («Веб-ресурси») або всю базу. Закриті замком та 18+ не чіпає, а перед перезаписом твоїх ручних змін спочатку запитає підтвердження. Якщо передумав — є кнопка «Скасувати».'],
                         ['Скріпка й зірочка', 'Скріпка пришпилює лінк у Pin-бар на головній над усіма папками. Зірочка ★ робить його блатною шишкою — піднімає на самий верх, але тільки всередині своїх папок.']
                     ]
                 },
@@ -2676,12 +2678,12 @@
                 {
                     id: 'about-sec-data',
                     nav: 'Дані',
-                    tag: 'ІМПОРТ · ЕКСПОРТ · ЗЛІПКИ',
+                    tag: 'ІМПОРТ · ЕКСПОРТ · АВТОКОПІЯ',
                     title: 'Дані та резервні копії',
                     items: [
-                        ['Імпорт', 'Всеїдно приймає браузерні закладки (.HTML) і бекапи (.JSON). Режим «Без дублів» береже старі картки як зіницю ока, а «Оновлювати» освіжає дані (крім тих карток, які ти вже правив руками). На фініші видає чесний звіт: скільки нових, скільки дублів.'],
-                        ['Експорт', '.HTML відкривається в будь-якому браузері на ПК чи телефоні, а .JSON — це повний клон твоєї бази з усіма папками, тегами, пріоритетами й замками.'],
-                        ['Авто-зліпок', 'Раз на тиждень, або коли база помітно підросла, тихо створюється локальна резервна копія. Відновлення — однією кнопкою в налаштуваннях. Три рівні страховки: параноя тут називається стратегічним плануванням.']
+                        ['Імпорт', 'Окреме вікно «Імпорт та експорт» у налаштуваннях. Приймає браузерні закладки (.HTML) і бекапи (.JSON). За замовчуванням повтори пропускаються; за бажанням можна ввімкнути оновлення існуючих (ручні правки не чіпає).'],
+                        ['Експорт', '.JSON — повна копія бази з папками, тегами й замками. .HTML — файл закладок для будь-якого браузера.'],
+                        ['Автокопія', 'Регулярно створюється в пам’яті телефону. Відновлення — в один дотик у вікні «Імпорт та експорт».']
                     ]
                 }
             ];
@@ -2716,12 +2718,7 @@
 
             container.innerHTML = `
                 <div id="about-top-anchor" class="about-guide-hero p-4" style="scroll-margin-top: 8px; margin-bottom: 1.5rem;">
-                    <div class="flex items-center justify-between gap-3 mb-2">
-                        <span class="text-xs font-black tracking-[.14em] uppercase" style="color:rgb(var(--accent-rgb))">LINKBOX / ЯК УСЕ ВЛАШТОВАНО</span>
-                        <span class="text-xs font-mono-code font-bold theme-muted">GUIDE</span>
-                    </div>
-                    <div class="text-lg leading-tight font-black tracking-tight" style="color:var(--text-main)">Посилання під контролем.<br>Пам’ять — у законній відпустці.</div>
-                    <p class="text-sm leading-relaxed theme-muted mt-2">Зберігати все підряд — це талант. Знайти потрібне через пів року — вже магія. Тицяй на іконку розділу нижче, щоб миттєво телепортуватися до потрібного абзацу.</p>
+                    <div class="text-sm font-black tracking-tight" style="color:rgb(var(--accent-rgb))">LinkBox - Smart Link Organiser</div>
                     <div class="flex flex-wrap gap-1.5 mt-3 pt-3 border-t" style="border-color:var(--border-main)">
                         ${navChipsHtml}
                     </div>
@@ -3598,7 +3595,7 @@
         }
         function renderAiGuide() {
             const pid = _aiEl('ai-provider').value; const p = AI_PROVIDERS[pid]; const box = _aiEl('ai-guide'); if (!box || !p) return;
-            const open = p.link ? `<button type="button" data-action="ai-open-guide" class="key-press mt-2.5 px-3 py-2 rounded-lg bg-accent text-onaccent text-xs font-black">Отримати ключ на сайті ↗</button>` : '';
+            const open = p.link ? `<button type="button" data-action="ai-open-guide" class="key-press mt-3 px-3.5 py-2.5 rounded-xl bg-accent text-onaccent text-xs font-black">Отримати ключ на сайті ↗</button>` : '';
             box.innerHTML = `<ol class="list-decimal pl-4 text-xs theme-muted space-y-1">${p.steps.map(x => `<li>${esc(x)}</li>`).join('')}</ol>${open}`;
             const isCustom = pid === 'custom';
             _aiEl('ai-base-wrap').style.display = isCustom ? 'block' : 'none';
@@ -3719,7 +3716,7 @@
             const nWeb = _resortTargets('web').length, nAll = _resortTargets('all').length;
             const n = _resortMode === 'all' ? nAll : nWeb;
             const manualInTarget = _resortTargets(_resortMode).filter(_isManuallyEditedItem).length;
-            _aiEl('resort-count').textContent = `${nWeb} / ${nAll}`;
+            const _rc = _aiEl('resort-count'); if (_rc) _rc.textContent = '';
             ['web', 'all'].forEach(m => {
                 const b = _aiEl('resort-mode-' + m); if (!b) return;
                 b.style.backgroundColor = (_resortMode === m) ? 'var(--bg-card)' : 'transparent';
