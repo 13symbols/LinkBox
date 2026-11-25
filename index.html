@@ -606,6 +606,8 @@
 
 
 
+        @keyframes lb-logo-spin { from { transform: rotate(0deg) scale(1); } 50% { transform: rotate(540deg) scale(1.25); } to { transform: rotate(1080deg) scale(1); } }
+        .lb-logo-spin { animation: lb-logo-spin 1.1s cubic-bezier(.3,.7,.3,1); }
         .lb-switch {
             position: relative;
             width: 44px;
@@ -741,7 +743,7 @@
                         <svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24"><line x1="3" y1="7" x2="21" y2="7"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="17" x2="15" y2="17"/></svg>
                     </button>
 
-                    <div data-action="scroll-top" data-stop="1" class="key-press w-8 h-8 flex items-center justify-center shrink-0 cursor-pointer">
+                    <div id="app-logo-tap" data-action="scroll-top" data-stop="1" class="key-press w-8 h-8 flex items-center justify-center shrink-0 cursor-pointer">
                         <svg viewBox="0 0 2048 2048" class="w-full h-full drop-shadow-xs text-ink" xmlns="http://www.w3.org/2000/svg">
                             <path fill="currentColor" d="M 820.745 774.484 C 843.943 773.99 873.918 775.257 896.837 776.679 C 976.15 781.6 1061.49 792.356 1128.78 838.041 C 1194.53 882.69 1242.68 950.654 1257.85 1029.03 C 1208.06 1030.81 1114.09 1032.21 1070.34 1012.39 C 1057.54 1006.59 1048.04 997.356 1037.19 988.759 C 1026.23 980.074 1014.43 972.7 1001.26 967.858 C 926.976 940.551 772.06 945.932 690.612 955.345 C 544.138 972.273 403.224 1022 309.048 1140.88 C 237.059 1230.09 204.079 1344.56 217.568 1458.39 C 231.435 1569.88 289.137 1671.25 377.917 1740.09 C 465.695 1809.18 578.939 1849.08 690.998 1834.81 C 903.421 1807.77 1039.63 1638.79 1082.95 1438.5 C 1088.66 1412.8 1092.59 1386.74 1094.72 1360.5 C 1095.11 1355.7 1095.66 1338.72 1097.53 1336.33 L 1102 1335.91 C 1122.33 1336.33 1146.1 1338.33 1167.22 1339.02 C 1201.81 1339.88 1236.42 1340.02 1271.01 1339.43 C 1266.42 1377.03 1265.41 1411.49 1258.02 1450.12 C 1230.46 1594.11 1175.15 1722.01 1073.17 1828.16 C 964.32 1939.53 816.106 2003.75 660.404 2006.98 C 493.262 2010.27 337.212 1952.99 216.275 1837.64 C -28.8002 1603.91 -23.8879 1230.94 211.223 991.613 C 372.412 827.536 598.052 777.654 820.745 774.484 z"/>
                             <path fill="#DF6D27" d="M 1396.31 39.4755 C 1512.61 37.6317 1629.32 66.1793 1727.77 129.345 C 1864.71 218.317 1960.59 358.153 1994.23 517.959 C 2028.26 673.494 1996.72 832.794 1909.46 968.647 C 1732.09 1244.52 1388.18 1291.96 1087.03 1264.59 C 1048.66 1261.11 1009.23 1251.21 973.5 1236.71 C 886.848 1201.56 809.795 1113.6 790.003 1021.45 C 832.844 1021.23 946.663 1019.89 981.612 1037.17 C 998.635 1045.58 1010.96 1060.85 1027.08 1070.83 C 1056.87 1089.28 1097.11 1093.28 1131.48 1096.35 C 1235.42 1105.62 1351.69 1098.17 1453.25 1074.63 C 1620.82 1041.23 1770.82 924.626 1816.58 756.08 C 1854.48 616.481 1821.61 459.393 1726.31 349.829 C 1654.8 266.642 1552.75 215.815 1443.27 208.849 C 1329.89 200.394 1217.92 238.271 1132.96 313.824 C 1017.91 415.124 972.93 564.552 963.56 712.937 C 951.318 713.323 939.91 712.409 927.711 712.049 L 856.285 710.134 C 833.991 709.611 807.256 711.231 786.079 709.852 L 786.001 708.387 C 784.917 684.003 793.699 644.934 797.397 620.219 C 844.945 302.493 1060.97 53.5881 1396.31 39.4755 z"/>
@@ -1088,6 +1090,14 @@
                                 <button data-action="set-font-scale" data-scale="lg" id="font-lg-btn" class="key-press py-2.5 rounded-lg text-xs font-mono-code font-bold transition">A+ Великий</button>
                             </div>
                         </div>
+
+                        <button type="button" data-action="toggle-shake-random" class="w-full pt-3 border-t flex items-center justify-between gap-3 text-left" style="border-color: var(--border-main);">
+                            <div class="min-w-0 space-y-0.5 pr-2">
+                                <div class="text-xs font-extrabold">Струс → випадкове посилання</div>
+                                <div class="text-xs theme-muted leading-snug">Струсни телефон, і відкриється випадкове посилання</div>
+                            </div>
+                            <span id="shake-switch" class="lb-switch" role="switch" aria-checked="false"></span>
+                        </button>
                     </div>
                 </div>
 
@@ -1530,6 +1540,7 @@
         const UNREAD_FOLDER_KEY = '__UNREAD_ONLY__';
         const AUTO_SNAP_KEY = 'linkbox_weekly_autosnap_v1';
         let importDuplicateMode = 'skip';
+        let shakeRandomEnabled = false;
 
         const DICT = {
             uk: {
@@ -1548,6 +1559,7 @@
                 saved: 'Збережено', deleted: 'Видалено', randomOpened: 'Випадкове: ',
                 lockToggleLabel: 'Блокувати прямий перехід', lockedToast: 'Прямий перехід заблоковано (тільки копіювання)',
                 folderLockedToast: 'Папку заблоковано для прямих переходів', folderUnlockedToast: 'Папку розблоковано',
+                folderPinnedToast: 'Папку закріплено вгорі меню', folderUnpinnedToast: 'Папку відкріплено',
                 allLockedRandom: 'Усі посилання заблоковані для прямого переходу', duplicateFound: 'Дублікат! Вже є в базі: ',
                 aiAddedSingle: 'Додано у «{cat}» ({lang}) ✓', aiAddedOffline: 'Збережено в офлайн-чергу «Очікують мережі» ⏳',
                 aiImportReport: 'Імпорт: +{added} нових (дублікатів: {dups})', selectAll: 'Вибрати всі',
@@ -1601,6 +1613,7 @@
         };
 
         let LOCKED_FOLDERS = new Set();
+        let PINNED_FOLDERS = new Set();
         const DEFAULT_ITEMS = [
             { id: 1, name: 'Google', domain: 'google.com.ua', url: 'https://www.google.com.ua', title: 'Пошукова система Google Україна', cat: 'Веб-ресурси', cats: ['Веб-ресурси'], date: '13/11/26', color: '#7A8A6A', note: 'Швидкий пошук інформації, новин, зображень та веб-ресурсів в Україні та світі.', tags: ['#пошук', '#інтернет', '#google'], svg: LINE_ICONS.globe, lockedOverride: null, pinned: true, folderPriority: false, pendingOffline: false, isRead: true },
             { id: 2, name: 'OLX', domain: 'olx.ua', url: 'https://www.olx.ua', title: 'Сервіс оголошень OLX Україна', cat: 'Покупки', cats: ['Покупки'], date: '13/11/26', color: '#6A9A3A', note: 'Дошка приватних та комерційних оголошень: купівля, продаж, послуги, оренда та авто.', tags: ['#покупки', '#оголошення', '#маркетплейс'], svg: LINE_ICONS.shop, lockedOverride: null, pinned: false, folderPriority: true, pendingOffline: false, isRead: true },
@@ -1695,7 +1708,7 @@
         async function _flushStateToStorageNow() {
             try {
                 checkAndSaveWeeklyAutoSnapshot(false);
-                const state = { items: ITEMS, lockedFolders: Array.from(LOCKED_FOLDERS), themeMode, viewMode, sortMode, fontScale };
+                const state = { items: ITEMS, lockedFolders: Array.from(LOCKED_FOLDERS), pinnedFolders: Array.from(PINNED_FOLDERS), themeMode, viewMode, sortMode, fontScale, shakeRandom: shakeRandomEnabled };
                 await _idbPut('app_state', state);
             } catch (e) {
                 console.error('IDB Save Error:', e);
@@ -1786,10 +1799,12 @@
                 });
             } else { ITEMS = structuredClone(DEFAULT_ITEMS); }
             if (Array.isArray(parsed.lockedFolders)) LOCKED_FOLDERS = new Set(parsed.lockedFolders.map(c => /^полуничка/i.test(c) ? 'NSFW 18+' : c));
+            if (Array.isArray(parsed.pinnedFolders)) PINNED_FOLDERS = new Set(parsed.pinnedFolders.map(c => /^полуничка/i.test(c) ? 'NSFW 18+' : c));
             if (parsed.themeMode) themeMode = parsed.themeMode;
             if (parsed.viewMode) viewMode = parsed.viewMode;
             if (parsed.sortMode) sortMode = parsed.sortMode;
             if (parsed.fontScale) fontScale = parsed.fontScale;
+            if (typeof parsed.shakeRandom === 'boolean') shakeRandomEnabled = parsed.shakeRandom;
         }
 
         // --- НАВІГАЦІЯ, APK-СУМІСНИЙ СТЕК #HASH, ЖЕСТИ ВІД КРАЮ ТА ПОДВІЙНИЙ СВАЙП ДЛЯ ВИХОДУ ---
@@ -2123,7 +2138,7 @@
 
         function requestDeleteSelected() {
             if (selectedIds.size === 0) return;
-            pendingDeleteAction = () => { const removedCount = selectedIds.size; ITEMS = ITEMS.filter(i => !selectedIds.has(i.id)); selectedIds.clear(); isSelectMode = false; updateBulkBarUI(); saveStateToStorage(); renderApp(); showToast(t('bulkDeleted') + removedCount); };
+            pendingDeleteAction = () => { const removedCount = selectedIds.size; ITEMS = ITEMS.filter(i => !selectedIds.has(i.id)); selectedIds.clear(); isSelectMode = false; updateBulkBarUI(); saveStateToStorage(); renderApp(); showToast(removedCount > 10 ? `Зачистка (${removedCount}). Рука не здригнулась` : t('bulkDeleted') + removedCount); };
             showConfirmModal('Видалити вибрані?', `Ви дійсно хочете видалити обрані посилання (${selectedIds.size} шт.)?`);
         }
 
@@ -2342,6 +2357,13 @@
             saveStateToStorage(); renderFoldersInMenu(); renderCategoriesCloud(); renderApp();
         }
 
+        function toggleFolderPin(cat, e) {
+            if (e) e.stopPropagation();
+            if (PINNED_FOLDERS.has(cat)) { PINNED_FOLDERS.delete(cat); showToast(`${cat}: ${t('folderUnpinnedToast')}`); }
+            else { PINNED_FOLDERS.add(cat); showToast(`${cat}: ${t('folderPinnedToast')}`); }
+            saveStateToStorage(); renderFoldersInMenu(); renderCategoriesCloud(); renderApp();
+        }
+
         function setLayoutMode(mode) {
             viewMode = mode;
             ['small', 'large', 'list'].forEach(m => {
@@ -2351,6 +2373,57 @@
             const sub = document.getElementById('settings-layout-sub');
             if (sub) sub.textContent = mode === 'large' ? 'Великі картки' : (mode === 'list' ? 'Список' : 'Малі картки');
             saveStateToStorage(); renderApp();
+        }
+
+        // --- ПАСХАЛКИ ---
+        let _themeSwitchTimes = [];
+        function trackThemeSwitch(newMode) {
+            if (newMode === themeMode) return;
+            const now = Date.now();
+            _themeSwitchTimes = _themeSwitchTimes.filter(t => now - t < 5000); _themeSwitchTimes.push(now);
+            if (_themeSwitchTimes.length >= 5) { _themeSwitchTimes = []; showToast('Визначся вже 😄'); }
+        }
+
+        let _shakeBound = false, _shakeHits = [], _shakeCooldownUntil = 0;
+        function _onShakeMotion(e) {
+            if (!shakeRandomEnabled) return;
+            const a = e.accelerationIncludingGravity; if (!a) return;
+            const now = Date.now(); if (now < _shakeCooldownUntil) return;
+            const mag = Math.sqrt((a.x || 0) ** 2 + (a.y || 0) ** 2 + (a.z || 0) ** 2);
+            if (Math.abs(mag - 9.81) < 13) return;
+            if (_shakeHits.length && now - _shakeHits[_shakeHits.length - 1] < 120) return;
+            _shakeHits = _shakeHits.filter(t => now - t < 1200); _shakeHits.push(now);
+            if (_shakeHits.length < 3) return;
+            _shakeHits = []; _shakeCooldownUntil = now + 4000;
+            if (document.visibilityState !== 'visible' || isSelectMode || document.querySelector('[id$="-modal"].open')) return;
+            try { navigator.vibrate && navigator.vibrate(40); } catch (e) {}
+            openRandomLink();
+        }
+        function _syncShakeSwitch() {
+            const sw = document.getElementById('shake-switch'); if (!sw) return;
+            sw.classList.toggle('on', shakeRandomEnabled); sw.setAttribute('aria-checked', shakeRandomEnabled ? 'true' : 'false');
+        }
+        async function setShakeRandom(on, persist = true) {
+            if (on && persist && typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
+                try { const r = await DeviceMotionEvent.requestPermission(); if (r !== 'granted') { on = false; showToast('Немає доступу до датчиків руху'); } }
+                catch (e) { on = false; showToast('Немає доступу до датчиків руху'); }
+            }
+            shakeRandomEnabled = !!on;
+            if (shakeRandomEnabled && !_shakeBound) { window.addEventListener('devicemotion', _onShakeMotion, { passive: true }); _shakeBound = true; }
+            _syncShakeSwitch();
+            if (persist) { saveStateToStorage(); showToast(shakeRandomEnabled ? 'Струс увімкнено' : 'Струс вимкнено'); }
+        }
+
+        function initEasterEggs() {
+            const logo = document.getElementById('app-logo-tap'); if (!logo) return;
+            let taps = 0, lastTap = 0;
+            logo.addEventListener('click', () => {
+                const now = Date.now(); taps = (now - lastTap > 1500) ? 1 : taps + 1; lastTap = now;
+                if (taps < 7) return;
+                taps = 0;
+                const svg = logo.querySelector('svg'); if (svg) { svg.classList.remove('lb-logo-spin'); void svg.getBoundingClientRect(); svg.classList.add('lb-logo-spin'); setTimeout(() => svg.classList.remove('lb-logo-spin'), 1200); }
+                setTimeout(() => showToast('Тепер ти розробник (але це не точно)', 3500), 40);
+            });
         }
 
         function openRandomLink() {
@@ -2481,8 +2554,8 @@
                 html += `<button data-action="select-cat-sheet" data-cat="${UNREAD_FOLDER_KEY}" class="key-press rounded-lg px-3.5 py-2.5 flex items-center justify-between border border-accent/40 transition ${isUnr ? 'bg-accent text-onaccent' : 'bg-accent/15 text-accent'}"><span class="text-xs sm:text-sm font-bold">${t('unreadFolderName')}</span><span class="text-xs font-mono-code font-bold">${unreadCount}</span></button>`;
             }
             html += cats.map(c => {
-                const active = selectedFolder === c.cat; const folderLocked = LOCKED_FOLDERS.has(c.cat); const safeCat = escJsAttr(c.cat); const safeColor = sanitizeColor(c.color);
-                return `<div class="rounded-lg flex items-stretch overflow-hidden ${active ? 'text-white' : 'theme-input'}" style="${active ? `background:${safeColor};` : ''}"><button data-action="select-cat-sheet" data-cat="${esc(c.cat)}" class="key-press flex-1 px-3.5 py-2.5 text-left flex items-center justify-between min-w-0"><div class="flex items-center gap-2.5 min-w-0"><span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:${active ? '#fff' : safeColor}"></span><span class="text-xs sm:text-sm font-bold truncate">${esc(c.cat)}</span></div><span class="text-xs font-mono-code font-bold opacity-75 ml-2">${c.count}</span></button><button data-action="toggle-folder-lock" data-cat="${esc(c.cat)}" data-stop="1" class="key-press px-3 border-l flex items-center justify-center transition ${folderLocked ? (active ? 'bg-black/25 text-white' : 'bg-accent/15 text-accent') : 'opacity-45 hover:opacity-100'}" style="border-color: var(--border-main)">${folderLocked ? LINE_ICONS.lock : LINE_ICONS.unlock}</button></div>`;
+                const active = selectedFolder === c.cat; const folderLocked = LOCKED_FOLDERS.has(c.cat); const folderPinned = PINNED_FOLDERS.has(c.cat); const safeColor = sanitizeColor(c.color);
+                return `<div class="rounded-lg flex items-stretch overflow-hidden ${active ? 'text-white' : 'theme-input'}" style="${active ? `background:${safeColor};` : ''}"><button data-action="select-cat-sheet" data-cat="${esc(c.cat)}" class="key-press flex-1 px-3.5 py-2.5 text-left flex items-center justify-between min-w-0"><div class="flex items-center gap-2.5 min-w-0"><span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:${active ? '#fff' : safeColor}"></span><span class="text-xs sm:text-sm font-bold truncate">${esc(c.cat)}</span></div><span class="text-xs font-mono-code font-bold opacity-75 ml-2">${c.count}</span></button><button data-action="toggle-folder-pin" data-cat="${esc(c.cat)}" data-stop="1" title="${folderPinned ? 'Відкріпити папку' : 'Закріпити вгорі меню'}" class="key-press px-3 border-l flex items-center justify-center transition ${folderPinned ? (active ? 'bg-black/25 text-white' : 'bg-accent/15 text-accent') : 'opacity-45 hover:opacity-100'}" style="border-color: var(--border-main)">${folderPinned ? LINE_ICONS.pinFilled : LINE_ICONS.pin}</button><button data-action="toggle-folder-lock" data-cat="${esc(c.cat)}" data-stop="1" class="key-press px-3 border-l flex items-center justify-center transition ${folderLocked ? (active ? 'bg-black/25 text-white' : 'bg-accent/15 text-accent') : 'opacity-45 hover:opacity-100'}" style="border-color: var(--border-main)">${folderLocked ? LINE_ICONS.lock : LINE_ICONS.unlock}</button></div>`;
             }).join('');
             container.innerHTML = html;
         }
@@ -2770,7 +2843,13 @@
         function renderFoldersInMenu() {
             const catMap = new Map();
             ITEMS.forEach(item => { getItemCats(item).forEach(cName => { if (!catMap.has(cName)) { catMap.set(cName, { cat: cName, color: item.color, count: 0 }); } catMap.get(cName).count += 1; }); });
-            let cats = Array.from(catMap.values()); cats.sort((a, b) => b.count - a.count || a.cat.localeCompare(b.cat, 'uk'));
+            let cats = Array.from(catMap.values());
+            cats.sort((a, b) => {
+                const ap = PINNED_FOLDERS.has(a.cat) ? 1 : 0;
+                const bp = PINNED_FOLDERS.has(b.cat) ? 1 : 0;
+                if (ap !== bp) return bp - ap;
+                return b.count - a.count || a.cat.localeCompare(b.cat, 'uk');
+            });
 
             const offlineItems = ITEMS.filter(i => i.pendingOffline);
             const grid = document.getElementById('folders-grid'); if (!grid) return;
@@ -2790,10 +2869,11 @@
                 html += `<button data-action="select-folder" data-cat="${OFFLINE_FOLDER_KEY}" class="key-press rounded-lg px-3 py-2 flex items-center justify-between border border-amber-500/40 transition ${isOffActive ? 'bg-amber-600 text-white' : 'bg-amber-500/15 text-amber-600'}"><span class="text-xs sm:text-sm font-bold">${t('offlineFolderName')}</span><span class="text-xs font-mono-code font-bold">${offlineItems.length}</span></button>`;
             }
 
-            const limitedCats = cats.slice(0, 10);
+            const pinnedCount = cats.filter(c => PINNED_FOLDERS.has(c.cat)).length;
+            const limitedCats = cats.slice(0, Math.max(10, pinnedCount));
             html += limitedCats.map(c => {
-                const active = selectedFolder === c.cat; const folderLocked = LOCKED_FOLDERS.has(c.cat); const safeCat = escJsAttr(c.cat); const safeColor = sanitizeColor(c.color);
-                return `<div class="rounded-lg flex items-stretch overflow-hidden ${active ? 'text-white' : 'theme-input'}" style="${active ? `background:${safeColor};` : ''}"><button data-action="select-folder" data-cat="${esc(c.cat)}" class="key-press flex-1 px-3 py-2 text-left flex items-center justify-between min-w-0"><div class="flex items-center gap-2 min-w-0"><span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:${active ? '#fff' : safeColor}"></span><span class="text-xs sm:text-sm font-bold truncate">${esc(c.cat)}</span></div><span class="text-xs font-mono-code font-bold opacity-75 ml-1">${c.count}</span></button><button data-action="toggle-folder-lock" data-cat="${esc(c.cat)}" data-stop="1" class="key-press px-2.5 border-l flex items-center justify-center transition ${folderLocked ? (active ? 'bg-black/25 text-white' : 'bg-accent/15 text-accent') : 'opacity-45 hover:opacity-100'}" style="border-color: var(--border-main)">${folderLocked ? LINE_ICONS.lock : LINE_ICONS.unlock}</button></div>`;
+                const active = selectedFolder === c.cat; const folderLocked = LOCKED_FOLDERS.has(c.cat); const folderPinned = PINNED_FOLDERS.has(c.cat); const safeColor = sanitizeColor(c.color);
+                return `<div class="rounded-lg flex items-stretch overflow-hidden ${active ? 'text-white' : 'theme-input'}" style="${active ? `background:${safeColor};` : ''}"><button data-action="select-folder" data-cat="${esc(c.cat)}" class="key-press flex-1 px-3 py-2 text-left flex items-center justify-between min-w-0"><div class="flex items-center gap-2 min-w-0"><span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:${active ? '#fff' : safeColor}"></span><span class="text-xs sm:text-sm font-bold truncate">${esc(c.cat)}</span></div><span class="text-xs font-mono-code font-bold opacity-75 ml-1">${c.count}</span></button><button data-action="toggle-folder-pin" data-cat="${esc(c.cat)}" data-stop="1" title="${folderPinned ? 'Відкріпити папку' : 'Закріпити вгорі меню'}" class="key-press px-2.5 border-l flex items-center justify-center transition ${folderPinned ? (active ? 'bg-black/25 text-white' : 'bg-accent/15 text-accent') : 'opacity-45 hover:opacity-100'}" style="border-color: var(--border-main)">${folderPinned ? LINE_ICONS.pinFilled : LINE_ICONS.pin}</button><button data-action="toggle-folder-lock" data-cat="${esc(c.cat)}" data-stop="1" class="key-press px-2.5 border-l flex items-center justify-center transition ${folderLocked ? (active ? 'bg-black/25 text-white' : 'bg-accent/15 text-accent') : 'opacity-45 hover:opacity-100'}" style="border-color: var(--border-main)">${folderLocked ? LINE_ICONS.lock : LINE_ICONS.unlock}</button></div>`;
             }).join('');
             grid.innerHTML = html;
         }
@@ -2948,7 +3028,7 @@
         }
 
         function exportFullJsonBackup() {
-            const backup = { app: 'LinkBox', version: 2, exportedAt: new Date().toISOString(), items: ITEMS, lockedFolders: Array.from(LOCKED_FOLDERS), themeMode, viewMode, sortMode, fontScale };
+            const backup = { app: 'LinkBox', version: 2, exportedAt: new Date().toISOString(), items: ITEMS, lockedFolders: Array.from(LOCKED_FOLDERS), pinnedFolders: Array.from(PINNED_FOLDERS), themeMode, viewMode, sortMode, fontScale };
             const dateTag = new Date().toISOString().slice(0, 10);
             recordFileBackupDone(ITEMS.length);
             _exportFileAndroidAndShare(`linkbox_backup_${dateTag}.json`, JSON.stringify(backup, null, 2), 'application/json', t('exportedJson'));
@@ -2994,7 +3074,7 @@
             }
 
             const allFiltered = getFilteredItems(); const cardsEl = document.getElementById('cards-container');
-            if (allFiltered.length === 0) { cardsEl.className = ''; cardsEl.innerHTML = `<div class="py-12 text-center text-sm theme-muted font-mono-code">Порожньо</div>`; return; }
+            if (allFiltered.length === 0) { cardsEl.className = ''; const _emptyFolder = selectedFolder !== 'ALL' && selectedFolder !== OFFLINE_FOLDER_KEY && selectedFolder !== UNREAD_FOLDER_KEY && !selectedTag && !qSig && ITEMS.length > 0; cardsEl.innerHTML = `<div class="py-12 text-center text-sm theme-muted font-mono-code">${_emptyFolder ? 'Тут було щось важливе.<br>Тепер тут відлуння 🕳️' : 'Порожньо'}</div>`; return; }
             if (highlightedDuplicateId) {
                 const dupIdx = allFiltered.findIndex(x => x.id === highlightedDuplicateId);
                 if (dupIdx >= _renderLimit) _renderLimit = dupIdx + 10;
@@ -4243,7 +4323,8 @@
                         dateLabel: new Date(now).toLocaleDateString('uk-UA'),
                         count: ITEMS.length,
                         items: structuredClone(ITEMS),
-                        lockedFolders: Array.from(LOCKED_FOLDERS)
+                        lockedFolders: Array.from(LOCKED_FOLDERS),
+                        pinnedFolders: Array.from(PINNED_FOLDERS)
                     };
                     _cachedAutoSnap = snap;
                     _idbPut('auto_snap', snap);
@@ -4291,6 +4372,7 @@
                     }
                 });
                 if (Array.isArray(snap.lockedFolders)) snap.lockedFolders.forEach(f => LOCKED_FOLDERS.add(f));
+                if (Array.isArray(snap.pinnedFolders)) snap.pinnedFolders.forEach(f => PINNED_FOLDERS.add(f));
                 saveStateToStorage(true);
                 renderFoldersInMenu();
                 renderApp();
@@ -4414,6 +4496,7 @@
                             }
                         }
                         if (Array.isArray(maybeJson.lockedFolders)) maybeJson.lockedFolders.forEach(f => LOCKED_FOLDERS.add(f));
+                        if (Array.isArray(maybeJson.pinnedFolders)) maybeJson.pinnedFolders.forEach(f => PINNED_FOLDERS.add(f));
                         await saveStateToStorage(true);
                         checkAndSaveWeeklyAutoSnapshot(true);
                         recordFileBackupDone(ITEMS.length);
@@ -5498,6 +5581,7 @@
                     }
                     case 'open-backup-sheet': openBackupSheet(); break;
                     case 'close-backup-sheet': closeBackupSheet(); break;
+                    case 'toggle-shake-random': setShakeRandom(!shakeRandomEnabled); break;
                     case 'toggle-import-dup-mode': setImportDupMode(importDuplicateMode === 'update' ? 'skip' : 'update'); break;
                     case 'open-about-sheet': openAboutSheet(); break;
                     case 'close-about-sheet': closeAboutSheet(); break;
@@ -5522,7 +5606,7 @@
                     case 'open-calendar-sheet': openCalendarSheet(); break;
                     case 'close-calendar': closeCalendarSheet(); break;
                     case 'set-layout': setLayoutMode(actionEl.dataset.mode); break;
-                    case 'set-theme': setThemeMode(actionEl.dataset.mode); break;
+                    case 'set-theme': trackThemeSwitch(actionEl.dataset.mode); setThemeMode(actionEl.dataset.mode); break;
                     case 'set-sort': setSortMode(actionEl.dataset.mode); break;
                     case 'set-cats-sort': setCatsSortMode(actionEl.dataset.mode); break;
                     case 'set-tags-sort': setTagsSortMode(actionEl.dataset.mode); break;
@@ -5568,6 +5652,7 @@
                     case 'hide-toast': hideToast(); break;
                     case 'select-cat-sheet': selectCategoryFromSheet(actionEl.dataset.cat); break;
                     case 'toggle-folder-lock': toggleFolderLock(actionEl.dataset.cat, e); break;
+                    case 'toggle-folder-pin': toggleFolderPin(actionEl.dataset.cat, e); break;
                     case 'select-tag': selectTagAndClose(actionEl.dataset.tag || null); break;
                     case 'select-folder': selectFolderAndClose(actionEl.dataset.cat); break;
                     case 'open-item': openItemById(Number(actionEl.dataset.id), e); break;
@@ -5640,6 +5725,7 @@
             updateStaticTexts();
             setThemeMode(themeMode || 'light');
             setFontScale(fontScale || 'sm');
+            setShakeRandom(shakeRandomEnabled, false);
             const initialMode = hadSaved ? viewMode : (window.innerWidth >= 1024 ? 'large' : 'small');
             setLayoutMode(initialMode); setSortMode(sortMode || 'newest');
             attachSidebarSwipe(); attachSidebarOpenSwipe();
@@ -5655,6 +5741,7 @@
             attachSheetDrag('bulk-edit-drag-handle', 'bulk-edit-sheet-panel', closeBulkEditSheet);
             attachSheetDrag('qr-drag-handle', 'qr-panel', closeQRModal);
             initToastSwipe();
+            initEasterEggs();
             attachPullToRefresh();
             attachLazyScrollObserver();
             _ensureBaseHistoryGuard();
