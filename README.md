@@ -1,45 +1,99 @@
-![Скриншот 1](images/screen1.jpg)
-![Скриншот 2](images/screen2.jpg)
+🇺🇦 LinkBox
+
+Менше хаосу. Більше порядку. Усі посилання на своїх місцях.
+
+Посилання зберігаються в браузері, месенджерах, нотатках і десятках інших місць. Згодом знайти потрібне стає справжньою археологічною експедицією.
+
+LinkBox — це розумний органайзер посилань, який збирає все в одному місці та допомагає підтримувати порядок без зайвої метушні.
+
+Можливості
+
+- Швидке збереження. Додавання посилань, очищення URL та виявлення дублікатів.
+- Порядок і структура. Категорії, папки, хештеги та кілька способів організації посилань.
+- Контроль і пріоритети. Закріплення важливого, позначки непрочитаного та блокування посилань і папок.
+- Потужний пошук. Пошук за назвою, доменом, описом, нотатками, папками та тегами.
+- Масові дії. Керування кількома посиланнями одночасно.
+- QR-коди. Створення QR-кодів для посилань.
+- Приватний контент. Окрема категорія 18+ та додатковий захист.
+- Офлайн-можливості. Черга операцій для роботи без постійного підключення до мережі.
+- Історія активності. Календар, який допомагає відстежувати роботу з посиланнями.
+
+Інтерфейс і зручність
+
+LinkBox має світлу, темну та OLED-теми, налаштування розміру шрифту, різні режими відображення карток, жести керування, висувне меню та мобільну навігацію.
+
+Підтримуються можливості PWA та передавання посилань через системне меню «Поділитися» на сумісних пристроях.
+
+Дані та резервні копії
+
+Дані зберігаються локально в IndexedDB. Для базового використання не потрібен обліковий запис у хмарному сервісі.
+
+Передбачено імпорт закладок браузера у форматі HTML, експорт HTML та JSON, а також створення резервних копій і перенесення даних.
+
+LinkBox — маленький органайзер для великого інтернету.
+
+<table>
+  <tr>
+    <td width="50%"><a href="images/LinkBoxPugPreview1.png"><img src="images/LinkBoxPugPreview1.png" width="100%" alt="LinkBox preview 1"></a></td>
+    <td width="50%"><a href="images/LinkBoxPugPreview2.png"><img src="images/LinkBoxPugPreview2.png" width="100%" alt="LinkBox preview 2"></a></td>
+  </tr>
+  <tr>
+    <td><a href="images/LinkBoxPugPreview3.png"><img src="images/LinkBoxPugPreview3.png" width="100%" alt="LinkBox preview 3"></a></td>
+    <td><a href="images/LinkBoxPugPreview4.png"><img src="images/LinkBoxPugPreview4.png" width="100%" alt="LinkBox preview 4"></a></td>
+  </tr>
+  <tr>
+    <td><a href="images/LinkBoxPugPreview5.png"><img src="images/LinkBoxPugPreview5.png" width="100%" alt="LinkBox preview 5"></a></td>
+    <td><a href="images/LinkBoxPugPreview6.png"><img src="images/LinkBoxPugPreview6.png" width="100%" alt="LinkBox preview 6"></a></td>
+  </tr>
+  <tr>
+    <td><a href="images/LinkBoxPugPreview7.png"><img src="images/LinkBoxPugPreview7.png" width="100%" alt="LinkBox preview 7"></a></td>
+    <td><a href="images/LinkBoxPugPreview8.png"><img src="images/LinkBoxPugPreview8.png" width="100%" alt="LinkBox preview 8"></a></td>
+  </tr>
+  <tr>
+    <td><a href="images/LinkBoxPugPreview9.png"><img src="images/LinkBoxPugPreview9.png" width="100%" alt="LinkBox preview 9"></a></td>
+    <td><a href="images/LinkBoxPugPreview10.png"><img src="images/LinkBoxPugPreview10.png" width="100%" alt="LinkBox preview 10"></a></td>
+  </tr>
+  <tr>
+    <td><a href="images/LinkBoxPugPreview11.png"><img src="images/LinkBoxPugPreview11.png" width="100%" alt="LinkBox preview 11"></a></td>
+    <td><a href="images/LinkBoxPugPreview12.png"><img src="images/LinkBoxPugPreview12.png" width="100%" alt="LinkBox preview 12"></a></td>
+  </tr>
+  <tr>
+    <td><a href="images/LinkBoxPugPreview13.png"><img src="images/LinkBoxPugPreview13.png" width="100%" alt="LinkBox preview 13"></a></td>
+    <td><a href="images/LinkBoxPugPreview14.png"><img src="images/LinkBoxPugPreview14.png" width="100%" alt="LinkBox preview 14"></a></td>
+  </tr>
+</table>
 
 
-# LinkBox - Smart Link Organiser 
+🇬🇧 LinkBox
 
-Android-додаток для тих, хто зберігає посилання «на потім», а потім ніколи їх не відкриває.
+Less clutter. More order. Every link in its place.
 
-Без реєстрації, без хмари, без «увійдіть через Google». Поставив — і все. Дані лежать на телефоні і нікуди самі не втікають.
+Links end up everywhere: browsers, messengers, notes, and countless other places. Eventually, finding the one you need turns into a full-scale archaeological expedition.
 
-Кидаєш одне посилання чи цілий список — додаток сам намагається зрозуміти, що це за сайт, і кидає в нормальну папку. Можна додати свої категорії, навішати хештеги, закріпити важливе зверху, щоб не шукати потім по всьому списку. Є нормальний пошук, сортування і навіть календар: можна глянути, що ти взагалі зберігав того дивного вівторка три тижні тому.
+LinkBox is a smart link organizer that brings everything together and helps keep it neatly organized without unnecessary hassle.
 
-Без інтернету теж працює. Посилання просто чекають у черзі. З’явиться мережа — підтягне заголовки й описи. Нічого не губиться.
+Features
 
-ШІ підключати не обов’язково. Є вбудовані правила, які цілком нормально справляються і ще й вчаться на твоїх правках. Але якщо захочеш розумніший розклад — можна підкинути ключ від Gemini, Groq, Mistral, OpenRouter і ще купи всього.
+- Quick saving. Add links, clean up URLs, and detect duplicates.
+- Flexible organization. Categories, folders, hashtags, and multiple ways to organize your collection.
+- Priorities and control. Pin important links, mark unread items, and lock links or folders.
+- Powerful search. Search by title, domain, description, notes, folders, and tags.
+- Bulk actions. Manage multiple links at once.
+- QR codes. Generate QR codes for links.
+- Private content. A separate 18+ category with additional protection.
+- Offline capabilities. An operation queue for situations without a constant internet connection.
+- Activity history. A calendar for tracking link activity.
 
-Три теми (включаючи нормальний чорний AMOLED, а не «сірий із претензією»), три вигляди карток, масове редагування, імпорт і експорт. З браузера, телеграма чи будь-якого іншого додатка можна кидати посилання напряму — воно одразу потрапляє в LinkBox.
+Interface and usability
 
-Коротше, щоб закладки нарешті перестали бути місцем, куди все зникає і більше ніколи не знаходиться.
+LinkBox includes light, dark, and OLED themes, font size settings, different card display modes, gesture controls, a slide-out menu, and mobile navigation.
 
----
-**Встановити**  
-АПК → [Releases](https://github.com/13symbols/LinkBox/tree/main/releases)
+PWA capabilities and sharing links through the system Share menu are supported on compatible devices.
 
----
+Data and backups
 
-# LinkBox - Smart Link Organiser 
+Data is stored locally in IndexedDB. No cloud account is required for basic use.
 
-An Android app for people who save links “for later” and then never open them again.
+LinkBox supports importing browser bookmarks in HTML format, exporting HTML and JSON, creating backups, and transferring data.
 
-No sign-up, no cloud, no “continue with Google”. Install and that’s it. Data stays on the phone and doesn’t wander off on its own.
-
-Throw in one link or a whole list — the app tries to figure ou what the site is and drops it into a decent folder. You can add your own categories, slap on hashtags, pin the important stuff to the top so you don’t have to dig through the entire list later. There’s proper search, sorting, and even a calendar: you can check what the hell you saved that weird Tuesday three weeks ago.
-
-Works offline too. Links just sit in a queue. Internet comes back — it pulls titles and descriptions. Nothing gets lost.
-
-AI is optional. Built-in rules do a solid job and even learn from your corrections. But if you want smarter sorting, you can drop in a key for Gemini, Groq, Mistral, OpenRouter and a bunch of others.
-
-Three themes (including a proper AMOLED black, not some “almost black” gray), three card layouts, bulk editing, import and export. You can share links straight from the browser, Telegram or any other app — they land in LinkBox immediately.
-
-In short: so your bookmarks finally stop being the place where things go to disappear forever.
-
----
-**Install**  
-APK → [Releases](https://github.com/13symbols/LinkBox/tree/main/releases)
+LinkBox — a little organizer for a very big internet.
