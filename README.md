@@ -32,6 +32,10 @@ LinkBox має світлу, темну та OLED-теми, налаштуван
 
 LinkBox — маленький органайзер для великого інтернету.
 
+Telegram
+https://t.me/linkbox_slo
+
+
 <table>
   <tr>
     <td width="50%"><a href="images/LinkBoxPugPreview1.png"><img src="images/LinkBoxPugPreview1.png" width="100%" alt="LinkBox preview 1"></a></td>
@@ -97,3 +101,7 @@ Data is stored locally in IndexedDB. No cloud account is required for basic use.
 LinkBox supports importing browser bookmarks in HTML format, exporting HTML and JSON, creating backups, and transferring data.
 
 LinkBox — a little organizer for a very big internet.
+
+
+Telegram
+https://t.me/linkbox_slo
