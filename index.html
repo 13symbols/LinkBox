@@ -2542,9 +2542,14 @@
             ITEMS.forEach(item => { getItemCats(item).forEach(cName => { if (!catMap.has(cName)) { catMap.set(cName, { cat: cName, color: item.color, count: 0 }); } catMap.get(cName).count += 1; }); });
             let cats = Array.from(catMap.values());
             if (q) cats = cats.filter(c => c.cat.toLowerCase().includes(q));
-            if (catsSortMode === 'popular') cats.sort((a, b) => b.count - a.count || a.cat.localeCompare(b.cat, 'uk'));
-            else if (catsSortMode === 'az') cats.sort((a, b) => a.cat.localeCompare(b.cat, 'uk'));
-            else if (catsSortMode === 'za') cats.sort((a, b) => b.cat.localeCompare(a.cat, 'uk'));
+            cats.sort((a, b) => {
+                const ap = PINNED_FOLDERS.has(a.cat) ? 1 : 0;
+                const bp = PINNED_FOLDERS.has(b.cat) ? 1 : 0;
+                if (ap !== bp) return bp - ap;
+                if (catsSortMode === 'az') return a.cat.localeCompare(b.cat, 'uk');
+                if (catsSortMode === 'za') return b.cat.localeCompare(a.cat, 'uk');
+                return b.count - a.count || a.cat.localeCompare(b.cat, 'uk');
+            });
 
             const isAll = selectedFolder === 'ALL' && !selectedTag;
             const unreadCount = ITEMS.filter(i => i.isRead === false).length;
