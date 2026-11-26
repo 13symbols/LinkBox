@@ -608,6 +608,40 @@
 
         @keyframes lb-logo-spin { from { transform: rotate(0deg) scale(1); } 50% { transform: rotate(540deg) scale(1.25); } to { transform: rotate(1080deg) scale(1); } }
         .lb-logo-spin { animation: lb-logo-spin 1.1s cubic-bezier(.3,.7,.3,1); }
+        @keyframes lb-pin-in {
+            0% { transform: translate(2px, -5px) rotate(-22deg) scale(1.18); }
+            45% { transform: translate(0px, 2px) rotate(6deg) scale(0.92); }
+            75% { transform: translate(0px, -1px) rotate(-3deg) scale(1.06); }
+            100% { transform: translate(0, 0) rotate(0deg) scale(1); }
+        }
+        @keyframes lb-pin-out {
+            0% { transform: translate(0, 0) rotate(0deg) scale(1); }
+            40% { transform: translate(2px, -4px) rotate(14deg) scale(1.1); }
+            100% { transform: translate(0, 0) rotate(0deg) scale(1); }
+        }
+        @keyframes lb-star-in {
+            0% { transform: scale(0.75) rotate(-18deg); }
+            45% { transform: scale(1.32) rotate(72deg); }
+            75% { transform: scale(0.92) rotate(68deg); }
+            100% { transform: scale(1) rotate(72deg); }
+        }
+        @keyframes lb-star-out {
+            0% { transform: scale(1) rotate(0deg); }
+            35% { transform: scale(0.82) rotate(-18deg); }
+            70% { transform: scale(1.06) rotate(8deg); }
+            100% { transform: scale(1) rotate(0deg); }
+        }
+        .lb-pin-in { animation: lb-pin-in 0.42s cubic-bezier(0.22, 1, 0.36, 1); transform-origin: center; }
+        .lb-pin-out { animation: lb-pin-out 0.32s cubic-bezier(0.22, 1, 0.36, 1); transform-origin: center; }
+        .lb-star-in { animation: lb-star-in 0.48s cubic-bezier(0.22, 1, 0.36, 1); transform-origin: center; }
+        .lb-star-out { animation: lb-star-out 0.34s ease-out; transform-origin: center; }
+        .lb-flip-moving { position: relative; z-index: 25 !important; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.25), 0 0 0 1.5px rgb(var(--accent-rgb) / 0.5) !important; }
+        @keyframes lb-chip-pop {
+            0% { opacity: 0; transform: scale(0.72) translateY(4px); }
+            65% { opacity: 1; transform: scale(1.06) translateY(0); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .lb-chip-pop { animation: lb-chip-pop 0.34s cubic-bezier(0.22, 1, 0.36, 1); }
         .lb-switch {
             position: relative;
             width: 44px;
@@ -2344,10 +2378,78 @@
             return getItemCats(item).some(c => LOCKED_FOLDERS.has(c));
         }
 
+        function triggerIconAnim(svg, cls) {
+            if (!svg) return;
+            svg.classList.remove('lb-pin-in', 'lb-pin-out', 'lb-star-in', 'lb-star-out');
+            void svg.getBoundingClientRect();
+            svg.classList.add(cls);
+            const clean = () => svg.classList.remove(cls);
+            svg.addEventListener('animationend', clean, { once: true });
+            setTimeout(clean, 550);
+        }
+
+        function runFlipTransition(container, selector, keyAttr, activeKey, updateFn) {
+            if (!container) { updateFn(); return; }
+            const prevRects = new Map();
+            container.querySelectorAll(selector).forEach(el => {
+                const k = el.getAttribute(keyAttr);
+                if (k) prevRects.set(k, el.getBoundingClientRect());
+            });
+            updateFn();
+            const newEls = Array.from(container.querySelectorAll(selector));
+            newEls.forEach(el => {
+                const k = el.getAttribute(keyAttr);
+                const prev = prevRects.get(k);
+                const isTarget = k === String(activeKey);
+                if (!prev) {
+                    if (isTarget && typeof el.animate === 'function') {
+                        el.animate([
+                            { opacity: 0, transform: 'scale(0.88) translateY(-8px)' },
+                            { opacity: 1, transform: 'scale(1) translateY(0)' }
+                        ], { duration: 360, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' });
+                    }
+                    return;
+                }
+                const next = el.getBoundingClientRect();
+                const dx = prev.left - next.left;
+                const dy = prev.top - next.top;
+                if (Math.abs(dx) < 0.5 && Math.abs(dy) < 0.5) return;
+                if (typeof el.animate === 'function') {
+                    if (isTarget) el.classList.add('lb-flip-moving');
+                    const anim = el.animate([
+                        { transform: `translate3d(${dx}px, ${dy}px, 0)${isTarget ? ' scale(1.03)' : ''}` },
+                        { transform: 'translate3d(0, 0, 0) scale(1)' }
+                    ], {
+                        duration: isTarget ? 460 : 400,
+                        easing: 'cubic-bezier(0.22, 1, 0.36, 1)'
+                    });
+                    if (isTarget) {
+                        anim.onfinish = () => el.classList.remove('lb-flip-moving');
+                        anim.oncancel = () => el.classList.remove('lb-flip-moving');
+                    }
+                }
+            });
+        }
+
         function toggleItemPinQuick(id, e) {
             if (e) e.stopPropagation();
             const item = ITEMS.find(x => x.id === id); if (!item) return;
-            item.pinned = !item.pinned; saveStateToStorage(); renderApp(); showToast(item.pinned ? t('pinnedToast') : t('unpinnedToast'));
+            item.pinned = !item.pinned;
+            saveStateToStorage();
+            const pinBar = document.getElementById('pinned-bar-wrapper');
+            runFlipTransition(pinBar, '[data-flip-pin]', 'data-flip-pin', id, () => {
+                renderApp(true);
+            });
+            showToast(item.pinned ? t('pinnedToast') : t('unpinnedToast'));
+            const animCls = item.pinned ? 'lb-pin-in' : 'lb-pin-out';
+            document.querySelectorAll(`[data-action="toggle-pin"][data-id="${id}"] svg`).forEach(svg => triggerIconAnim(svg, animCls));
+            if (item.pinned) {
+                const chip = document.querySelector(`[data-flip-pin="${id}"]`);
+                if (chip) {
+                    chip.classList.add('lb-chip-pop');
+                    setTimeout(() => chip.classList.remove('lb-chip-pop'), 380);
+                }
+            }
         }
 
         function toggleFolderLock(cat, e) {
@@ -2359,9 +2461,22 @@
 
         function toggleFolderPin(cat, e) {
             if (e) e.stopPropagation();
-            if (PINNED_FOLDERS.has(cat)) { PINNED_FOLDERS.delete(cat); showToast(`${cat}: ${t('folderUnpinnedToast')}`); }
+            const willPin = !PINNED_FOLDERS.has(cat);
+            if (!willPin) { PINNED_FOLDERS.delete(cat); showToast(`${cat}: ${t('folderUnpinnedToast')}`); }
             else { PINNED_FOLDERS.add(cat); showToast(`${cat}: ${t('folderPinnedToast')}`); }
-            saveStateToStorage(); renderFoldersInMenu(); renderCategoriesCloud(); renderApp();
+            saveStateToStorage();
+            const sidebarGrid = document.getElementById('folders-grid');
+            const cloudGrid = document.getElementById('cats-cloud-container');
+            runFlipTransition(sidebarGrid, '[data-flip-cat]', 'data-flip-cat', cat, () => {
+                renderFoldersInMenu();
+            });
+            runFlipTransition(cloudGrid, '[data-flip-cat]', 'data-flip-cat', cat, () => {
+                renderCategoriesCloud();
+            });
+            const animCls = willPin ? 'lb-pin-in' : 'lb-pin-out';
+            document.querySelectorAll('[data-action="toggle-folder-pin"]').forEach(btn => {
+                if (btn.dataset.cat === cat) triggerIconAnim(btn.querySelector('svg'), animCls);
+            });
         }
 
         function setLayoutMode(mode) {
@@ -2560,7 +2675,7 @@
             }
             html += cats.map(c => {
                 const active = selectedFolder === c.cat; const folderLocked = LOCKED_FOLDERS.has(c.cat); const folderPinned = PINNED_FOLDERS.has(c.cat); const safeColor = sanitizeColor(c.color);
-                return `<div class="rounded-lg flex items-stretch overflow-hidden ${active ? 'text-white' : 'theme-input'}" style="${active ? `background:${safeColor};` : ''}"><button data-action="select-cat-sheet" data-cat="${esc(c.cat)}" class="key-press flex-1 px-3.5 py-2.5 text-left flex items-center justify-between min-w-0"><div class="flex items-center gap-2.5 min-w-0"><span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:${active ? '#fff' : safeColor}"></span><span class="text-xs sm:text-sm font-bold truncate">${esc(c.cat)}</span></div><span class="text-xs font-mono-code font-bold opacity-75 ml-2">${c.count}</span></button><button data-action="toggle-folder-pin" data-cat="${esc(c.cat)}" data-stop="1" title="${folderPinned ? 'Відкріпити папку' : 'Закріпити вгорі меню'}" class="key-press px-3 border-l flex items-center justify-center transition ${folderPinned ? (active ? 'bg-black/25 text-white' : 'bg-accent/15 text-accent') : 'opacity-45 hover:opacity-100'}" style="border-color: var(--border-main)">${folderPinned ? LINE_ICONS.pinFilled : LINE_ICONS.pin}</button><button data-action="toggle-folder-lock" data-cat="${esc(c.cat)}" data-stop="1" class="key-press px-3 border-l flex items-center justify-center transition ${folderLocked ? (active ? 'bg-black/25 text-white' : 'bg-accent/15 text-accent') : 'opacity-45 hover:opacity-100'}" style="border-color: var(--border-main)">${folderLocked ? LINE_ICONS.lock : LINE_ICONS.unlock}</button></div>`;
+                return `<div data-flip-cat="${esc(c.cat)}" class="rounded-lg flex items-stretch overflow-hidden ${active ? 'text-white' : 'theme-input'}" style="${active ? `background:${safeColor};` : ''}"><button data-action="select-cat-sheet" data-cat="${esc(c.cat)}" class="key-press flex-1 px-3.5 py-2.5 text-left flex items-center justify-between min-w-0"><div class="flex items-center gap-2.5 min-w-0"><span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:${active ? '#fff' : safeColor}"></span><span class="text-xs sm:text-sm font-bold truncate">${esc(c.cat)}</span></div><span class="text-xs font-mono-code font-bold opacity-75 ml-2">${c.count}</span></button><button data-action="toggle-folder-pin" data-cat="${esc(c.cat)}" data-stop="1" title="${folderPinned ? 'Відкріпити папку' : 'Закріпити вгорі меню'}" class="key-press px-3 border-l flex items-center justify-center transition ${folderPinned ? (active ? 'bg-black/25 text-white' : 'bg-accent/15 text-accent') : 'opacity-45 hover:opacity-100'}" style="border-color: var(--border-main)">${folderPinned ? LINE_ICONS.pinFilled : LINE_ICONS.pin}</button><button data-action="toggle-folder-lock" data-cat="${esc(c.cat)}" data-stop="1" class="key-press px-3 border-l flex items-center justify-center transition ${folderLocked ? (active ? 'bg-black/25 text-white' : 'bg-accent/15 text-accent') : 'opacity-45 hover:opacity-100'}" style="border-color: var(--border-main)">${folderLocked ? LINE_ICONS.lock : LINE_ICONS.unlock}</button></div>`;
             }).join('');
             container.innerHTML = html;
         }
@@ -2878,7 +2993,7 @@
             const limitedCats = cats.slice(0, Math.max(10, pinnedCount));
             html += limitedCats.map(c => {
                 const active = selectedFolder === c.cat; const folderLocked = LOCKED_FOLDERS.has(c.cat); const folderPinned = PINNED_FOLDERS.has(c.cat); const safeColor = sanitizeColor(c.color);
-                return `<div class="rounded-lg flex items-stretch overflow-hidden ${active ? 'text-white' : 'theme-input'}" style="${active ? `background:${safeColor};` : ''}"><button data-action="select-folder" data-cat="${esc(c.cat)}" class="key-press flex-1 px-3 py-2 text-left flex items-center justify-between min-w-0"><div class="flex items-center gap-2 min-w-0"><span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:${active ? '#fff' : safeColor}"></span><span class="text-xs sm:text-sm font-bold truncate">${esc(c.cat)}</span></div><span class="text-xs font-mono-code font-bold opacity-75 ml-1">${c.count}</span></button><button data-action="toggle-folder-pin" data-cat="${esc(c.cat)}" data-stop="1" title="${folderPinned ? 'Відкріпити папку' : 'Закріпити вгорі меню'}" class="key-press px-2.5 border-l flex items-center justify-center transition ${folderPinned ? (active ? 'bg-black/25 text-white' : 'bg-accent/15 text-accent') : 'opacity-45 hover:opacity-100'}" style="border-color: var(--border-main)">${folderPinned ? LINE_ICONS.pinFilled : LINE_ICONS.pin}</button><button data-action="toggle-folder-lock" data-cat="${esc(c.cat)}" data-stop="1" class="key-press px-2.5 border-l flex items-center justify-center transition ${folderLocked ? (active ? 'bg-black/25 text-white' : 'bg-accent/15 text-accent') : 'opacity-45 hover:opacity-100'}" style="border-color: var(--border-main)">${folderLocked ? LINE_ICONS.lock : LINE_ICONS.unlock}</button></div>`;
+                return `<div data-flip-cat="${esc(c.cat)}" class="rounded-lg flex items-stretch overflow-hidden ${active ? 'text-white' : 'theme-input'}" style="${active ? `background:${safeColor};` : ''}"><button data-action="select-folder" data-cat="${esc(c.cat)}" class="key-press flex-1 px-3 py-2 text-left flex items-center justify-between min-w-0"><div class="flex items-center gap-2 min-w-0"><span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:${active ? '#fff' : safeColor}"></span><span class="text-xs sm:text-sm font-bold truncate">${esc(c.cat)}</span></div><span class="text-xs font-mono-code font-bold opacity-75 ml-1">${c.count}</span></button><button data-action="toggle-folder-pin" data-cat="${esc(c.cat)}" data-stop="1" title="${folderPinned ? 'Відкріпити папку' : 'Закріпити вгорі меню'}" class="key-press px-2.5 border-l flex items-center justify-center transition ${folderPinned ? (active ? 'bg-black/25 text-white' : 'bg-accent/15 text-accent') : 'opacity-45 hover:opacity-100'}" style="border-color: var(--border-main)">${folderPinned ? LINE_ICONS.pinFilled : LINE_ICONS.pin}</button><button data-action="toggle-folder-lock" data-cat="${esc(c.cat)}" data-stop="1" class="key-press px-2.5 border-l flex items-center justify-center transition ${folderLocked ? (active ? 'bg-black/25 text-white' : 'bg-accent/15 text-accent') : 'opacity-45 hover:opacity-100'}" style="border-color: var(--border-main)">${folderLocked ? LINE_ICONS.lock : LINE_ICONS.unlock}</button></div>`;
             }).join('');
             grid.innerHTML = html;
         }
@@ -3046,7 +3161,7 @@
             bar.classList.remove('hidden'); bar.classList.add('flex');
             bar.innerHTML = pinnedItems.map(p => {
                 const locked = isItemLocked(p); const faviconBadge = getSiteFaviconHtml(p, 'w-6 h-6');
-                return `<div class="theme-card border rounded-lg p-1 flex items-center gap-1.5 shrink-0 shadow-2xs hover:border-accent transition"><button data-action="open-item" data-id="${p.id}" data-stop="1" title="${esc(p.title)} (${esc(p.domain)})" class="key-press flex items-center gap-1.5 pl-0.5 pr-1.5 py-0.5 rounded-md min-w-0">${faviconBadge}<span class="text-xs font-extrabold truncate max-w-[105px] sm:max-w-[140px]">${esc(p.name)}</span>${locked ? `<span class="opacity-65">${LINE_ICONS.lock}</span>` : ''}</button><button data-action="open-edit" data-id="${p.id}" title="Налаштування" class="key-press w-6 h-6 rounded-md theme-input flex items-center justify-center opacity-70 hover:opacity-100 shrink-0"><svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></button></div>`;
+                return `<div data-flip-pin="${p.id}" class="theme-card border rounded-lg p-1 flex items-center gap-1.5 shrink-0 shadow-2xs hover:border-accent transition"><button data-action="open-item" data-id="${p.id}" data-stop="1" title="${esc(p.title)} (${esc(p.domain)})" class="key-press flex items-center gap-1.5 pl-0.5 pr-1.5 py-0.5 rounded-md min-w-0">${faviconBadge}<span class="text-xs font-extrabold truncate max-w-[105px] sm:max-w-[140px]">${esc(p.name)}</span>${locked ? `<span class="opacity-65">${LINE_ICONS.lock}</span>` : ''}</button><button data-action="open-edit" data-id="${p.id}" title="Налаштування" class="key-press w-6 h-6 rounded-md theme-input flex items-center justify-center opacity-70 hover:opacity-100 shrink-0"><svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></button></div>`;
             }).join('');
         }
 
@@ -3098,7 +3213,7 @@
                 return `${offBadge}${badges}`;
             }
 
-            function renderPrioStar(item, sz) { return item.folderPriority ? `<span class="${sz} rounded-md bg-amber-500/15 text-amber-500 flex items-center justify-center shrink-0" title="${t('priorityActiveBtn')}">${LINE_ICONS.starFilled}</span>` : ''; }
+            function renderPrioStar(item, sz) { return item.folderPriority ? `<span class="lb-prio-star ${sz} rounded-md bg-amber-500/15 text-amber-500 flex items-center justify-center shrink-0" title="${t('priorityActiveBtn')}">${LINE_ICONS.starFilled}</span>` : ''; }
 
             if (viewMode === 'small') {
                 cardsEl.className = 'grid grid-cols-1 sm:grid-cols-2 gap-3';
@@ -4636,7 +4751,7 @@
         }
 
         function toggleSheetItemLock() { sheetTempLocked = !sheetTempLocked; syncSheetLockUI(); }
-        function toggleSheetFolderPriority() { sheetTempFolderPriority = !sheetTempFolderPriority; syncSheetPriorityUI(); }
+        function toggleSheetFolderPriority() { sheetTempFolderPriority = !sheetTempFolderPriority; syncSheetPriorityUI(); const svg = document.querySelector('#sheet-priority-icon svg'); triggerIconAnim(svg, sheetTempFolderPriority ? 'lb-star-in' : 'lb-star-out'); }
 
         function renderCategorySuggestions() {
             const container = document.getElementById('sheet-cat-suggestions'); const inputEl = document.getElementById('sheet-cat'); if (!container || !inputEl) return;
@@ -4840,8 +4955,27 @@
             try { if (parsedCats.length > 0 && _prevCats.join('|') !== item.cats.join('|')) learnFromItem(item, _prevCats); } catch (e) {}
             const rawTags = document.getElementById('sheet-tags').value.trim();
             item.tags = rawTags ? rawTags.split(/\s+/).filter(Boolean).map(tg => tg.startsWith('#') ? tg : `#${tg}`) : [];
+            const _starAdded = !item.folderPriority && sheetTempFolderPriority;
+            const _prioChanged = Boolean(item.folderPriority) !== Boolean(sheetTempFolderPriority);
+            const _savedId = item.id;
             item.lockedOverride = sheetTempLocked; item.folderPriority = sheetTempFolderPriority;
-            saveStateToStorage(); closeEditSheet(); renderApp(); showToast(t('saved'));
+            saveStateToStorage(); closeEditSheet();
+            const cardsEl = document.getElementById('cards-container');
+            showToast(t('saved'));
+            if (_prioChanged && cardsEl) {
+                setTimeout(() => {
+                    runFlipTransition(cardsEl, '[id^="card-"]', 'id', `card-${_savedId}`, () => {
+                        renderApp(true);
+                    });
+                    if (_starAdded) {
+                        const starSvg = document.querySelector(`#card-${_savedId} .lb-prio-star svg`);
+                        triggerIconAnim(starSvg, 'lb-star-in');
+                    }
+                }, 220);
+            } else {
+                renderApp();
+                if (_starAdded) { const starSvg = document.querySelector(`#card-${_savedId} .lb-prio-star svg`); triggerIconAnim(starSvg, 'lb-star-in'); }
+            }
         }
 
         function attachSheetDrag(handleId, panelId, closeFn) {
