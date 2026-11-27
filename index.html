@@ -1320,12 +1320,9 @@
             </div>
 
             <!-- СТАТУС ТА ПРИНЦИП РОБОТИ -->
-            <div class="space-y-2">
-                <div class="text-[11px] font-mono-code font-bold uppercase theme-muted px-1">Поточний режим</div>
-                <div class="theme-card border rounded-2xl p-4 space-y-1.5 shadow-xs">
-                    <div id="ai-mode-badge" class="text-sm font-extrabold text-accent"></div>
-                    <p class="text-xs theme-muted leading-snug">Автоматично підбирає папки за сайтом і вчиться на твоїх правках. За бажанням можна підключити ШІ — до нього йде лише заголовок сторінки.</p>
-                </div>
+            <div class="rounded-2xl px-4 py-3.5 space-y-1.5" style="background:var(--bg-input); border:1px solid var(--border-main);">
+                <div id="ai-mode-badge" class="text-sm font-extrabold leading-snug" style="color:var(--accent)"></div>
+                <p id="ai-mode-description" class="text-xs theme-muted leading-relaxed">LinkBox сам визначає відповідні папки за адресою та назвою сайту. Твої ручні зміни мають пріоритет. Підключення зовнішнього ШІ необов’язкове.</p>
             </div>
 
             <!-- ПІДКЛЮЧЕННЯ ШІ -->
@@ -1353,6 +1350,7 @@
 
                     <div class="p-4 border-t space-y-2.5" style="border-color: var(--border-main);">
                         <label for="ai-key" class="text-sm font-extrabold block">API-ключ</label>
+                        <p class="text-[11px] leading-relaxed rounded-lg px-3 py-2" style="background:rgba(217,119,6,.10);color:var(--text-muted)">Ключ зберігається локально в пам’яті цього браузера. Не вставляй сюди пароль від акаунта. Для безпеки не передавай файл LinkBox іншим людям разом із налаштуваннями.</p>
                         <div class="flex items-center theme-input rounded-xl px-3 py-1.5 gap-2 border border-transparent focus-within:border-accent transition">
                             <input id="ai-key" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Напр.: AIzaSyD-9x8Y7z6W5v4U3t2S1r0Q..." class="w-full bg-transparent py-1 text-sm font-mono-code outline-none min-w-0">
                             <button type="button" data-action="toggle-ai-key-vis" title="Показати або приховати ключ" class="key-press w-7 h-7 rounded-md flex items-center justify-center opacity-60 hover:opacity-100 hover:text-accent transition shrink-0">
@@ -2500,18 +2498,38 @@
         }
 
         let _shakeBound = false, _shakeHits = [], _shakeCooldownUntil = 0;
+        let _shakeGravity = null, _shakeLastSample = 0, _shakeSensorAvailable = false;
         function _onShakeMotion(e) {
-            if (!shakeRandomEnabled) return;
-            const a = e.accelerationIncludingGravity; if (!a) return;
-            const now = Date.now(); if (now < _shakeCooldownUntil) return;
-            const mag = Math.sqrt((a.x || 0) ** 2 + (a.y || 0) ** 2 + (a.z || 0) ** 2);
-            if (Math.abs(mag - 9.81) < 13) return;
-            if (_shakeHits.length && now - _shakeHits[_shakeHits.length - 1] < 120) return;
-            _shakeHits = _shakeHits.filter(t => now - t < 1200); _shakeHits.push(now);
+            if (!shakeRandomEnabled || document.visibilityState !== 'visible') return;
+            const now = Date.now();
+            if (now < _shakeCooldownUntil || now - _shakeLastSample < 45) return;
+            _shakeLastSample = now;
+            const linear = e.acceleration;
+            const gravity = e.accelerationIncludingGravity;
+            let x = 0, y = 0, z = 0, magnitude = 0;
+            if (linear && [linear.x, linear.y, linear.z].some(v => Number.isFinite(v))) {
+                x = Number(linear.x) || 0; y = Number(linear.y) || 0; z = Number(linear.z) || 0;
+                magnitude = Math.sqrt(x*x + y*y + z*z);
+            } else if (gravity && [gravity.x, gravity.y, gravity.z].some(v => Number.isFinite(v))) {
+                x = Number(gravity.x) || 0; y = Number(gravity.y) || 0; z = Number(gravity.z) || 0;
+                if (!_shakeGravity) _shakeGravity = { x, y, z };
+                const alpha = 0.82;
+                _shakeGravity.x = alpha * _shakeGravity.x + (1-alpha) * x;
+                _shakeGravity.y = alpha * _shakeGravity.y + (1-alpha) * y;
+                _shakeGravity.z = alpha * _shakeGravity.z + (1-alpha) * z;
+                const dx = x - _shakeGravity.x, dy = y - _shakeGravity.y, dz = z - _shakeGravity.z;
+                magnitude = Math.sqrt(dx*dx + dy*dy + dz*dz);
+            } else return;
+            _shakeSensorAvailable = true;
+            // A real shake usually produces a short acceleration peak above ~10 m/s².
+            if (magnitude < 10) return;
+            if (_shakeHits.length && now - _shakeHits[_shakeHits.length - 1] < 90) return;
+            _shakeHits = _shakeHits.filter(t => now - t < 950);
+            _shakeHits.push(now);
             if (_shakeHits.length < 3) return;
-            _shakeHits = []; _shakeCooldownUntil = now + 4000;
-            if (document.visibilityState !== 'visible' || isSelectMode || document.querySelector('[id$="-modal"].open')) return;
-            try { navigator.vibrate && navigator.vibrate(40); } catch (e) {}
+            _shakeHits = []; _shakeCooldownUntil = now + 3500;
+            if (isSelectMode || document.querySelector('.sheet-backdrop.open, [id$="-modal"].open')) return;
+            try { if (navigator.vibrate) navigator.vibrate(35); } catch (err) {}
             openRandomLink();
         }
         function _syncShakeSwitch() {
@@ -2519,14 +2537,32 @@
             sw.classList.toggle('on', shakeRandomEnabled); sw.setAttribute('aria-checked', shakeRandomEnabled ? 'true' : 'false');
         }
         async function setShakeRandom(on, persist = true) {
+            if (on && typeof DeviceMotionEvent === 'undefined') {
+                shakeRandomEnabled = false; _syncShakeSwitch();
+                showToast('Цей браузер не надає доступу до датчика руху');
+                return;
+            }
             if (on && persist && typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
-                try { const r = await DeviceMotionEvent.requestPermission(); if (r !== 'granted') { on = false; showToast('Немає доступу до датчиків руху'); } }
-                catch (e) { on = false; showToast('Немає доступу до датчиків руху'); }
+                try {
+                    const permission = await DeviceMotionEvent.requestPermission();
+                    if (permission !== 'granted') { on = false; showToast('Немає доступу до датчиків руху'); }
+                } catch (err) { on = false; showToast('Не вдалося отримати доступ до датчиків руху'); }
             }
             shakeRandomEnabled = !!on;
-            if (shakeRandomEnabled && !_shakeBound) { window.addEventListener('devicemotion', _onShakeMotion, { passive: true }); _shakeBound = true; }
+            if (shakeRandomEnabled && !_shakeBound) {
+                _shakeGravity = null; _shakeHits = []; _shakeSensorAvailable = false;
+                window.addEventListener('devicemotion', _onShakeMotion, { passive: true });
+                _shakeBound = true;
+                // Detect browsers that expose the event API but do not deliver sensor data.
+                setTimeout(() => {
+                    if (shakeRandomEnabled && !_shakeSensorAvailable) showToast('Датчик руху недоступний. Перевір дозвіл браузера на датчики.');
+                }, 1800);
+            } else if (!shakeRandomEnabled && _shakeBound) {
+                window.removeEventListener('devicemotion', _onShakeMotion);
+                _shakeBound = false; _shakeHits = []; _shakeGravity = null;
+            }
             _syncShakeSwitch();
-            if (persist) { saveStateToStorage(); showToast(shakeRandomEnabled ? 'Струс увімкнено' : 'Струс вимкнено'); }
+            if (persist) { saveStateToStorage(); if (shakeRandomEnabled) showToast('Струс увімкнено'); else showToast('Струс вимкнено'); }
         }
 
         function initEasterEggs() {
@@ -2720,7 +2756,7 @@
             const aiSub = document.getElementById('settings-ai-status-sub');
             if (aiSub) {
                 const cfg = getAiConfig();
-                aiSub.textContent = cfg ? ('✨ Працює ШІ: ' + AI_PROVIDERS[cfg.provider].label.replace(/ \(.*/, '')) : 'Автосортування (без ключа)';
+                aiSub.textContent = cfg ? ('Працює ШІ: ' + AI_PROVIDERS[cfg.provider].label.replace(/ \(.*/, '')) : 'Автоматичне сортування увімкнено';
             }
         }
 
@@ -3046,39 +3082,38 @@
 
         async function _exportFileAndroidAndShare(filename, contentStr, mimeType, toastMsg) {
             closeBackupSheet();
-            // 1. Якщо ми всередині Android APK із нативним мостом LinkBoxNative — зберігаємо в Download і відкриваємо системне меню Поділитися
+            // Native bridge reports a saved path only after the file was written.
             if (window.LinkBoxNative && typeof window.LinkBoxNative.exportFile === 'function') {
                 try {
-                    const savedPath = window.LinkBoxNative.exportFile(filename, contentStr, mimeType);
-                    showToast(savedPath ? `Збережено в Download/${filename} ✓` : toastMsg);
-                    return;
-                } catch (err) {
-                    console.error('Native export error:', err);
-                }
+                    const savedPath = await window.LinkBoxNative.exportFile(filename, contentStr, mimeType);
+                    if (savedPath) { recordFileBackupDone(ITEMS.length); showToast(`Збережено: ${savedPath} ✓`); return true; }
+                } catch (err) { console.error('Native export error:', err); }
             }
-            // 2. Спроба через системний Web Share API з файлом
+            // File System Access API: the backup is recorded only after writable.close() succeeds.
+            if (window.isSecureContext && typeof window.showSaveFilePicker === 'function') {
+                try {
+                    const handle = await window.showSaveFilePicker({ suggestedName: filename, types: [{ description: 'Файл резервної копії', accept: { [mimeType]: [filename.endsWith('.json') ? '.json' : '.html'] } }] });
+                    const writable = await handle.createWritable();
+                    await writable.write(new Blob([contentStr], { type: `${mimeType};charset=utf-8` }));
+                    await writable.close();
+                    recordFileBackupDone(ITEMS.length); showToast(toastMsg); return true;
+                } catch (err) { if (err && err.name === 'AbortError') return false; console.warn('Save picker failed:', err); }
+            }
+            // Share/download handoff is not proof that the user saved a backup.
             try {
                 const fileObj = new File([contentStr], filename, { type: mimeType });
-                if (navigator.canShare && navigator.canShare({ files: [fileObj] })) {
-                    await navigator.share({
-                        title: filename,
-                        files: [fileObj]
-                    });
-                    showToast(toastMsg);
-                    return;
+                if (navigator.canShare && navigator.canShare({ files: [fileObj] }) && navigator.share) {
+                    await navigator.share({ title: filename, files: [fileObj] });
+                    showToast('Файл передано в меню поширення. Переконайся, що його збережено.');
+                    return false;
                 }
-            } catch (err) {
-                if (err && err.name === 'AbortError') return;
-            }
-            // 3. Класичне завантаження (резерв)
+            } catch (err) { if (err && err.name === 'AbortError') return false; }
             const blob = new Blob([contentStr], { type: `${mimeType};charset=utf-8` });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = filename;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            showToast(toastMsg);
+            const link = document.createElement('a'); const objectUrl = URL.createObjectURL(blob);
+            link.href = objectUrl; link.download = filename; document.body.appendChild(link); link.click();
+            document.body.removeChild(link); setTimeout(() => URL.revokeObjectURL(objectUrl), 30000);
+            showToast('Завантаження розпочато. Перевір, чи файл з’явився у завантаженнях.');
+            return false;
         }
 
         const LAST_FILE_BACKUP_KEY = 'linkbox_last_file_backup_v1';
@@ -3143,14 +3178,12 @@
             });
             html += `</DL><p>\n`;
             const dateTag = new Date().toISOString().slice(0, 10);
-            recordFileBackupDone(ITEMS.length);
             _exportFileAndroidAndShare(`linkbox_bookmarks_${dateTag}.html`, html, 'text/html', t('exported'));
         }
 
         function exportFullJsonBackup() {
             const backup = { app: 'LinkBox', version: 2, exportedAt: new Date().toISOString(), items: ITEMS, lockedFolders: Array.from(LOCKED_FOLDERS), pinnedFolders: Array.from(PINNED_FOLDERS), themeMode, viewMode, sortMode, fontScale };
             const dateTag = new Date().toISOString().slice(0, 10);
-            recordFileBackupDone(ITEMS.length);
             _exportFileAndroidAndShare(`linkbox_backup_${dateTag}.json`, JSON.stringify(backup, null, 2), 'application/json', t('exportedJson'));
         }
 
@@ -3809,8 +3842,8 @@
         function renderAiBadge() {
             const cfg = getAiConfig(); const b = _aiEl('ai-mode-badge'); if (!b) return;
             b.textContent = cfg
-                ? ('✨ Активний ШІ: ' + AI_PROVIDERS[cfg.provider].label.replace(/ \(.*/, ''))
-                : '⚙️ Зараз працює: Автосортування (без ключа)';
+                ? ('Підключено: ' + AI_PROVIDERS[cfg.provider].label.replace(/ \(.*/, ''))
+                : 'Працює автоматичне сортування';
         }
         function openAiSheet() {
             _pushModalState(); _hideSidebar();
@@ -4450,8 +4483,8 @@
                     _idbPut('auto_snap', snap);
                     if (window.LinkBoxNative && typeof window.LinkBoxNative.saveSilentBackup === 'function') {
                         try {
-                            window.LinkBoxNative.saveSilentBackup('linkbox_autosnap.json', JSON.stringify(snap));
-                            recordFileBackupDone(ITEMS.length);
+                            const saved = window.LinkBoxNative.saveSilentBackup('linkbox_autosnap.json', JSON.stringify(snap));
+                            if (saved) recordFileBackupDone(ITEMS.length);
                         } catch (e) {}
                     }
                 }
@@ -5889,6 +5922,196 @@
             renderApp();
         });
     })();
+        // ===== LinkBox reliability & data safety extensions =====
+        // Bounded per-card change history. Only changed cards are stored.
+        const LB_HISTORY_KEY = 'linkbox_card_history_v1';
+        let _lbLastItemsSnapshot = null;
+        let _lbHistoryReady = false;
+        function _lbReadHistory() { try { const v = JSON.parse(localStorage.getItem(LB_HISTORY_KEY) || '[]'); return Array.isArray(v) ? v : []; } catch (_) { return []; } }
+        function _lbWriteHistory(v) { try { localStorage.setItem(LB_HISTORY_KEY, JSON.stringify(v.slice(-80))); } catch (e) { console.warn('History storage full', e); } }
+        function _lbClone(v) { try { return JSON.parse(JSON.stringify(v)); } catch (_) { return null; } }
+        function _lbTrackChanges() {
+            if (!_lbHistoryReady || !Array.isArray(ITEMS)) return;
+            const now = new Map(ITEMS.filter(x => x && x.id != null).map(x => [String(x.id), x]));
+            const prev = _lbLastItemsSnapshot || new Map();
+            const history = _lbReadHistory();
+            for (const [id, oldItem] of prev) {
+                const current = now.get(id);
+                if (!current || JSON.stringify(oldItem) !== JSON.stringify(current)) {
+                    history.push({ id, at: Date.now(), before: _lbClone(oldItem), after: current ? _lbClone(current) : null });
+                }
+            }
+            _lbWriteHistory(history);
+            _lbLastItemsSnapshot = new Map(Array.from(now, ([id, item]) => [id, _lbClone(item)]));
+        }
+        const _lbOriginalFlush = _flushStateToStorageNow;
+        _flushStateToStorageNow = async function() { _lbTrackChanges(); return _lbOriginalFlush.apply(this, arguments); };
+        setTimeout(() => { _lbLastItemsSnapshot = new Map((ITEMS || []).filter(x => x && x.id != null).map(x => [String(x.id), _lbClone(x)])); _lbHistoryReady = true; }, 1200);
+
+        function _lbShowHistory() {
+            const h = _lbReadHistory();
+            if (!h.length) { showToast('Історія змін поки порожня'); return; }
+            const recent = h.slice(-20).reverse();
+            const lines = recent.map((x, i) => `${i+1}. ${new Date(x.at).toLocaleString()} · ${x.before?.title || x.before?.name || x.before?.url || x.after?.title || x.after?.url || 'Картка'}${x.after === null ? ' (видалено)' : ''}`).join('\n');
+            const choice = prompt('ІСТОРІЯ КАРТОЧОК\nВведи номер версії для відновлення:\n\n' + lines);
+            if (choice === null || !/^\d+$/.test(choice)) return;
+            const entry = recent[Number(choice)-1]; if (!entry) { showToast('Такого номера немає'); return; }
+            if (!confirm('Відновити попередній стан цієї картки? Поточний стан також залишиться в історії.')) return;
+            const idx = ITEMS.findIndex(x => String(x.id) === String(entry.id));
+            if (entry.before === null) { if (idx >= 0) ITEMS.splice(idx, 1); }
+            else if (idx >= 0) ITEMS[idx] = _lbClone(entry.before);
+            else ITEMS.push(_lbClone(entry.before));
+            saveStateToStorage(true).then(() => { renderApp(); showToast('Попередню версію картки відновлено'); });
+        }
+
+        function _lbDiagnose() {
+            const rows = Array.isArray(ITEMS) ? ITEMS : [];
+            const ids = new Set(), urls = new Map(); let badUrl=0, duplicateUrl=0, missingId=0, emptyTitle=0, badCats=0;
+            rows.forEach((it, i) => {
+                if (!it || it.id == null || String(it.id).trim()==='') missingId++;
+                else if (ids.has(String(it.id))) missingId++;
+                else ids.add(String(it.id));
+                try { const u = new URL(String(it?.url || '')); if (!/^https?:$/.test(u.protocol) || !u.hostname) badUrl++; } catch (_) { badUrl++; }
+                const k = normalizeUrlForCompare(it?.url || ''); if (k) { if (urls.has(k)) duplicateUrl++; else urls.set(k, i); }
+                if (!(String(it?.title || it?.name || '').trim())) emptyTitle++;
+                if (!getItemCats(it || {}).length) badCats++;
+            });
+            const report = `ДІАГНОСТИКА БАЗИ\n\nКарток: ${rows.length}\nНекоректні URL: ${badUrl}\nДублікати URL: ${duplicateUrl}\nВідсутні/повторні ID: ${missingId}\nПорожні назви: ${emptyTitle}\nБез категорій: ${badCats}\n\nПеревірка лише читає дані. Нічого не змінено.`;
+            alert(report);
+        }
+        function _lbAddSafetyActions() {
+            const panel = document.getElementById('backup-sheet-panel');
+            if (!panel || document.getElementById('lb-safety-actions')) return;
+            const wrap = document.createElement('div'); wrap.id='lb-safety-actions'; wrap.className='theme-card border rounded-2xl overflow-hidden shadow-xs';
+            wrap.innerHTML = `<button type="button" class="w-full p-4 text-left text-sm font-extrabold" data-lb-action="diagnose">Перевірити цілісність бази</button><div class="border-t" style="border-color:var(--border-main)"></div><button type="button" class="w-full p-4 text-left text-sm font-extrabold" data-lb-action="history">Історія змін карток</button>`;
+            const status = panel.querySelector('#storage-persist-badge')?.parentElement;
+            panel.insertBefore(wrap, status || null);
+        }
+        document.addEventListener('click', e => {
+            const b = e.target.closest('[data-lb-action]'); if (!b) return;
+            e.preventDefault(); e.stopPropagation();
+            if (b.dataset.lbAction === 'diagnose') _lbDiagnose();
+            if (b.dataset.lbAction === 'history') _lbShowHistory();
+        }, true);
+        const _lbOriginalOpenBackup = openBackupSheet;
+        openBackupSheet = function() { _lbOriginalOpenBackup.apply(this, arguments); setTimeout(_lbAddSafetyActions, 30); };
+
+        // Import preflight: size/shape checks, counts, duplicates and optional full replacement.
+        const _lbOriginalImportHandler = handleAIFileImport;
+        document.getElementById('ai-import-file')?.addEventListener('change', async function(e) {
+            const file = e.target.files && e.target.files[0]; if (!file) return;
+            e.stopImmediatePropagation();
+            if (file.size > 20 * 1024 * 1024) { alert('Файл завеликий. Максимальний розмір імпорту: 20 МБ.'); e.target.value=''; return; }
+            try {
+                const content = await file.text();
+                let preview = { total:0, valid:0, duplicates:0, invalid:0, kind:'закладки' };
+                let json = null;
+                if (/\.json$/i.test(file.name) || /^\s*\{/.test(content)) {
+                    try { json = JSON.parse(content); } catch (_) { alert('JSON-файл пошкоджений або має неправильний формат.'); e.target.value=''; return; }
+                    const list = Array.isArray(json) ? json : (Array.isArray(json.items) ? json.items : null);
+                    if (!list) { alert('У JSON не знайдено масив карток items.'); e.target.value=''; return; }
+                    preview.kind='резервна копія JSON'; preview.total=list.length;
+                    const seen=new Set(); list.forEach(it=>{ if (!it || typeof it!=='object' || typeof it.url!=='string' || !/^https?:\/\//i.test(cleanRawUrl(it.url))) preview.invalid++; else { preview.valid++; const k=normalizeUrlForCompare(it.url); if(seen.has(k)) preview.duplicates++; seen.add(k); } });
+                } else {
+                    const doc = new DOMParser().parseFromString(content,'text/html'); const links=Array.from(doc.querySelectorAll('a[href]'));
+                    const raw=links.length ? links.map(a=>a.getAttribute('href')) : (content.match(/(?:https?:\/\/|www\.)[^\s"'<>]+/gi)||[]);
+                    preview.total=raw.length; const seen=new Set(); raw.forEach(u=>{const clean=cleanRawUrl(u||''); if(!/^https?:\/\//i.test(clean)){preview.invalid++;return;} const k=normalizeUrlForCompare(clean); if(seen.has(k))preview.duplicates++;seen.add(k);preview.valid++;});
+                }
+                const existing = new Set((ITEMS||[]).map(x=>normalizeUrlForCompare(x.url)).filter(Boolean));
+                let already=0;
+                if(json){const list=Array.isArray(json)?json:json.items; list.forEach(x=>{const k=normalizeUrlForCompare(x?.url||'');if(k&&existing.has(k))already++;});}
+                else {const doc=new DOMParser().parseFromString(content,'text/html'); Array.from(doc.querySelectorAll('a[href]')).forEach(a=>{const k=normalizeUrlForCompare(a.href);if(k&&existing.has(k))already++;});}
+                let msg=`Попередній перегляд імпорту\nТип: ${preview.kind}\nЗаписів у файлі: ${preview.total}\nКоректних: ${preview.valid}\nНекоректних: ${preview.invalid}\nДублікатів у файлі: ${preview.duplicates}\nВже є в базі: ${already}\n\nПродовжити?`;
+                if (!confirm(msg)) { e.target.value=''; return; }
+                if (json && Array.isArray(json.items) && confirm('Режим відновлення:\nOK — ПОВНА ЗАМІНА поточної бази даними з файлу.\nСкасувати — об’єднати з поточною базою.')) {
+                    try { await _idbPut('auto_snap', { items:_lbClone(ITEMS), lockedFolders:Array.from(LOCKED_FOLDERS), pinnedFolders:Array.from(PINNED_FOLDERS), at:Date.now(), reason:'Перед повною заміною бази' }); _cachedAutoSnap=await _idbGet('auto_snap'); } catch(err) { alert('Не вдалося створити страховочну копію. Заміна скасована.'); e.target.value=''; return; }
+                    ITEMS=[]; LOCKED_FOLDERS=new Set(); PINNED_FOLDERS=new Set(); await saveStateToStorage(true);
+                }
+                _lbOriginalImportHandler.call(this, { target:e.target });
+            } catch(err) { console.error(err); alert('Не вдалося прочитати файл для попередньої перевірки.'); e.target.value=''; }
+        }, true);
+
+        // API keys are encrypted with PBKDF2 + AES-GCM. Password is never stored.
+        const LB_AI_ENC_TAG = 'linkbox_ai_encrypted_v1';
+        let _lbUnlockedAi = null;
+        const _lbNativeLoadAiRaw = _loadAiRaw;
+        _loadAiRaw = function() {
+            if (_lbUnlockedAi) return _lbClone(_lbUnlockedAi);
+            try { const raw=JSON.parse(localStorage.getItem(AI_KEY)||'{}'); return raw && raw.encrypted===LB_AI_ENC_TAG ? {} : raw; } catch (_) { return {}; }
+        };
+        async function _lbDeriveKey(password, salt) {
+            const material=await crypto.subtle.importKey('raw',new TextEncoder().encode(password),'PBKDF2',false,['deriveKey']);
+            return crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:310000,hash:'SHA-256'},material,{name:'AES-GCM',length:256},false,['encrypt','decrypt']);
+        }
+        async function _lbEncryptAi(config, password) {
+            const salt=crypto.getRandomValues(new Uint8Array(16)), iv=crypto.getRandomValues(new Uint8Array(12));
+            const key=await _lbDeriveKey(password,salt); const data=await crypto.subtle.encrypt({name:'AES-GCM',iv},key,new TextEncoder().encode(JSON.stringify(config)));
+            return { encrypted:LB_AI_ENC_TAG, salt:Array.from(salt), iv:Array.from(iv), data:Array.from(new Uint8Array(data)), provider:config.provider, model:config.model||'', base:config.base||'' };
+        }
+        async function _lbDecryptAi(record,password) {
+            const key=await _lbDeriveKey(password,new Uint8Array(record.salt));
+            const clear=await crypto.subtle.decrypt({name:'AES-GCM',iv:new Uint8Array(record.iv)},key,new Uint8Array(record.data));
+            return JSON.parse(new TextDecoder().decode(clear));
+        }
+        const _lbOriginalOpenAi = openAiSheet;
+        openAiSheet = async function() {
+            let raw={}; try { raw=JSON.parse(localStorage.getItem(AI_KEY)||'{}'); } catch(_) {}
+            if (raw && raw.encrypted===LB_AI_ENC_TAG) {
+                if (!_lbUnlockedAi) {
+                    const pass=prompt('API-ключ захищено паролем. Введи пароль, щоб розблокувати налаштування ШІ.');
+                    if (pass===null) return;
+                    try { _lbUnlockedAi=await _lbDecryptAi(raw,pass); }
+                    catch(_) { alert('Неправильний пароль або пошкоджені дані. Ключ не розблоковано.'); return; }
+                }
+            } else if (raw && raw.key) { _lbUnlockedAi=_lbClone(raw); }
+            return _lbOriginalOpenAi.apply(this,arguments);
+        };
+        const _lbOriginalRenderAiBadge = renderAiBadge;
+        renderAiBadge = function() {
+            _lbOriginalRenderAiBadge.apply(this, arguments);
+            const b=_aiEl('ai-mode-badge'); if(!b) return;
+            try { const raw=JSON.parse(localStorage.getItem(AI_KEY)||'{}'); if(raw && raw.encrypted===LB_AI_ENC_TAG && !_lbUnlockedAi) b.textContent='ШІ захищено паролем · потрібне розблокування'; } catch(_) {}
+        };
+        saveAiSettings = async function() {
+            const f=_readAiForm();
+            if(f.key){const warn=_validateKeyFormat(f.provider,f.key);if(warn){_setAiStatusUI('err','✕ '+warn);return;}}
+            if(!f.key){try{localStorage.removeItem(AI_KEY);}catch(_){} _lbUnlockedAi=null; renderAiBadge(); _setAiStatusUI('idle','Ключ порожній: працюють вбудовані правила.'); showToast('Налаштування ШІ збережено'); return;}
+            if(!crypto?.subtle){_setAiStatusUI('err','Шифрування недоступне в цьому браузері. Ключ не збережено.');return;}
+            alert('ВАЖЛИВО! API-ключ буде зашифровано паролем. Якщо забудеш або загубиш пароль, відновити ключ буде НЕМОЖЛИВО. Пароль не зберігається в застосунку. Збережи його окремо.');
+            const p1=prompt('Створи пароль для захисту API-ключа (мінімум 8 символів):'); if(p1===null)return;
+            if(p1.length<8){alert('Пароль має містити щонайменше 8 символів.');return;}
+            const p2=prompt('Повтори пароль для перевірки:'); if(p2===null)return;
+            if(p1!==p2){alert('Паролі не збігаються. Нічого не збережено.');return;}
+            try { const encrypted=await _lbEncryptAi(f,p1); localStorage.setItem(AI_KEY,JSON.stringify(encrypted)); _lbUnlockedAi=_lbClone(f); renderAiBadge(); _setAiStatusUI('ok','✓ Ключ зашифровано та збережено. Пароль потрібен для наступного розблокування.'); showToast('Зашифрований ключ збережено'); }
+            catch(e){console.error(e);_setAiStatusUI('err','Не вдалося зашифрувати ключ. Нічого не збережено.');}
+        };
+        clearAiSettings = function() { if(!confirm('Видалити збережений API-ключ і його зашифровану копію?'))return; try{localStorage.removeItem(AI_KEY);}catch(_){} _lbUnlockedAi=null; _aiEl('ai-key').value='';_aiEl('ai-model').value='';_aiEl('ai-base').value='';renderAiBadge();_setAiStatusUI('idle','Ключ видалено. Працюють вбудовані правила.'); };
+
+        // DeviceMotion fallback tuned for Android browsers that expose only accelerationIncludingGravity.
+        _onShakeMotion = function(e) {
+            if (!shakeRandomEnabled || document.visibilityState !== 'visible') return;
+            const now=Date.now(); if(now<_shakeCooldownUntil || now-_shakeLastSample<35)return; _shakeLastSample=now;
+            const a=e.acceleration; const g=e.accelerationIncludingGravity; let mag=0;
+            if(a && [a.x,a.y,a.z].some(Number.isFinite)) mag=Math.hypot(Number(a.x)||0,Number(a.y)||0,Number(a.z)||0);
+            else if(g && [g.x,g.y,g.z].some(Number.isFinite)) {
+                const v={x:Number(g.x)||0,y:Number(g.y)||0,z:Number(g.z)||0};
+                if(!_shakeGravity) _shakeGravity={...v};
+                const alpha=0.72; const dx=v.x-_shakeGravity.x,dy=v.y-_shakeGravity.y,dz=v.z-_shakeGravity.z;
+                _shakeGravity.x=alpha*_shakeGravity.x+(1-alpha)*v.x;_shakeGravity.y=alpha*_shakeGravity.y+(1-alpha)*v.y;_shakeGravity.z=alpha*_shakeGravity.z+(1-alpha)*v.z;
+                mag=Math.hypot(dx,dy,dz);
+            } else return;
+            _shakeSensorAvailable=true;
+            if(mag<4.2)return;
+            if(_shakeHits.length && now-_shakeHits[_shakeHits.length-1]<100)return;
+            _shakeHits=_shakeHits.filter(t=>now-t<1100);_shakeHits.push(now);
+            if(_shakeHits.length<3)return;
+            _shakeHits=[];_shakeCooldownUntil=now+3000;
+            if(isSelectMode || document.querySelector('.sheet-backdrop.open, [id$="-modal"].open'))return;
+            try{if(navigator.vibrate)navigator.vibrate(35);}catch(_){}
+            openRandomLink();
+        };
+        // Keep the switch in sync after the revised motion handler is installed.
+        if (_shakeBound) { window.removeEventListener('devicemotion', _onShakeMotion); window.addEventListener('devicemotion', _onShakeMotion, {passive:true}); }
     </script>
 </body>
 </html>
