@@ -671,6 +671,137 @@
             transform: translateX(18px);
             background-color: #ffffff;
         }
+        .pin-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            flex-shrink: 0;
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-main);
+            border-radius: 0.75rem;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
+            cursor: pointer;
+            white-space: nowrap;
+            -webkit-touch-callout: none;
+            user-select: none;
+            -webkit-user-select: none;
+            transition: border-color 0.15s ease, transform 0.12s ease, opacity 0.15s ease;
+        }
+        .pin-chip:hover { border-color: rgb(var(--accent-rgb)); }
+        .pin-chip-both { padding: 0.3rem 0.75rem 0.3rem 0.34rem; }
+        .pin-chip-title { padding: 0.42rem 0.8rem; }
+        .pin-chip-icon { padding: 0.34rem; border-radius: 0.8rem; }
+        .pin-chip-label {
+            font-size: 0.78rem;
+            font-weight: 800;
+            line-height: 1.25;
+            max-width: 135px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        #pinned-bar-wrapper [data-flip-pin].pin-drag-placeholder {
+            opacity: 0.22;
+            transform: scale(0.94);
+        }
+        .pin-drag-ghost {
+            position: fixed;
+            z-index: 75;
+            pointer-events: none;
+            margin: 0 !important;
+            width: max-content !important;
+            white-space: nowrap !important;
+            border-color: rgb(var(--accent-rgb)) !important;
+            box-shadow: 0 14px 30px -6px rgba(0, 0, 0, 0.3), 0 0 0 1.5px rgb(var(--accent-rgb) / 0.65) !important;
+            transition: transform 0.14s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.14s ease;
+            will-change: left, top, transform;
+        }
+        #pin-action-dock {
+            position: fixed;
+            top: calc(max(env(safe-area-inset-top, 0px), 10px) + 0.45rem);
+            left: 50%;
+            z-index: 68;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.4rem;
+            transform: translate3d(-50%, -140%, 0) scale(0.94);
+            opacity: 0;
+            pointer-events: none;
+            transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s ease;
+            will-change: transform, opacity;
+        }
+        #pin-action-dock.active {
+            transform: translate3d(-50%, 0, 0) scale(1);
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .pin-dock-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            padding: 0.4rem 0.5rem;
+            border-radius: 9999px;
+            background-color: var(--bg-header);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid rgb(var(--accent-rgb) / 0.45);
+            box-shadow: 0 14px 32px -6px rgba(0, 0, 0, 0.24);
+        }
+        .pin-drop-zone {
+            width: 2.6rem;
+            height: 2.6rem;
+            border-radius: 9999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--bg-input);
+            color: var(--text-main);
+            border: 1px solid transparent;
+            transition: transform 0.14s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.14s ease, color 0.14s ease, box-shadow 0.14s ease;
+        }
+        .pin-drop-zone[data-pin-drop="unpin"] {
+            background-color: rgba(244, 63, 94, 0.14);
+            color: #f43f5e;
+        }
+        .pin-drop-zone[data-pin-drop="edit"],
+        .pin-drop-zone[data-pin-drop="qr"] {
+            background-color: rgb(var(--accent-rgb) / 0.14);
+            color: rgb(var(--accent-rgb));
+        }
+        .pin-drop-zone.pin-drop-hover {
+            background-color: rgb(var(--accent-rgb));
+            color: var(--on-accent);
+            transform: scale(1.14);
+            box-shadow: 0 8px 18px -4px rgb(var(--accent-rgb) / 0.5);
+        }
+        .pin-drop-zone[data-pin-drop="unpin"].pin-drop-hover {
+            background-color: #f43f5e;
+            color: #ffffff;
+            box-shadow: 0 8px 18px -4px rgba(244, 63, 94, 0.5);
+        }
+        #pin-dock-label {
+            padding: 0.2rem 0.7rem;
+            border-radius: 9999px;
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-main);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.14);
+            font-size: 11px;
+            font-weight: 800;
+            line-height: 1.25;
+            letter-spacing: 0.02em;
+            color: var(--text-muted);
+            white-space: nowrap;
+            transition: color 0.14s ease, border-color 0.14s ease;
+        }
+        #pin-dock-label.is-accent {
+            color: rgb(var(--accent-rgb));
+            border-color: rgb(var(--accent-rgb) / 0.5);
+        }
+        #pin-dock-label.is-danger {
+            color: #f43f5e;
+            border-color: rgba(244, 63, 94, 0.5);
+        }
 </style>
 </head>
 <body class="min-h-screen flex flex-col">
@@ -756,6 +887,28 @@
             </div>
         </div>
     </aside>
+
+    <!-- ПАНЕЛЬ ШВИДКИХ ДІЙ ДЛЯ PIN-БАРУ -->
+    <div id="pin-action-dock" aria-hidden="true">
+        <div class="pin-dock-pill">
+            <div data-pin-drop="unpin" data-label="Відкріпити" class="pin-drop-zone" title="Відкріпити">
+                <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><line x1="2" y1="2" x2="22" y2="22"/><path d="M12 17v5"/><path d="M9 9v1.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h11"/><path d="M15 9.34V7a1 1 0 0 1 1-1 1 1 0 0 0 1-1V4a1 1 0 0 0-1-1H8a1 1 0 0 0-.7.29"/></svg>
+            </div>
+            <div data-pin-drop="edit" data-label="Відкрити картку" class="pin-drop-zone" title="Картка">
+                <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            </div>
+            <div data-pin-drop="copy" data-label="Копіювати URL" class="pin-drop-zone" title="Копіювати">
+                <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="1"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            </div>
+            <div data-pin-drop="qr" data-label="QR-код" class="pin-drop-zone" title="QR-код">
+                <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M7 7h.01M18 7h.01M18 18h.01M7 18h.01"/></svg>
+            </div>
+            <div data-pin-drop="share" data-label="Поділитися" class="pin-drop-zone" title="Поділитися">
+                <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+            </div>
+        </div>
+        <div id="pin-dock-label">Перетягни на дію</div>
+    </div>
 
     <!-- ІНДИКАТОР PULL-TO-REFRESH -->
     <div id="ptr-indicator" aria-hidden="true">
@@ -1132,6 +1285,23 @@
                     </div>
                 </div>
 
+                <!-- ВИГЛЯД PIN-БАРУ -->
+                <div class="space-y-2 mt-6">
+                    <div class="text-[11px] font-mono-code font-bold uppercase theme-muted px-1">Швидка панель</div>
+                    <button type="button" data-action="open-pinbar-sheet" class="key-press w-full theme-card border rounded-2xl p-4 flex items-center justify-between gap-3 text-left hover:border-accent transition shadow-xs">
+                        <div class="flex items-center gap-4 min-w-0">
+                            <span class="w-10 h-10 rounded-xl bg-accent/15 text-accent flex items-center justify-center shrink-0">
+                                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17v5"/><path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 1 1 0 0 0 1-1V4a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1 1 1 0 0 1 1 1z"/></svg>
+                            </span>
+                            <div class="min-w-0 space-y-0.5 ml-1">
+                                <div class="text-sm font-extrabold truncate">Вигляд Pin-бару</div>
+                                <div id="settings-pinbar-sub" class="text-xs theme-muted truncate">Іконка та назва</div>
+                            </div>
+                        </div>
+                        <span class="text-accent font-mono-code text-lg font-black shrink-0">›</span>
+                    </button>
+                </div>
+
                 <!-- СЕКЦІЯ 2: РОЗУМНІ ПАПКИ ТА ШІ -->
                 <div class="space-y-2 mt-6">
                     <div class="text-[11px] font-mono-code font-bold uppercase theme-muted px-1">Інтелект та сортування</div>
@@ -1186,6 +1356,53 @@
         </div>
     </div>
 
+
+    <!-- ШТОРКА ВИГЛЯДУ PIN-БАРУ -->
+    <div id="pinbar-sheet-modal" data-backdrop="close-pinbar-sheet" class="sheet-backdrop fixed inset-0 bg-black/60 z-60 hidden items-end sm:items-center justify-center p-0 sm:p-4">
+        <div id="pinbar-sheet-panel" class="sheet-panel theme-surface w-full max-w-md rounded-t-2xl sm:rounded-xl p-5 border-t sm:border space-y-5 max-h-[90vh] overflow-y-auto" style="background-color: var(--bg-body);">
+            <div id="pinbar-drag-handle" class="w-12 h-2 bg-stone-400/50 rounded-full mx-auto -mt-1 cursor-grab active:cursor-grabbing touch-none sm:hidden"></div>
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                    <span class="w-8 h-8 rounded-xl bg-accent/15 text-accent flex items-center justify-center shrink-0">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17v5"/><path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 1 1 0 0 0 1-1V4a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1 1 1 0 0 1 1 1z"/></svg>
+                    </span>
+                    <span class="font-black text-base uppercase tracking-tight">Вигляд Pin-бару</span>
+                </div>
+                <button data-action="close-pinbar-sheet" class="key-press w-9 h-9 rounded-xl theme-input flex items-center justify-center"><svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+            </div>
+
+            <div class="space-y-2">
+                <div class="text-[11px] font-mono-code font-bold uppercase theme-muted px-1">Формат відображення</div>
+                <div class="theme-card border rounded-2xl overflow-hidden shadow-xs">
+                    <button type="button" data-action="set-pinbar-mode" data-mode="both" class="w-full p-4 flex items-center justify-between gap-3 text-left hover:opacity-90 transition">
+                        <div class="min-w-0 space-y-0.5 pr-2">
+                            <div class="text-sm font-extrabold">Іконка та назва</div>
+                            <div class="text-xs theme-muted leading-snug">Показувати фавікон сайту разом із короткою назвою</div>
+                        </div>
+                        <span id="pinbar-sw-both" class="lb-switch on" role="switch" aria-checked="true"></span>
+                    </button>
+                    <button type="button" data-action="set-pinbar-mode" data-mode="title" class="w-full p-4 border-t flex items-center justify-between gap-3 text-left hover:opacity-90 transition" style="border-color: var(--border-main);">
+                        <div class="min-w-0 space-y-0.5 pr-2">
+                            <div class="text-sm font-extrabold">Тільки назва</div>
+                            <div class="text-xs theme-muted leading-snug">Компактні текстові плашки без іконок сайтів</div>
+                        </div>
+                        <span id="pinbar-sw-title" class="lb-switch" role="switch" aria-checked="false"></span>
+                    </button>
+                    <button type="button" data-action="set-pinbar-mode" data-mode="icon" class="w-full p-4 border-t flex items-center justify-between gap-3 text-left hover:opacity-90 transition" style="border-color: var(--border-main);">
+                        <div class="min-w-0 space-y-0.5 pr-2">
+                            <div class="text-sm font-extrabold">Тільки іконка</div>
+                            <div class="text-xs theme-muted leading-snug">Мінімалістичні квадратні значки — поміститься максимум сайтів</div>
+                        </div>
+                        <span id="pinbar-sw-icon" class="lb-switch" role="switch" aria-checked="false"></span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="text-xs theme-muted leading-relaxed px-1 pb-2">
+                Затисни будь-який закріплений сайт у Pin-барі, щоб змінити порядок вліво-вправо або потягнути вгору до швидких дій.
+            </div>
+        </div>
+    </div>
 
     <!-- ШТОРКА ІМПОРТ ТА ЕКСПОРТ (MATERIAL YOU LIST TILES) -->
     <div id="backup-sheet-modal" data-backdrop="close-backup-sheet" class="sheet-backdrop fixed inset-0 bg-black/60 z-60 hidden items-end sm:items-center justify-center p-0 sm:p-4">
@@ -1580,6 +1797,37 @@
         const AUTO_SNAP_KEY = 'linkbox_weekly_autosnap_v1';
         let importDuplicateMode = 'skip';
         let shakeRandomEnabled = false;
+        let pinBarMode = 'both';
+        let pinOrder = [];
+        let _isPinDragging = false;
+        let _suppressPinClickUntil = 0;
+
+        const SEARCH_PLACEHOLDERS = [
+            'https://www...',
+            'Як справи?',
+            'Їсти хочеш?',
+            'Треба винести сміття!',
+            'Курити шкідливо!',
+            'Спину вирівняй',
+            'Може, кави?',
+            'Очі не втомилися?',
+            'Зарядити телефон',
+            'Кидай лінк, я потримаю',
+            'Ну... цей, той, як його?',
+            'Хто тут?'
+        ];
+        let _lastPlaceholderIdx = -1;
+
+        function rotateSearchPlaceholder() {
+            const input = document.getElementById('url-input');
+            if (!input) return;
+            let idx = Math.floor(Math.random() * SEARCH_PLACEHOLDERS.length);
+            if (SEARCH_PLACEHOLDERS.length > 1 && idx === _lastPlaceholderIdx) {
+                idx = (idx + 1) % SEARCH_PLACEHOLDERS.length;
+            }
+            _lastPlaceholderIdx = idx;
+            input.placeholder = SEARCH_PLACEHOLDERS[idx];
+        }
 
         const DICT = {
             uk: {
@@ -1789,7 +2037,7 @@
             try {
                 await _captureItemHistory();
                 checkAndSaveWeeklyAutoSnapshot(false);
-                const state = { items: ITEMS, lockedFolders: Array.from(LOCKED_FOLDERS), pinnedFolders: Array.from(PINNED_FOLDERS), themeMode, viewMode, sortMode, fontScale, shakeRandom: shakeRandomEnabled };
+                const state = { items: ITEMS, lockedFolders: Array.from(LOCKED_FOLDERS), pinnedFolders: Array.from(PINNED_FOLDERS), themeMode, viewMode, sortMode, fontScale, shakeRandom: shakeRandomEnabled, pinBarMode, pinOrder };
                 await _idbPut('app_state', state);
             } catch (e) {
                 console.error('IDB Save Error:', e);
@@ -1815,6 +2063,9 @@
                 clearTimeout(_saveStateTimer);
                 _saveStateTimer = null;
                 _flushStateToStorageNow();
+            } else if (document.visibilityState === 'visible') {
+                const inp = document.getElementById('url-input');
+                if (inp && !inp.value.trim()) rotateSearchPlaceholder();
             }
         });
 
@@ -1888,6 +2139,8 @@
             if (parsed.sortMode) sortMode = parsed.sortMode;
             if (parsed.fontScale) fontScale = parsed.fontScale;
             if (typeof parsed.shakeRandom === 'boolean') shakeRandomEnabled = parsed.shakeRandom;
+            if (['both', 'title', 'icon'].includes(parsed.pinBarMode)) pinBarMode = parsed.pinBarMode;
+            if (Array.isArray(parsed.pinOrder)) pinOrder = parsed.pinOrder.map(x => Number(x)).filter(x => !Number.isNaN(x));
         }
 
         // --- НАВІГАЦІЯ, APK-СУМІСНИЙ СТЕК #HASH, ЖЕСТИ ВІД КРАЮ ТА ПОДВІЙНИЙ СВАЙП ДЛЯ ВИХОДУ ---
@@ -1990,6 +2243,11 @@
             }
             if (document.getElementById('ai-sheet-modal')?.classList.contains('open')) {
                 viaHistory ? _hideAiSheet() : closeAiSheet();
+                if (viaHistory) _restoreGuardHash();
+                return true;
+            }
+            if (document.getElementById('pinbar-sheet-modal')?.classList.contains('open')) {
+                viaHistory ? _hidePinbarSheet() : closePinbarSheet();
                 if (viaHistory) _restoreGuardHash();
                 return true;
             }
@@ -2123,7 +2381,7 @@
         }
 
         function _forceCloseAllUI() {
-            _hideSidebar(); _hideCatsSheet(); _hideTagsSheet(); _hideSettingsSheet(); _hideBackupSheet(); _hideAboutSheet(); _hideCalendarSheet(); _hideEditSheet(); _hideDomainLinksSheet(); _hideBulkEditSheet(); _hideQRModal(); _hideConfirmModal();
+            _hideSidebar(); _hideCatsSheet(); _hideTagsSheet(); _hideSettingsSheet(); _hidePinbarSheet(); _hideBackupSheet(); _hideAboutSheet(); _hideCalendarSheet(); _hideEditSheet(); _hideDomainLinksSheet(); _hideBulkEditSheet(); _hideQRModal(); _hideConfirmModal();
         }
 
         function openMobileSidebar() {
@@ -2179,7 +2437,7 @@
             const sb = document.getElementById('app-sidebar'); const ov = document.getElementById('sidebar-overlay'); if (!sb || !ov) return;
             let startX = 0, startY = 0, dx = 0, tracking = false, dragging = null, sbW = 320;
             function blocked(target) {
-                if (isMobileSidebarOpen || document.querySelector('.sheet-backdrop.open')) return true;
+                if (_isPinDragging || isMobileSidebarOpen || document.querySelector('.sheet-backdrop.open')) return true;
                 for (let el = target; el && el !== document.body; el = el.parentElement) {
                     if (!(el instanceof HTMLElement)) continue;
                     if (/^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName)) return true;
@@ -2514,7 +2772,17 @@
         function toggleItemPinQuick(id, e) {
             if (e) e.stopPropagation();
             const item = ITEMS.find(x => x.id === id); if (!item) return;
+            if (!item.pinned && isItemLocked(item)) {
+                showToast('Заблоковане посилання не можна закріпити у Pin-бар');
+                return;
+            }
             item.pinned = !item.pinned;
+            if (item.pinned) {
+                pinOrder = pinOrder.filter(x => x !== id);
+                pinOrder.push(id);
+            } else {
+                pinOrder = pinOrder.filter(x => x !== id);
+            }
             saveStateToStorage();
             const pinBar = document.getElementById('pinned-bar-wrapper');
             runFlipTransition(pinBar, '[data-flip-pin]', 'data-flip-pin', id, () => {
@@ -2633,7 +2901,7 @@
             const menuLblEl = document.getElementById('btn-menu-label'); if (menuLblEl) menuLblEl.textContent = t('menu'); const addLblEl = document.getElementById('btn-add-label'); if (addLblEl) addLblEl.textContent = t('addBtn'); const rndLblEl = document.getElementById('btn-random-label'); if (rndLblEl) rndLblEl.textContent = t('random');
             document.getElementById('lbl-folders-section').textContent = t('foldersSection'); document.getElementById('lbl-hashtags-section').textContent = t('hashtagsSection');
             document.getElementById('cats-sheet-title').textContent = t('catsSheetTitle'); document.getElementById('tags-sheet-title').textContent = t('tagsSheetTitle');
-            document.getElementById('about-sheet-title').textContent = t('aboutSheetTitle'); document.getElementById('url-input').placeholder = t('urlPlaceholder');
+            document.getElementById('about-sheet-title').textContent = t('aboutSheetTitle'); rotateSearchPlaceholder();
             const impAiEl = document.getElementById('btn-import-ai'); if (impAiEl) impAiEl.textContent = 'Завантажити з файлу';
             const expHtmlEl = document.getElementById('btn-export-html'); if (expHtmlEl) expHtmlEl.textContent = 'Експорт бази';
             const lblExpHtml = document.getElementById('lbl-exp-html'); if (lblExpHtml) lblExpHtml.textContent = t('expHtmlSub');
@@ -2793,8 +3061,50 @@
             }
         }
 
+        function _pinBarModeLabel(mode) {
+            if (mode === 'title') return 'Тільки назва';
+            if (mode === 'icon') return 'Тільки іконка';
+            return 'Іконка та назва';
+        }
+
+        function setPinBarMode(mode, persist = true) {
+            if (!['both', 'title', 'icon'].includes(mode)) mode = 'both';
+            pinBarMode = mode;
+            ['both', 'title', 'icon'].forEach(m => {
+                const sw = document.getElementById(`pinbar-sw-${m}`);
+                if (sw) {
+                    const isOn = m === mode;
+                    sw.classList.toggle('on', isOn);
+                    sw.setAttribute('aria-checked', isOn ? 'true' : 'false');
+                }
+            });
+            const sub = document.getElementById('settings-pinbar-sub');
+            if (sub) sub.textContent = _pinBarModeLabel(mode);
+            if (persist) {
+                saveStateToStorage();
+                renderPinnedBar();
+            }
+        }
+
+        function openPinbarSheet() {
+            _pushModalState(); _hideSidebar();
+            setPinBarMode(pinBarMode || 'both', false);
+            const modal = document.getElementById('pinbar-sheet-modal'); const panel = document.getElementById('pinbar-sheet-panel');
+            if (!modal || !panel) return;
+            panel.style.transform = ''; panel.scrollTop = 0; modal.classList.remove('hidden'); modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('open'), 10);
+        }
+        function closePinbarSheet() { safeCloseModal(_hidePinbarSheet); }
+        function _hidePinbarSheet() {
+            const modal = document.getElementById('pinbar-sheet-modal'); const panel = document.getElementById('pinbar-sheet-panel');
+            if (!modal || !panel) return;
+            panel.style.transform = ''; modal.classList.remove('open');
+            setTimeout(() => { modal.classList.add('hidden'); modal.style.display = 'none'; }, 340);
+        }
+
         function syncSettingsSheetUI() {
             setImportDupMode(importDuplicateMode || 'skip');
+            setPinBarMode(pinBarMode || 'both', false);
             syncAutoSnapButtonUI();
             syncBackupAndPersistenceUI();
             const aiSub = document.getElementById('settings-ai-status-sub');
@@ -2878,9 +3188,9 @@
                     title: 'Головний екран',
                     items: [
                         ['Шапка', 'Натискання по ній піднімає стрічку на самий верх поточного фільтра. Повторний тап, коли вже нагорі, скидає всі фільтри й повертає повний список. Працює як ліфт: спершу на верхній поверх, а другим натисканням — одразу у вестибюль. Схема проста: <span class="font-mono-code text-xs px-1.5 py-0.5 rounded theme-input">Натискання → нагору → ще раз → усі лінки</span>'],
-                        ['Всеїдний рядок (Пошук + Додавання)', 'Тепер один рядок на головній тягне за двох: і шукає, і зберігає. Поки друкуєш — він миттєво перебирає назву, домен, заголовок, папки, нотатку та #теги. Пам’ять тепер живе в телефоні, а голова вільна для чогось приємнішого.'],
+                        ['Всеїдний рядок (Пошук + Додавання)', 'Один рядок на головній тягне за двох: і шукає, і зберігає. Поки друкуєш — він миттєво перебирає назву, домен, заголовок, папки, нотатку та #теги, а в порожньому полі час від часу підкидає короткі життєві фрази для настрою. Пам’ять тепер живе в телефоні, а голова вільна для чогось приємнішого.'],
                         ['Рандом', 'Живе на головній одразу за кнопкою «Додати». Відкриває випадкове посилання з бази, а закриті замком чемно оминає. Лотерея, де неможливо програти (хіба що натрапиш на статтю, яку обіцяв прочитати ще три роки тому).'],
-                        ['Pin-бар', 'Закріплені сайти лежать у горизонтальній стрічці прямо над списком: іконка, назва, один дотик. VIP-ложа для тих ресурсів, які відкриваєш частіше, ніж холодильник.'],
+                        ['Pin-бар', 'Закріплені сайти лежать у горизонтальній стрічці під пошуком — чисто, без зайвих кнопок і трьох крапок (посилання під замком сюди не потрапляють). Короткий тап відкриває сайт. Затисни палець на ~0,3 с — і можна вільно перетягувати сайти вліво-вправо (порядок зберігається) або потягнути вгору на плаваючу панель швидких дій: відкріпити, відкрити картку, скопіювати, QR-код чи поділитися. У «Налаштуваннях → Вигляд Pin-бару» перемикається формат: іконка та назва, тільки назва або тільки іконка.'],
                         ['Вигляд', 'Картки малі, великі або компактним списком. Сортування: нові, старі, А–Я. Тема: світла, м’яка темна чи OLED (де чорний настільки чорний, що економить батарею одним своїм виглядом). Розмір тексту: A-, A, A+.'],
                         ['Жести', 'Свайп вправо з будь-якої точки головного екрана відкриває бокове меню, свайп вліво — ховає його. Протягування стрічки вниз оновлює заголовки, описи та іконки сайтів (а без мережі ще й сипле жартами). А от відкриті шторки й вікна закриваються нативним жестом Android тільки від самого краю екрана або стягуванням за бігунок — ніяких випадкових закриттів посеред читання.']
                     ]
@@ -3238,20 +3548,325 @@
         }
 
         function exportFullJsonBackup() {
-            const backup = { app: 'LinkBox', version: 2, exportedAt: new Date().toISOString(), items: ITEMS, lockedFolders: Array.from(LOCKED_FOLDERS), pinnedFolders: Array.from(PINNED_FOLDERS), themeMode, viewMode, sortMode, fontScale };
+            const backup = { app: 'LinkBox', version: 2, exportedAt: new Date().toISOString(), items: ITEMS, lockedFolders: Array.from(LOCKED_FOLDERS), pinnedFolders: Array.from(PINNED_FOLDERS), themeMode, viewMode, sortMode, fontScale, pinBarMode, pinOrder };
             const dateTag = new Date().toISOString().slice(0, 10);
             _exportFileAndroidAndShare(`linkbox_backup_${dateTag}.json`, JSON.stringify(backup, null, 2), 'application/json', t('exportedJson'));
         }
 
+        function getOrderedPinnedItems() {
+            const pinned = ITEMS.filter(i => i.pinned && !isItemLocked(i));
+            if (!pinOrder.length) return pinned;
+            const idxMap = new Map(pinOrder.map((id, idx) => [id, idx]));
+            return pinned.slice().sort((a, b) => {
+                const ia = idxMap.has(a.id) ? idxMap.get(a.id) : Number.MAX_SAFE_INTEGER;
+                const ib = idxMap.has(b.id) ? idxMap.get(b.id) : Number.MAX_SAFE_INTEGER;
+                return ia - ib;
+            });
+        }
+
+        function shareSingleItem(id) {
+            const item = ITEMS.find(x => x.id === id);
+            if (!item) return;
+            const url = cleanRawUrl(item.url);
+            if (!url) return;
+            const title = item.title || item.name || 'LinkBox';
+            if (navigator.share) {
+                navigator.share({ title, url }).catch((err) => {
+                    if (err && err.name !== 'AbortError') copyItemUrl(url);
+                });
+            } else {
+                copyItemUrl(url);
+            }
+        }
+
         function renderPinnedBar() {
             const bar = document.getElementById('pinned-bar-wrapper'); if (!bar) return;
-            const pinnedItems = ITEMS.filter(i => i.pinned);
+            const pinnedItems = getOrderedPinnedItems();
             if (pinnedItems.length === 0) { bar.classList.add('hidden'); bar.classList.remove('flex'); bar.innerHTML = ''; return; }
             bar.classList.remove('hidden'); bar.classList.add('flex');
+            const mode = pinBarMode || 'both';
             bar.innerHTML = pinnedItems.map(p => {
-                const locked = isItemLocked(p); const faviconBadge = getSiteFaviconHtml(p, 'w-6 h-6');
-                return `<div data-flip-pin="${p.id}" class="theme-card border rounded-lg p-1 flex items-center gap-1.5 shrink-0 shadow-2xs hover:border-accent transition"><button data-action="open-item" data-id="${p.id}" data-stop="1" title="${esc(p.title)} (${esc(p.domain)})" class="key-press flex items-center gap-1.5 pl-0.5 pr-1.5 py-0.5 rounded-md min-w-0">${faviconBadge}<span class="text-xs font-extrabold truncate max-w-[105px] sm:max-w-[140px]">${esc(p.name)}</span>${locked ? `<span class="opacity-65">${LINE_ICONS.lock}</span>` : ''}</button><button data-action="open-edit" data-id="${p.id}" title="Налаштування" class="key-press w-6 h-6 rounded-md theme-input flex items-center justify-center opacity-70 hover:opacity-100 shrink-0"><svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></button></div>`;
+                const titleAttr = `${esc(p.title)} (${esc(p.domain)})`;
+                if (mode === 'icon') {
+                    const faviconBadge = getSiteFaviconHtml(p, 'w-7 h-7', 'w-5 h-5');
+                    return `<div data-flip-pin="${p.id}" data-action="open-pin-item" data-id="${p.id}" title="${titleAttr}" class="key-press pin-chip pin-chip-icon">${faviconBadge}</div>`;
+                }
+                if (mode === 'title') {
+                    return `<div data-flip-pin="${p.id}" data-action="open-pin-item" data-id="${p.id}" title="${titleAttr}" class="key-press pin-chip pin-chip-title"><span class="pin-chip-label">${esc(p.name)}</span></div>`;
+                }
+                const faviconBadge = getSiteFaviconHtml(p, 'w-6 h-6');
+                return `<div data-flip-pin="${p.id}" data-action="open-pin-item" data-id="${p.id}" title="${titleAttr}" class="key-press pin-chip pin-chip-both">${faviconBadge}<span class="pin-chip-label">${esc(p.name)}</span></div>`;
             }).join('');
+        }
+
+        function attachPinBarDragAndDrop() {
+            const bar = document.getElementById('pinned-bar-wrapper');
+            const dock = document.getElementById('pin-action-dock');
+            if (!bar || !dock) return;
+
+            let holdTimer = null;
+            let activeChip = null;
+            let activeId = null;
+            let ghostEl = null;
+            let startX = 0, startY = 0;
+            let offsetX = 0, offsetY = 0;
+            let hoveredDropAction = null;
+            let pointerType = null;
+            let autoScrollRaf = null;
+            let lastClientX = 0;
+
+            bar.addEventListener('contextmenu', (e) => {
+                if (e.target.closest('[data-flip-pin]')) e.preventDefault();
+            });
+
+            function clearHoldTimer() {
+                if (holdTimer) { clearTimeout(holdTimer); holdTimer = null; }
+            }
+
+            function stopAutoScroll() {
+                if (autoScrollRaf) { cancelAnimationFrame(autoScrollRaf); autoScrollRaf = null; }
+            }
+
+            function runAutoScroll() {
+                if (!_isPinDragging || hoveredDropAction) { autoScrollRaf = null; return; }
+                const rect = bar.getBoundingClientRect();
+                const edge = 42;
+                if (lastClientX < rect.left + edge) {
+                    bar.scrollLeft -= 6;
+                } else if (lastClientX > rect.right - edge) {
+                    bar.scrollLeft += 6;
+                }
+                autoScrollRaf = requestAnimationFrame(runAutoScroll);
+            }
+
+            const dockLabel = document.getElementById('pin-dock-label');
+
+            function resetDockLabel() {
+                if (!dockLabel) return;
+                dockLabel.textContent = 'Перетягни на дію';
+                dockLabel.className = '';
+            }
+
+            function updateDockHover(clientX, clientY) {
+                const dockRect = dock.getBoundingClientRect();
+                const zones = dock.querySelectorAll('[data-pin-drop]');
+                let nextAction = null;
+                let nextLabel = 'Перетягни на дію';
+                if (clientY <= dockRect.bottom + 28) {
+                    zones.forEach(z => {
+                        const r = z.getBoundingClientRect();
+                        if (clientX >= r.left - 6 && clientX <= r.right + 6) {
+                            nextAction = z.dataset.pinDrop;
+                            nextLabel = z.dataset.label || nextLabel;
+                        }
+                    });
+                }
+                if (nextAction !== hoveredDropAction) {
+                    hoveredDropAction = nextAction;
+                    zones.forEach(z => z.classList.toggle('pin-drop-hover', z.dataset.pinDrop === hoveredDropAction));
+                    if (dockLabel) {
+                        dockLabel.textContent = nextLabel;
+                        dockLabel.className = hoveredDropAction === 'unpin' ? 'is-danger' : (hoveredDropAction ? 'is-accent' : '');
+                    }
+                    if (hoveredDropAction) {
+                        try { navigator.vibrate && navigator.vibrate(14); } catch (err) {}
+                    }
+                    if (ghostEl) {
+                        ghostEl.style.transform = hoveredDropAction ? 'scale(0.85)' : 'scale(1.06)';
+                        ghostEl.style.opacity = hoveredDropAction ? '0.82' : '1';
+                    }
+                }
+            }
+
+            function reorderInBar(clientX) {
+                if (!activeChip || hoveredDropAction) return;
+                const chips = Array.from(bar.querySelectorAll('[data-flip-pin]'));
+                if (chips.length < 2) return;
+                const currentIdx = chips.indexOf(activeChip);
+                if (currentIdx === -1) return;
+
+                let targetIdx = currentIdx;
+                for (let i = 0; i < chips.length; i++) {
+                    if (chips[i] === activeChip) continue;
+                    const r = chips[i].getBoundingClientRect();
+                    const mid = r.left + r.width / 2;
+                    if (i < currentIdx && clientX < mid) { targetIdx = i; break; }
+                    if (i > currentIdx && clientX > mid) { targetIdx = i; }
+                }
+                if (targetIdx === currentIdx) return;
+
+                const prevRects = new Map();
+                chips.forEach(c => { if (c !== activeChip) prevRects.set(c, c.getBoundingClientRect()); });
+
+                if (targetIdx < currentIdx) {
+                    bar.insertBefore(activeChip, chips[targetIdx]);
+                } else {
+                    bar.insertBefore(activeChip, chips[targetIdx].nextSibling);
+                }
+
+                prevRects.forEach((prev, el) => {
+                    const next = el.getBoundingClientRect();
+                    const dx = prev.left - next.left;
+                    if (Math.abs(dx) > 0.5 && typeof el.animate === 'function') {
+                        el.animate(
+                            [{ transform: `translate3d(${dx}px, 0, 0)` }, { transform: 'translate3d(0, 0, 0)' }],
+                            { duration: 220, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' }
+                        );
+                    }
+                });
+            }
+
+            function activateDrag(chip, clientX, clientY) {
+                _isPinDragging = true;
+                activeChip = chip;
+                activeId = Number(chip.dataset.flipPin);
+                hoveredDropAction = null;
+
+                try { navigator.vibrate && navigator.vibrate(25); } catch (err) {}
+
+                const rect = chip.getBoundingClientRect();
+                offsetX = clientX - rect.left;
+                offsetY = clientY - rect.top;
+
+                ghostEl = chip.cloneNode(true);
+                ghostEl.removeAttribute('data-flip-pin');
+                ghostEl.removeAttribute('data-action');
+                ghostEl.classList.add('pin-drag-ghost');
+                ghostEl.style.height = rect.height + 'px';
+                ghostEl.style.left = rect.left + 'px';
+                ghostEl.style.top = rect.top + 'px';
+                ghostEl.style.transform = 'scale(1.06)';
+                document.body.appendChild(ghostEl);
+
+                chip.classList.add('pin-drag-placeholder');
+                resetDockLabel();
+                dock.classList.add('active');
+                dock.setAttribute('aria-hidden', 'false');
+                lastClientX = clientX;
+                if (!autoScrollRaf) autoScrollRaf = requestAnimationFrame(runAutoScroll);
+            }
+
+            function executeDropAction(action, id) {
+                const item = ITEMS.find(x => x.id === id);
+                if (!item) return;
+                if (action === 'unpin') {
+                    toggleItemPinQuick(id);
+                } else if (action === 'edit') {
+                    openEditSheet(id);
+                } else if (action === 'copy') {
+                    copyItemUrl(item.url);
+                } else if (action === 'qr') {
+                    showQRCode(id);
+                } else if (action === 'share') {
+                    shareSingleItem(id);
+                }
+            }
+
+            function finishDrag(cancelled = false) {
+                clearHoldTimer();
+                stopAutoScroll();
+                if (!_isPinDragging) {
+                    activeChip = null; activeId = null; pointerType = null;
+                    return;
+                }
+
+                const droppedAction = cancelled ? null : hoveredDropAction;
+                const droppedId = activeId;
+
+                _isPinDragging = false;
+                _suppressPinClickUntil = Date.now() + 360;
+
+                if (ghostEl && ghostEl.parentNode) ghostEl.parentNode.removeChild(ghostEl);
+                ghostEl = null;
+
+                if (activeChip) activeChip.classList.remove('pin-drag-placeholder');
+
+                dock.classList.remove('active');
+                dock.setAttribute('aria-hidden', 'true');
+                dock.querySelectorAll('[data-pin-drop]').forEach(z => z.classList.remove('pin-drop-hover'));
+                resetDockLabel();
+                hoveredDropAction = null;
+
+                if (droppedAction && droppedId != null) {
+                    activeChip = null; activeId = null; pointerType = null;
+                    executeDropAction(droppedAction, droppedId);
+                    return;
+                }
+
+                // Зберігаємо новий порядок у Pin-барі
+                const newOrder = Array.from(bar.querySelectorAll('[data-flip-pin]'))
+                    .map(el => Number(el.dataset.flipPin))
+                    .filter(n => !Number.isNaN(n));
+                if (newOrder.length) {
+                    pinOrder = newOrder;
+                    saveStateToStorage();
+                }
+
+                activeChip = null; activeId = null; pointerType = null;
+            }
+
+            function onStart(clientX, clientY, target, type) {
+                if (_isPinDragging) return;
+                const chip = target.closest('[data-flip-pin]');
+                if (!chip || !bar.contains(chip)) return;
+                pointerType = type;
+                startX = clientX;
+                startY = clientY;
+                clearHoldTimer();
+                holdTimer = setTimeout(() => {
+                    holdTimer = null;
+                    activateDrag(chip, startX, startY);
+                }, 260);
+            }
+
+            function onMove(clientX, clientY, e) {
+                if (holdTimer) {
+                    if (Math.abs(clientX - startX) > 9 || Math.abs(clientY - startY) > 9) {
+                        clearHoldTimer();
+                    }
+                    return;
+                }
+                if (!_isPinDragging || !ghostEl) return;
+                if (e && e.cancelable) e.preventDefault();
+                lastClientX = clientX;
+                ghostEl.style.left = (clientX - offsetX) + 'px';
+                ghostEl.style.top = (clientY - offsetY) + 'px';
+                updateDockHover(clientX, clientY);
+                reorderInBar(clientX);
+            }
+
+            bar.addEventListener('touchstart', (e) => {
+                if (e.touches.length !== 1) return;
+                onStart(e.touches[0].clientX, e.touches[0].clientY, e.target, 'touch');
+            }, { passive: true });
+
+            document.addEventListener('touchmove', (e) => {
+                if (pointerType !== 'touch' || (!holdTimer && !_isPinDragging)) return;
+                if (!e.touches.length) return;
+                onMove(e.touches[0].clientX, e.touches[0].clientY, e);
+            }, { passive: false });
+
+            document.addEventListener('touchend', () => {
+                if (pointerType === 'touch') finishDrag(false);
+            }, { passive: true });
+
+            document.addEventListener('touchcancel', () => {
+                if (pointerType === 'touch') finishDrag(true);
+            }, { passive: true });
+
+            bar.addEventListener('mousedown', (e) => {
+                if (e.button !== 0) return;
+                onStart(e.clientX, e.clientY, e.target, 'mouse');
+            });
+
+            window.addEventListener('mousemove', (e) => {
+                if (pointerType !== 'mouse' || (!holdTimer && !_isPinDragging)) return;
+                onMove(e.clientX, e.clientY, e);
+            });
+
+            window.addEventListener('mouseup', () => {
+                if (pointerType === 'mouse') finishDrag(false);
+            });
         }
 
         function renderUnreadDot(item) {
@@ -3309,21 +3924,21 @@
                 cardsEl.innerHTML = filtered.map(s => {
                     const locked = isItemLocked(s); const isDup = highlightedDuplicateId === s.id; const isSelected = selectedIds.has(s.id);
                     const clickActionAttr = isSelectMode ? `data-action="toggle-card-select" data-id="${s.id}"` : `data-action="open-edit" data-id="${s.id}"`;
-                    return `<div id="card-${s.id}" ${clickActionAttr} class="rounded-xl p-4 theme-card border flex flex-col justify-between cursor-pointer hover:border-accent transition ${isDup || isSelected ? 'ring-2 ring-accent border-accent' : ''}"><div><div class="flex items-center justify-between gap-2"><div class="flex items-center gap-2.5 min-w-0">${isSelectMode ? `<span class="w-6 h-6 rounded-md border flex items-center justify-center shrink-0 ${isSelected ? 'bg-accent border-accent text-white' : 'theme-input'}">${isSelected ? '✓' : ''}</span>` : ''}<div class="relative">${getSiteFaviconHtml(s, 'w-8 h-8', 'w-5 h-5')}</div><div class="min-w-0"><div class="flex items-center gap-1.5 min-w-0"><div class="font-black text-base leading-tight truncate">${esc(s.name)}</div>${renderUnreadDot(s)}</div><div class="text-xs font-mono-code theme-muted truncate">${esc(s.domain)}</div></div></div><div class="flex items-center flex-wrap justify-end gap-1 shrink-0"><button data-action="toggle-pin" data-id="${s.id}" data-stop="1" title="${t('pinBtn')}" class="key-press w-6 h-6 rounded-md flex items-center justify-center transition ${s.pinned ? 'text-accent bg-accent/15' : 'theme-input opacity-55 hover:opacity-100'}">${s.pinned ? LINE_ICONS.pinFilled : LINE_ICONS.pin}</button>${renderPrioStar(s, 'w-6 h-6')}${locked ? `<span class="w-6 h-6 rounded-md theme-input flex items-center justify-center opacity-75" title="Прямий перехід заблоковано">${LINE_ICONS.lock}</span>` : ''}</div></div><div class="flex items-center justify-end flex-wrap gap-1 mt-2.5">${renderCatBadges(s)}</div><div class="text-sm sm:text-base font-bold mt-3 line-clamp-1">${esc(s.title)}</div><p class="mt-1.5 text-sm theme-muted leading-snug line-clamp-2">${esc(s.note)}</p></div><div class="flex items-stretch gap-2 mt-4 pt-3 border-t" style="border-color: var(--border-main)"><button data-action="open-item" data-id="${s.id}" data-stop="1" ${locked ? 'disabled' : ''} class="flex-1 py-2.5 px-3 rounded-lg font-extrabold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition ${locked ? 'theme-input opacity-45 cursor-not-allowed' : 'key-press bg-accent text-onaccent'}"><span>${t('openMain')}</span>${locked ? LINE_ICONS.lock : LINE_ICONS.extArrow}</button><button data-action="copy-url" data-url="${esc(s.url)}" data-stop="1" title="Копіювати URL" class="key-press w-11 rounded-lg theme-input flex items-center justify-center shrink-0"><svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="1"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div></div>`;
+                    return `<div id="card-${s.id}" ${clickActionAttr} class="rounded-xl p-4 theme-card border flex flex-col justify-between cursor-pointer hover:border-accent transition ${isDup || isSelected ? 'ring-2 ring-accent border-accent' : ''}"><div><div class="flex items-center justify-between gap-2"><div class="flex items-center gap-2.5 min-w-0">${isSelectMode ? `<span class="w-6 h-6 rounded-md border flex items-center justify-center shrink-0 ${isSelected ? 'bg-accent border-accent text-white' : 'theme-input'}">${isSelected ? '✓' : ''}</span>` : ''}<div class="relative">${getSiteFaviconHtml(s, 'w-8 h-8', 'w-5 h-5')}</div><div class="min-w-0"><div class="flex items-center gap-1.5 min-w-0"><div class="font-black text-base leading-tight truncate">${esc(s.name)}</div>${renderUnreadDot(s)}</div><div class="text-xs font-mono-code theme-muted truncate">${esc(s.domain)}</div></div></div><div class="flex items-center flex-wrap justify-end gap-1 shrink-0">${!locked ? `<button data-action="toggle-pin" data-id="${s.id}" data-stop="1" title="${t('pinBtn')}" class="key-press w-6 h-6 rounded-md flex items-center justify-center transition ${s.pinned ? 'text-accent bg-accent/15' : 'theme-input opacity-55 hover:opacity-100'}">${s.pinned ? LINE_ICONS.pinFilled : LINE_ICONS.pin}</button>` : ''}${renderPrioStar(s, 'w-6 h-6')}${locked ? `<span class="w-6 h-6 rounded-md theme-input flex items-center justify-center opacity-75" title="Прямий перехід заблоковано">${LINE_ICONS.lock}</span>` : ''}</div></div><div class="flex items-center justify-end flex-wrap gap-1 mt-2.5">${renderCatBadges(s)}</div><div class="text-sm sm:text-base font-bold mt-3 line-clamp-1">${esc(s.title)}</div><p class="mt-1.5 text-sm theme-muted leading-snug line-clamp-2">${esc(s.note)}</p></div><div class="flex items-stretch gap-2 mt-4 pt-3 border-t" style="border-color: var(--border-main)"><button data-action="open-item" data-id="${s.id}" data-stop="1" ${locked ? 'disabled' : ''} class="flex-1 py-2.5 px-3 rounded-lg font-extrabold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition ${locked ? 'theme-input opacity-45 cursor-not-allowed' : 'key-press bg-accent text-onaccent'}"><span>${t('openMain')}</span>${locked ? LINE_ICONS.lock : LINE_ICONS.extArrow}</button><button data-action="copy-url" data-url="${esc(s.url)}" data-stop="1" title="Копіювати URL" class="key-press w-11 rounded-lg theme-input flex items-center justify-center shrink-0"><svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="1"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div></div>`;
                 }).join('');
             } else if (viewMode === 'large') {
                 cardsEl.className = 'space-y-3';
                 cardsEl.innerHTML = filtered.map(s => {
                     const locked = isItemLocked(s); const isDup = highlightedDuplicateId === s.id; const isSelected = selectedIds.has(s.id);
                     const clickActionAttr = isSelectMode ? `data-action="toggle-card-select" data-id="${s.id}"` : `data-action="open-edit" data-id="${s.id}"`;
-                    return `<div id="card-${s.id}" ${clickActionAttr} class="rounded-xl p-4 sm:p-5 theme-card border grid grid-cols-1 md:grid-cols-12 gap-4 items-center cursor-pointer hover:border-accent transition ${isDup || isSelected ? 'ring-2 ring-accent border-accent' : ''}"><div class="md:col-span-5 flex flex-col justify-between space-y-3"><div class="flex items-center justify-between gap-2"><div class="flex items-center gap-2.5 min-w-0">${isSelectMode ? `<span class="w-6 h-6 rounded-md border flex items-center justify-center shrink-0 ${isSelected ? 'bg-accent border-accent text-white' : 'theme-input'}">${isSelected ? '✓' : ''}</span>` : ''}<div class="relative">${getSiteFaviconHtml(s, 'w-9 h-9', 'w-5 h-5')}</div><div class="min-w-0"><div class="flex items-center gap-1.5 min-w-0"><div class="font-black text-base truncate">${esc(s.name)}</div>${renderUnreadDot(s)}</div><div class="text-xs font-mono-code theme-muted truncate">${esc(s.domain)}</div></div></div><div class="flex items-center flex-wrap justify-end gap-1 shrink-0"><button data-action="toggle-pin" data-id="${s.id}" data-stop="1" title="${t('pinBtn')}" class="key-press w-7 h-7 rounded-md flex items-center justify-center transition ${s.pinned ? 'text-accent bg-accent/15' : 'theme-input opacity-55 hover:opacity-100'}">${s.pinned ? LINE_ICONS.pinFilled : LINE_ICONS.pin}</button>${renderPrioStar(s, 'w-7 h-7')}</div></div><div class="flex items-center justify-end flex-wrap gap-1">${renderCatBadges(s)}</div><div class="flex items-center justify-between gap-2"><div class="flex flex-wrap items-center gap-1.5 flex-1 min-w-0">${(s.tags || []).map(tg => `<button type="button" data-action="filter-tag-card" data-tag="${esc(tg)}" data-stop="1" class="text-[11px] font-mono-code theme-muted hover:text-accent transition">${esc(tg)}</button>`).join('')}</div><div class="flex items-stretch gap-2 shrink-0"><button type="button" data-action="show-qr" data-id="${s.id}" data-stop="1" title="QR-код" class="key-press w-11 h-10 rounded-lg theme-input flex items-center justify-center shrink-0 text-accent hover:bg-accent/15 transition">${LINE_ICONS.qr}</button><button data-action="copy-url" data-url="${esc(s.url)}" data-stop="1" title="Копіювати URL" class="key-press w-11 h-10 rounded-lg theme-input flex items-center justify-center shrink-0"><svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="1"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div></div></div><div class="md:col-span-7 md:border-l md:pl-4 space-y-2.5 flex flex-col justify-between" style="border-color: var(--border-main)"><div class="space-y-1.5"><div class="text-base font-bold">${esc(s.title)}</div><p class="text-sm theme-muted leading-relaxed">${esc(s.note)}</p></div><div class="pt-1"><button data-action="open-item" data-id="${s.id}" data-stop="1" ${locked ? 'disabled' : ''} class="w-full py-2.5 px-3 rounded-lg font-extrabold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition ${locked ? 'theme-input opacity-45 cursor-not-allowed' : 'key-press bg-accent text-onaccent'}"><span>${t('openMain')}</span>${locked ? LINE_ICONS.lock : LINE_ICONS.extArrow}</button></div></div></div>`;
+                    return `<div id="card-${s.id}" ${clickActionAttr} class="rounded-xl p-4 sm:p-5 theme-card border grid grid-cols-1 md:grid-cols-12 gap-4 items-center cursor-pointer hover:border-accent transition ${isDup || isSelected ? 'ring-2 ring-accent border-accent' : ''}"><div class="md:col-span-5 flex flex-col justify-between space-y-3"><div class="flex items-center justify-between gap-2"><div class="flex items-center gap-2.5 min-w-0">${isSelectMode ? `<span class="w-6 h-6 rounded-md border flex items-center justify-center shrink-0 ${isSelected ? 'bg-accent border-accent text-white' : 'theme-input'}">${isSelected ? '✓' : ''}</span>` : ''}<div class="relative">${getSiteFaviconHtml(s, 'w-9 h-9', 'w-5 h-5')}</div><div class="min-w-0"><div class="flex items-center gap-1.5 min-w-0"><div class="font-black text-base truncate">${esc(s.name)}</div>${renderUnreadDot(s)}</div><div class="text-xs font-mono-code theme-muted truncate">${esc(s.domain)}</div></div></div><div class="flex items-center flex-wrap justify-end gap-1 shrink-0">${!locked ? `<button data-action="toggle-pin" data-id="${s.id}" data-stop="1" title="${t('pinBtn')}" class="key-press w-7 h-7 rounded-md flex items-center justify-center transition ${s.pinned ? 'text-accent bg-accent/15' : 'theme-input opacity-55 hover:opacity-100'}">${s.pinned ? LINE_ICONS.pinFilled : LINE_ICONS.pin}</button>` : ''}${renderPrioStar(s, 'w-7 h-7')}</div></div><div class="flex items-center justify-end flex-wrap gap-1">${renderCatBadges(s)}</div><div class="flex items-center justify-between gap-2"><div class="flex flex-wrap items-center gap-1.5 flex-1 min-w-0">${(s.tags || []).map(tg => `<button type="button" data-action="filter-tag-card" data-tag="${esc(tg)}" data-stop="1" class="text-[11px] font-mono-code theme-muted hover:text-accent transition">${esc(tg)}</button>`).join('')}</div><div class="flex items-stretch gap-2 shrink-0"><button type="button" data-action="show-qr" data-id="${s.id}" data-stop="1" title="QR-код" class="key-press w-11 h-10 rounded-lg theme-input flex items-center justify-center shrink-0 text-accent hover:bg-accent/15 transition">${LINE_ICONS.qr}</button><button data-action="copy-url" data-url="${esc(s.url)}" data-stop="1" title="Копіювати URL" class="key-press w-11 h-10 rounded-lg theme-input flex items-center justify-center shrink-0"><svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="1"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div></div></div><div class="md:col-span-7 md:border-l md:pl-4 space-y-2.5 flex flex-col justify-between" style="border-color: var(--border-main)"><div class="space-y-1.5"><div class="text-base font-bold">${esc(s.title)}</div><p class="text-sm theme-muted leading-relaxed">${esc(s.note)}</p></div><div class="pt-1"><button data-action="open-item" data-id="${s.id}" data-stop="1" ${locked ? 'disabled' : ''} class="w-full py-2.5 px-3 rounded-lg font-extrabold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition ${locked ? 'theme-input opacity-45 cursor-not-allowed' : 'key-press bg-accent text-onaccent'}"><span>${t('openMain')}</span>${locked ? LINE_ICONS.lock : LINE_ICONS.extArrow}</button></div></div></div>`;
                 }).join('');
             } else {
                 cardsEl.className = 'space-y-2';
                 cardsEl.innerHTML = filtered.map(s => {
                     const locked = isItemLocked(s); const isDup = highlightedDuplicateId === s.id; const isSelected = selectedIds.has(s.id);
                     const clickActionAttr = isSelectMode ? `data-action="toggle-card-select" data-id="${s.id}"` : `data-action="open-edit" data-id="${s.id}"`;
-                    return `<div id="card-${s.id}" ${clickActionAttr} class="rounded-xl p-3 theme-card border flex items-center justify-between gap-3 cursor-pointer hover:border-accent transition ${isDup || isSelected ? 'ring-2 ring-accent border-accent' : ''}"><div class="flex items-center gap-2.5 min-w-0 flex-1">${isSelectMode ? `<span class="w-6 h-6 rounded-md border flex items-center justify-center shrink-0 ${isSelected ? 'bg-accent border-accent text-white' : 'theme-input'}">${isSelected ? '✓' : ''}</span>` : ''}<div class="relative">${getSiteFaviconHtml(s, 'w-8 h-8', 'w-5 h-5')}</div><div class="min-w-0 flex-1"><div class="flex items-center gap-1.5 min-w-0"><div class="font-bold text-sm truncate">${esc(s.title)}</div>${renderUnreadDot(s)}</div><div class="flex items-center justify-end flex-wrap gap-1 mt-1">${renderCatBadges(s)}</div><div class="text-xs theme-muted truncate">${esc(s.note)}</div></div></div><div class="flex items-center gap-1.5 shrink-0"><button data-action="toggle-pin" data-id="${s.id}" data-stop="1" title="${t('pinBtn')}" class="key-press w-8 h-8 rounded-lg flex items-center justify-center transition ${s.pinned ? 'text-accent bg-accent/15' : 'theme-input opacity-55 hover:opacity-100'}">${s.pinned ? LINE_ICONS.pinFilled : LINE_ICONS.pin}</button>${renderPrioStar(s, 'w-8 h-8')}<button data-action="open-item" data-id="${s.id}" data-stop="1" ${locked ? 'disabled' : ''} class="w-9 h-9 rounded-lg flex items-center justify-center transition ${locked ? 'theme-input opacity-45 cursor-not-allowed' : 'key-press bg-accent text-onaccent'}">${locked ? LINE_ICONS.lock : LINE_ICONS.extArrow}</button><button data-action="copy-url" data-url="${esc(s.url)}" data-stop="1" class="key-press w-9 h-9 rounded-lg theme-input flex items-center justify-center"><svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="1"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div></div>`;
+                    return `<div id="card-${s.id}" ${clickActionAttr} class="rounded-xl p-3 theme-card border flex items-center justify-between gap-3 cursor-pointer hover:border-accent transition ${isDup || isSelected ? 'ring-2 ring-accent border-accent' : ''}"><div class="flex items-center gap-2.5 min-w-0 flex-1">${isSelectMode ? `<span class="w-6 h-6 rounded-md border flex items-center justify-center shrink-0 ${isSelected ? 'bg-accent border-accent text-white' : 'theme-input'}">${isSelected ? '✓' : ''}</span>` : ''}<div class="relative">${getSiteFaviconHtml(s, 'w-8 h-8', 'w-5 h-5')}</div><div class="min-w-0 flex-1"><div class="flex items-center gap-1.5 min-w-0"><div class="font-bold text-sm truncate">${esc(s.title)}</div>${renderUnreadDot(s)}</div><div class="flex items-center justify-end flex-wrap gap-1 mt-1">${renderCatBadges(s)}</div><div class="text-xs theme-muted truncate">${esc(s.note)}</div></div></div><div class="flex items-center gap-1.5 shrink-0">${!locked ? `<button data-action="toggle-pin" data-id="${s.id}" data-stop="1" title="${t('pinBtn')}" class="key-press w-8 h-8 rounded-lg flex items-center justify-center transition ${s.pinned ? 'text-accent bg-accent/15' : 'theme-input opacity-55 hover:opacity-100'}">${s.pinned ? LINE_ICONS.pinFilled : LINE_ICONS.pin}</button>` : ''}${renderPrioStar(s, 'w-8 h-8')}<button data-action="open-item" data-id="${s.id}" data-stop="1" ${locked ? 'disabled' : ''} class="w-9 h-9 rounded-lg flex items-center justify-center transition ${locked ? 'theme-input opacity-45 cursor-not-allowed' : 'key-press bg-accent text-onaccent'}">${locked ? LINE_ICONS.lock : LINE_ICONS.extArrow}</button><button data-action="copy-url" data-url="${esc(s.url)}" data-stop="1" class="key-press w-9 h-9 rounded-lg theme-input flex items-center justify-center"><svg class="w-4 h-4 mono-icon" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="1"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div></div>`;
                 }).join('');
             }
         }
@@ -4369,7 +4984,7 @@
             const MAX_PULL = 115;
 
             document.addEventListener('touchstart', (e) => {
-                if (refreshing || e.touches.length !== 1) return;
+                if (refreshing || _isPinDragging || e.touches.length !== 1) return;
                 if (isAnyModalOpen()) return;
                 const scTop = window.scrollY || document.documentElement.scrollTop || 0;
                 if (scTop > 2) return;
@@ -4749,6 +5364,8 @@
                         }
                         if (Array.isArray(maybeJson.lockedFolders)) maybeJson.lockedFolders.forEach(f => LOCKED_FOLDERS.add(f));
                         if (Array.isArray(maybeJson.pinnedFolders)) maybeJson.pinnedFolders.forEach(f => PINNED_FOLDERS.add(f));
+                        if (['both', 'title', 'icon'].includes(maybeJson.pinBarMode)) pinBarMode = maybeJson.pinBarMode;
+                        if (Array.isArray(maybeJson.pinOrder)) pinOrder = maybeJson.pinOrder.map(x => Number(x)).filter(x => !Number.isNaN(x));
                         await saveStateToStorage(true);
                         checkAndSaveWeeklyAutoSnapshot(true);
                         _setImportOverlay(false);
@@ -5090,6 +5707,10 @@
             const _prioChanged = Boolean(item.folderPriority) !== Boolean(sheetTempFolderPriority);
             const _savedId = item.id;
             item.lockedOverride = sheetTempLocked; item.folderPriority = sheetTempFolderPriority;
+            if (isItemLocked(item) && item.pinned) {
+                item.pinned = false;
+                pinOrder = pinOrder.filter(x => x !== item.id);
+            }
             saveStateToStorage(); closeEditSheet();
             const cardsEl = document.getElementById('cards-container');
             showToast(t('saved'));
@@ -5808,6 +6429,8 @@
                     else if (bdAction === 'close-tags-sheet') closeTagsSheet();
                     else if (bdAction === 'close-about-sheet') closeAboutSheet();
                     else if (bdAction === 'close-settings-sheet') closeSettingsSheet();
+                    else if (bdAction === 'close-pinbar-sheet') closePinbarSheet();
+                    else if (bdAction === 'close-backup-sheet') closeBackupSheet();
                     else if (bdAction === 'close-ai-sheet') closeAiSheet();
                     else if (bdAction === 'close-edit-sheet') closeEditSheet();
                     else if (bdAction === 'close-domain-links-sheet') closeDomainLinksSheet();
@@ -5848,6 +6471,14 @@
                         } else {
                             toggleSelectMode();
                         }
+                        break;
+                    }
+                    case 'open-pinbar-sheet': openPinbarSheet(); break;
+                    case 'close-pinbar-sheet': closePinbarSheet(); break;
+                    case 'set-pinbar-mode': setPinBarMode(actionEl.dataset.mode); break;
+                    case 'open-pin-item': {
+                        if (Date.now() < _suppressPinClickUntil || _isPinDragging) break;
+                        openItemById(Number(actionEl.dataset.id), e);
                         break;
                     }
                     case 'open-backup-sheet': openBackupSheet(); break;
@@ -6006,8 +6637,11 @@
             attachSidebarSwipe(); attachSidebarOpenSwipe();
             attachSheetDrag('cats-drag-handle', 'cats-sheet-panel', closeCategoriesSheet);
             attachSheetDrag('tags-drag-handle', 'tags-sheet-panel', closeTagsSheet);
+            setPinBarMode(pinBarMode || 'both', false);
             attachSheetDrag('settings-drag-handle', 'settings-sheet-panel', closeSettingsSheet);
+            attachSheetDrag('pinbar-drag-handle', 'pinbar-sheet-panel', closePinbarSheet);
             attachSheetDrag('backup-drag-handle', 'backup-sheet-panel', closeBackupSheet);
+            attachPinBarDragAndDrop();
             attachSheetDrag('about-drag-handle', 'about-sheet-panel', closeAboutSheet);
             attachSheetDrag('ai-drag-handle', 'ai-sheet-panel', closeAiSheet);
             attachSheetDrag('edit-drag-handle', 'edit-sheet-panel', closeEditSheet);
