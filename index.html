@@ -2438,6 +2438,7 @@
             let startX = 0, startY = 0, dx = 0, tracking = false, dragging = null, sbW = 320;
             function blocked(target) {
                 if (_isPinDragging || isMobileSidebarOpen || document.querySelector('.sheet-backdrop.open')) return true;
+                if (target instanceof Element && target.closest('#pinned-bar-wrapper, #pin-action-dock')) return true;
                 for (let el = target; el && el !== document.body; el = el.parentElement) {
                     if (!(el instanceof HTMLElement)) continue;
                     if (/^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName)) return true;
@@ -2450,6 +2451,7 @@
             }, { passive: true });
             document.addEventListener('touchmove', (e) => {
                 if (!tracking) return;
+                if (_isPinDragging) { tracking = false; dragging = null; return; }
                 const mx = e.touches[0].clientX - startX; const my = e.touches[0].clientY - startY;
                 if (dragging === null) {
                     if (Math.abs(mx) < 10 && Math.abs(my) < 10) return;
@@ -4990,6 +4992,7 @@
                 if (scTop > 2) return;
                 const target = e.target;
                 if (target instanceof HTMLElement && /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName)) return;
+                if (target instanceof Element && target.closest('#pinned-bar-wrapper, #pin-action-dock')) return;
 
                 startY = e.touches[0].clientY;
                 startX = e.touches[0].clientX;
@@ -5000,6 +5003,7 @@
 
             document.addEventListener('touchmove', (e) => {
                 if (!pulling || refreshing) return;
+                if (_isPinDragging) { pulling = false; pullDist = 0; return; }
                 const scTop = window.scrollY || document.documentElement.scrollTop || 0;
                 if (scTop > 2) {
                     pulling = false;
