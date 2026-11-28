@@ -1594,7 +1594,7 @@
             <div class="space-y-2">
                 <div class="text-[11px] font-mono-code font-bold uppercase theme-muted px-1">Поточний режим</div>
                 <div class="theme-card border rounded-2xl p-4 space-y-1.5 shadow-xs">
-                    <div id="ai-mode-badge" class="text-sm font-extrabold text-accent"></div>
+                    <div id="ai-mode-badge" class="text-sm font-extrabold"></div>
                     <p class="text-xs theme-muted leading-snug">Автоматично підбирає папки за сайтом і вчиться на твоїх правках. За бажанням можна підключити ШІ — до нього йде лише заголовок сторінки.</p>
                 </div>
             </div>
@@ -3250,7 +3250,7 @@
             const aiSub = document.getElementById('settings-ai-status-sub');
             if (aiSub) {
                 const cfg = getAiConfig();
-                aiSub.textContent = cfg ? ('✨ Працює ШІ: ' + AI_PROVIDERS[cfg.provider].label.replace(/ \(.*/, '')) : 'Автосортування (без ключа)';
+                aiSub.textContent = cfg ? ('Працює ШІ: ' + AI_PROVIDERS[cfg.provider].label.replace(/ \(.*/, '')) : 'Автосортування (без ключа)';
             }
         }
 
@@ -4653,8 +4653,8 @@
         function renderAiBadge() {
             const cfg = getAiConfig(); const b = _aiEl('ai-mode-badge'); if (!b) return;
             b.textContent = cfg
-                ? ('✨ Активний ШІ: ' + AI_PROVIDERS[cfg.provider].label.replace(/ \(.*/, ''))
-                : '⚙️ Зараз працює: Автосортування (без ключа)';
+                ? ('Активний ШІ: ' + AI_PROVIDERS[cfg.provider].label.replace(/ \(.*/, ''))
+                : 'Зараз працює: Автосортування (без ключа)';
         }
         function openAiSheet() {
             _pushModalState(); _hideSidebar();
